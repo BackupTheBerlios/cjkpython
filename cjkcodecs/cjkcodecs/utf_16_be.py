@@ -1,4 +1,6 @@
-# gencodes: generates python-part codecs.
+# ACHTUNG: This file is generated automatically. Please do not edit.
+#
+# utf_16_be.py: Python Unicode Codec for UTF_16_BE
 #
 # Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
 # All rights reserved.
@@ -25,30 +27,34 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: gencodecs.py,v 1.7 2004/08/07 08:12:31 perky Exp $
+# $Id: utf_16_be.py,v 1.1 2004/08/07 08:12:31 perky Exp $
 #
 
-codecs = {
-    'cn': ('gb2312', 'gbk', 'gb18030', 'hz'),
-    'tw': ('big5', 'cp950', 'euc_tw'),
-    'hk': ('big5hkscs',),
-    'jp': ('cp932', 'shift_jis', 'euc_jp', 'euc_jisx0213', 'shift_jisx0213',
-           'euc_jis_2004', 'shift_jis_2004'),
-    'kr': ('cp949', 'euc_kr', 'johab'),
-    'iso2022': ('iso2022_cn', 'iso2022_jp', 'iso2022_jp_1', 'iso2022_jp_2',
-                'iso2022_jp_2004', 'iso2022_jp_3', 'iso2022_jp_ext',
-                'iso2022_kr'),
-    'unicode': ('utf_7', 'utf_8', 'utf_16', 'utf_16_be', 'utf_16_le'),
-}
-TEMPLATE = 'xxcodec.py.in'
+from cjkcodecs import _codecs_unicode
+import codecs
 
-tmpl = open(TEMPLATE).read()
-for loc, encodings in codecs.iteritems():
-    for enc in encodings:
-        code = tmpl.replace('%%encoding%%', enc) \
-                .replace('%%ENCODING%%', enc.upper()) \
-                .replace('%%locality%%', loc) \
-                .replace('%%__%%',
-                    'ACHTUNG: This file is generated automatically. '
-                    'Please do not edit.')
-        open(enc + '.py', 'w').write(code)
+codec = _codecs_unicode.getcodec('utf_16_be')
+
+class Codec(codecs.Codec):
+    encode = codec.encode
+    decode = codec.decode
+
+class StreamReader(Codec, codecs.StreamReader):
+    def __init__(self, stream, errors='strict'):
+        codecs.StreamReader.__init__(self, stream, errors)
+        __codec = codec.StreamReader(stream, errors)
+        self.read = __codec.read
+        self.readline = __codec.readline
+        self.readlines = __codec.readlines
+        self.reset = __codec.reset
+
+class StreamWriter(Codec, codecs.StreamWriter):
+    def __init__(self, stream, errors='strict'):
+        codecs.StreamWriter.__init__(self, stream, errors)
+        __codec = codec.StreamWriter(stream, errors)
+        self.write = __codec.write
+        self.writelines = __codec.writelines
+        self.reset = __codec.reset
+
+def getregentry():
+    return (codec.encode, codec.decode, StreamReader, StreamWriter)

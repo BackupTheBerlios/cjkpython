@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_unicode.c,v 1.5 2004/06/27 21:41:15 perky Exp $
+ * $Id: _codecs_unicode.c,v 1.6 2004/08/07 08:12:31 perky Exp $
  */
 
 #include "cjkcodecs.h"
@@ -573,12 +573,231 @@ DECODER(utf_8)
 }
 
 
+#define UTF16_ENCODE_PREAMBLE					\
+	while (inleft > 0) {					\
+		Py_UNICODE c = IN1;				\
+		ucs2_t uc;					\
+		unsigned char *ucdata = (unsigned char *)&uc;
+
+#define UTF16_ENCODE_BODY		\
+		_UTF16_ENCODE_UCS4	\
+		REQUIRE_OUTBUF(2)	\
+		uc = c;			\
+		OUT1(ucdata[BYTE0])	\
+		OUT2(ucdata[BYTE1])	\
+		NEXT(1, 2)		\
+	}				\
+	return 0;
+
+#if Py_UNICODE_SIZE == 4
+# define _UTF16_ENCODE_UCS4					\
+	if (c > 0xffff) {					\
+		if (c > 0x10ffff)				\
+			return 1;				\
+		REQUIRE_OUTBUF(4)				\
+		uc = 0xd800 + (((c) - 0x10000) >> 10);		\
+		OUT1(ucdata[BYTE0])				\
+		OUT2(ucdata[BYTE1])				\
+		uc = 0xdc00 + (((c) - 0x10000) & 0x3ff);	\
+		OUT3(ucdata[BYTE0])				\
+		OUT4(ucdata[BYTE1])				\
+		NEXT(1, 4)					\
+		continue;					\
+	}
+#else
+# define _UTF16_ENCODE_UCS4
+#endif
+
+
+#define UTF16_DECODE_PREAMBLE					\
+	while (inleft > 0) {					\
+		ucs2_t uc;					\
+		unsigned char *c = (unsigned char *)&uc;	\
+		REQUIRE_INBUF(2)				\
+
+#define UTF16_DECODE_BODY					\
+		REQUIRE_OUTBUF(1)				\
+		UTF16_DECGET(c, IN1, IN2)			\
+		UTF16_DECODE_UCS4				\
+		OUT1(uc)					\
+		NEXT(2, 1)					\
+	}							\
+	return 0;
+
+#if Py_UNICODE_SIZE == 4
+# define UTF16_DECODE_UCS4					\
+	if (uc >> 10 == 0xd800 >> 10) {				\
+		ucs2_t uc2;					\
+		unsigned char *c2 = (unsigned char *)&uc2;	\
+								\
+		REQUIRE_INBUF(4)				\
+		UTF16_DECGET(c2, IN3, IN4)			\
+		if (uc2 >> 10 != 0xdc00 >> 10)			\
+			return 4;				\
+		OUT1(0x10000 + ((ucs4_t)(uc - 0xd800) << 10) +	\
+		     (uc2 - 0xdc00))				\
+		NEXT(4, 1)					\
+		continue;					\
+	}
+#else
+# define UTF16_DECODE_UCS4
+#endif
+
+/*
+ * UTF-16 codec
+ */
+
+#ifdef WORDS_BIGENDIAN
+# define UTF16_NATIVE 1
+#else
+# define UTF16_NATIVE -1
+#endif
+
+#define BYTE0 0
+#define BYTE1 1
+
+#define UTF16_DECGET(assi, b1, b2)			\
+	if (state->i == UTF16_NATIVE)			\
+		(assi)[0] = (b1), (assi)[1] = (b2);	\
+	else						\
+		(assi)[1] = (b1), (assi)[0] = (b2);	\
+
+ENCODER_INIT(utf_16)
+{
+	state->i = 1; /* indicates "the beginning of stream" */
+	return 0;
+}
+
+ENCODER_RESET(utf_16)
+{
+	return 0;
+}
+
+ENCODER(utf_16)
+{
+	UTF16_ENCODE_PREAMBLE
+	if (state->i) { /* BOM */
+		state->i = 0;
+		uc = 0xfeff;
+		WRITE2(ucdata[0], ucdata[1])
+		NEXT_OUT(2)
+	}
+	UTF16_ENCODE_BODY
+}
+
+DECODER_INIT(utf_16)
+{
+	state->i = 0; /* -1: little 0: (the beginning of stream) 1: big */
+	return 0;
+}
+
+DECODER_RESET(utf_16)
+{
+	return 0;
+}
+
+DECODER(utf_16)
+{
+	UTF16_DECODE_PREAMBLE
+	if (state->i == 0) {
+		if (IN1 == 0xff && IN2 == 0xfe) {
+			state->i = -1;
+			NEXT_IN(2)
+			continue;
+		}
+		else if (IN1 == 0xfe && IN2 == 0xff) {
+			state->i = 1;
+			NEXT_IN(2)
+			continue;
+		}
+		else {	/* set as native byte order and don't
+			 * interpret any more BOMs
+			 * (RFC2781 Page 4) */
+			state->i = UTF16_NATIVE;
+		}
+	}
+	UTF16_DECODE_BODY
+}
+
+#undef BYTE0
+#undef BYTE1
+#undef UTF16_DECGET
+
+
+/*
+ * UTF-16BE codec
+ */
+
+#ifdef WORDS_BIGENDIAN
+# define BYTE0  0
+# define BYTE1  1
+#else
+# define BYTE0  1
+# define BYTE1  0
+#endif
+
+#define UTF16_DECGET(assi, b1, b2)	\
+	(assi)[BYTE0] = (b1);		\
+	(assi)[BYTE1] = (b2);
+
+ENCODER(utf_16_be)
+{
+	UTF16_ENCODE_PREAMBLE
+	UTF16_ENCODE_BODY
+}
+
+DECODER(utf_16_be)
+{
+	UTF16_DECODE_PREAMBLE
+	UTF16_DECODE_BODY
+}
+
+#undef BYTE0
+#undef BYTE1
+#undef UTF16_DECGET
+
+
+/*
+ * UTF-16LE codec
+ */
+
+#ifdef WORDS_BIGENDIAN
+# define BYTE0  1
+# define BYTE1  0
+#else
+# define BYTE0  0
+# define BYTE1  1
+#endif
+
+#define UTF16_DECGET(assi, b1, b2)	\
+	(assi)[BYTE0] = (b1);		\
+	(assi)[BYTE1] = (b2);
+
+ENCODER(utf_16_le)
+{
+	UTF16_ENCODE_PREAMBLE
+	UTF16_ENCODE_BODY
+}
+
+DECODER(utf_16_le)
+{
+	UTF16_DECODE_PREAMBLE
+	UTF16_DECODE_BODY
+}
+
+#undef BYTE0
+#undef BYTE1
+#undef UTF16_DECGET
+
 BEGIN_MAPPINGS_LIST
 END_MAPPINGS_LIST
 
 BEGIN_CODECS_LIST
   CODEC_STATEFUL(utf_7)
   CODEC_STATELESS(utf_8)
+  CODEC_STATEFUL(utf_16) /* not so stateful, but for implementation */
+  CODEC_STATELESS(utf_16_be)
+  CODEC_STATELESS(utf_16_le)
 END_CODECS_LIST
 
 I_AM_A_MODULE_FOR(unicode)

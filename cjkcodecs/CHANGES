@@ -6,6 +6,8 @@ Changes with CJKCodecs 1.1
   *) Fixed standard C compiler errors and warnings for MSVC 7.1
      compilation. (Merged fixes by Tim Peters from Python trunk)
 
+  *) UTF-16 codecs are added again.
+
 
 Changes with CJKCodecs 1.1b1
 
