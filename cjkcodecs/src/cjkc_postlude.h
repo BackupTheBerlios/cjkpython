@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_postlude.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: cjkc_postlude.h,v 1.2 2004/06/19 07:04:30 perky Exp $
  */
 
 #ifndef _CJKC_POSTLUDE_H_
@@ -85,7 +85,11 @@ getcodec(PyObject *self, PyObject *encoding)
 	if (codecobj == NULL)
 		return NULL;
 
+#if PY_VERSION_HEX >= 0x02020000
 	r = PyObject_CallFunctionObjArgs(cofunc, codecobj, NULL);
+#else
+	r = PyObject_CallFunction(cofunc, "O", codecobj);
+#endif
 	Py_DECREF(codecobj);
 
 	return r;
