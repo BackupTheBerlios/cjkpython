@@ -25,7 +25,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.2 2003/11/27 09:18:05 perky Exp $
+# $Id: setup.py,v 1.3 2003/11/29 23:54:32 perky Exp $
 #
 
 import sys
@@ -78,7 +78,7 @@ class Install(install):
             org_install_lib or self.install_purelib
 
 setup (name = "iconvcodec",
-       version = "1.1.1",
+       version = "1.1.2",
        author = "Hye-Shik Chang",
        author_email = "perky@FreeBSD.org",
        cmdclass = {'install': Install},
