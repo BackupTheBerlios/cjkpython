@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.20 2004/08/07 08:14:09 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.21 2004/08/11 22:07:27 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -141,7 +141,7 @@ struct iso2022_designation {
 
 struct iso2022_config {
 	int flags;
-	const struct iso2022_designation designations[]; /* non-ascii desigs */
+	const struct iso2022_designation *designations; /* non-ascii desigs */
 };
 
 /*-*- iso-2022 codec implementation -*-*/
@@ -1169,57 +1169,59 @@ dummy_encoder(const ucs4_t *data, int *length)
 #define REGISTRY_ISO8859_7	{ CHARSET_ISO8859_7, 2, 1,		\
 				  NULL, dummy_decoder, dummy_encoder }
 #define REGISTRY_SENTINEL	{ 0, }
+#define CONFIGDEF(var, attrs)						\
+	static const struct iso2022_config iso2022_##var##_config = {	\
+		attrs, iso2022_##var##_designations			\
+	};
 
-static const struct iso2022_config iso2022_kr_config = {
-	0,
-	{ REGISTRY_KSX1001, REGISTRY_SENTINEL },
+static const struct iso2022_designation iso2022_kr_designations[] = {
+	REGISTRY_KSX1001, REGISTRY_SENTINEL
 };
+CONFIGDEF(kr, 0)
 
-static const struct iso2022_config iso2022_jp_config = {
-	NO_SHIFT | USE_JISX0208_EXT,
-	{ REGISTRY_JISX0208, REGISTRY_JISX0201_R, REGISTRY_JISX0208_O,
-	  REGISTRY_SENTINEL },
+static const struct iso2022_designation iso2022_jp_designations[] = {
+	REGISTRY_JISX0208, REGISTRY_JISX0201_R, REGISTRY_JISX0208_O,
+	REGISTRY_SENTINEL
 };
+CONFIGDEF(jp, NO_SHIFT | USE_JISX0208_EXT)
 
-static const struct iso2022_config iso2022_jp_1_config = {
-	NO_SHIFT | USE_JISX0208_EXT,
-	{ REGISTRY_JISX0208, REGISTRY_JISX0212, REGISTRY_JISX0201_R,
-	  REGISTRY_JISX0208_O, REGISTRY_SENTINEL },
+static const struct iso2022_designation iso2022_jp_1_designations[] = {
+	REGISTRY_JISX0208, REGISTRY_JISX0212, REGISTRY_JISX0201_R,
+	REGISTRY_JISX0208_O, REGISTRY_SENTINEL
 };
+CONFIGDEF(jp_1, NO_SHIFT | USE_JISX0208_EXT)
 
-static const struct iso2022_config iso2022_jp_2_config = {
-	NO_SHIFT | USE_G2 | USE_JISX0208_EXT,
-	{ REGISTRY_JISX0208, REGISTRY_JISX0212, REGISTRY_KSX1001,
-	  REGISTRY_GB2312, REGISTRY_JISX0201_R, REGISTRY_JISX0208_O,
-	  REGISTRY_ISO8859_1, REGISTRY_ISO8859_7, REGISTRY_SENTINEL },
+static const struct iso2022_designation iso2022_jp_2_designations[] = {
+	REGISTRY_JISX0208, REGISTRY_JISX0212, REGISTRY_KSX1001,
+	REGISTRY_GB2312, REGISTRY_JISX0201_R, REGISTRY_JISX0208_O,
+	REGISTRY_ISO8859_1, REGISTRY_ISO8859_7, REGISTRY_SENTINEL
 };
+CONFIGDEF(jp_2, NO_SHIFT | USE_G2 | USE_JISX0208_EXT)
 
-static const struct iso2022_config iso2022_jp_2004_config = {
-	NO_SHIFT | USE_G2 | USE_JISX0208_EXT,
-	{ REGISTRY_JISX0213_2004_1_PAIRONLY, REGISTRY_JISX0208,
-	  REGISTRY_JISX0213_2004_1, REGISTRY_JISX0213_2004_2,
-	  REGISTRY_SENTINEL },
+static const struct iso2022_designation iso2022_jp_2004_designations[] = {
+	REGISTRY_JISX0213_2004_1_PAIRONLY, REGISTRY_JISX0208,
+	REGISTRY_JISX0213_2004_1, REGISTRY_JISX0213_2004_2, REGISTRY_SENTINEL
 };
+CONFIGDEF(jp_2004, NO_SHIFT | USE_JISX0208_EXT)
 
-static const struct iso2022_config iso2022_jp_3_config = {
-	NO_SHIFT | USE_JISX0208_EXT,
-	{ REGISTRY_JISX0213_2000_1_PAIRONLY, REGISTRY_JISX0208,
-	  REGISTRY_JISX0213_2000_1, REGISTRY_JISX0213_2000_2,
-	  REGISTRY_SENTINEL },
+static const struct iso2022_designation iso2022_jp_3_designations[] = {
+	REGISTRY_JISX0213_2000_1_PAIRONLY, REGISTRY_JISX0208,
+	REGISTRY_JISX0213_2000_1, REGISTRY_JISX0213_2000_2, REGISTRY_SENTINEL
 };
+CONFIGDEF(jp_3, NO_SHIFT | USE_JISX0208_EXT)
 
-static const struct iso2022_config iso2022_jp_ext_config = {
-	NO_SHIFT | USE_JISX0208_EXT,
-	{ REGISTRY_JISX0208, REGISTRY_JISX0212, REGISTRY_JISX0201_R,
-	  REGISTRY_JISX0201_K, REGISTRY_JISX0208_O, REGISTRY_SENTINEL },
+static const struct iso2022_designation iso2022_jp_ext_designations[] = {
+	REGISTRY_JISX0208, REGISTRY_JISX0212, REGISTRY_JISX0201_R,
+	REGISTRY_JISX0201_K, REGISTRY_JISX0208_O, REGISTRY_SENTINEL
 };
+CONFIGDEF(jp_ext, NO_SHIFT | USE_JISX0208_EXT)
 
 #ifndef NO_EXTRA_ENCODINGS
-static const struct iso2022_config iso2022_cn_config = {
-	NO_SHIFT | USE_G2,
-	{ REGISTRY_GB2312, REGISTRY_CNS11643_1, REGISTRY_CNS11643_2,
-	  REGISTRY_SENTINEL },
+static const struct iso2022_designation iso2022_cn_designations[] = {
+	REGISTRY_GB2312, REGISTRY_CNS11643_1, REGISTRY_CNS11643_2,
+	REGISTRY_SENTINEL
 };
+CONFIGDEF(cn, NO_SHIFT | USE_G2)
 #endif
 
 BEGIN_MAPPINGS_LIST

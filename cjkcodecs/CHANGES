@@ -1,3 +1,9 @@
+Changes with CJKCodecs 1.1.1
+
+  *) Converted codes in C99 grammar to legacy C code for HP-UX cc
+     and old versions of gcc.
+
+
 Changes with CJKCodecs 1.1
 
   *) Fixed a bug that BIG5HKSCS codec can't encode correctly
