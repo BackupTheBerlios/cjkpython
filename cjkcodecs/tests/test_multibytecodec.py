@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_multibytecodec.py,v 1.1 2003/09/24 17:47:05 perky Exp $
+# $Id: test_multibytecodec.py,v 1.2 2003/09/24 17:55:27 perky Exp $
 #
 
 from test import test_support
@@ -83,6 +83,11 @@ class Test_StreamWriter(unittest.TestCase):
 
     else: # UCS4
         pass
+
+    def test_nullcoding(self):
+        self.assertEqual(''.decode('cjkcodecs.utf-8'), u'')
+        self.assertEqual(unicode('', 'cjkcodecs.utf-8'), u'')
+        self.assertEqual(u''.encode('cjkcodecs.utf-8'), '')
 
 def test_main():
     suite = unittest.TestSuite()
