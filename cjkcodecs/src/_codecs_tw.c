@@ -1,5 +1,5 @@
 /*
- * mapdata_zh_CN.c: Map Provider for Simplified Chinese Encodings
+ * _codecs_tw.c: Codecs collection for Taiwan's encodings
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,47 +26,27 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: mapdata_zh_CN.c,v 1.3 2004/01/17 11:26:10 perky Exp $
+ * $Id: _codecs_tw.c,v 1.1 2004/06/17 18:31:20 perky Exp $
  */
 
-#include "Python.h"
-#include "../cjkcommon.h"
-#include "map_gb2312.h"
-#include "map_gbkext.h"
-#include "map_gbcommon.h"
-#include "map_gb18030ext.h"
+#include "cjkc_prelude.h"
+#include "maps/map_big5.h"
+#include "maps/map_cp950ext.h"
 
-static struct dbcs_map mapholders[] = {
-    {"gb2312",      NULL,               gb2312_decmap},
-    {"gbkext",      NULL,               gbkext_decmap},
-    {"gbcommon",    gbcommon_encmap,    NULL},
-    {"gb18030ext",  gb18030ext_encmap,  gb18030ext_decmap},
-    {"",            NULL,               NULL},
-};
+#include "cjkc_interlude.h"
+#include "codecimpl_big5.h"
+#include "codecimpl_cp950.h"
 
-static struct PyMethodDef __methods[] = {
-    {NULL, NULL},
-};
+BEGIN_MAPPING_LIST
+  MAPPING_ENCDEC(big5)
+  MAPPING_ENCDEC(cp950ext)
+END_MAPPING_LIST
 
-void
-init_codecs_mapdata_zh_CN(void)
-{
-    struct dbcs_map     *h;
-    PyObject            *m;
+BEGIN_CODEC_LIST
+  CODEC_STATELESS(big5)
+  CODEC_STATELESS(cp950)
+END_CODEC_LIST
 
-    m = Py_InitModule("_codecs_mapdata_zh_CN", __methods);
+#include "cjkc_postlude.h"
 
-    for (h = mapholders; h->charset[0] != '\0'; h++) {
-        char     mhname[256] = "__map_";
-
-        strcpy(mhname + sizeof("__map_") - 1, h->charset);
-        PyModule_AddObject(m, mhname, PyCObject_FromVoidPtr(h, NULL));
-    }
-
-    if (PyErr_Occurred())
-        Py_FatalError("can't initialize the _codecs_mapdata_zh_CN module");
-}
-
-/*
- * ex: ts=8 sts=4 et
- */
+I_AM_A_MODULE_FOR(tw)

@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_tchinese.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+# $Id: genmap_tchinese.py,v 1.3 2004/06/17 18:31:21 perky Exp $
 #
 
 from genmap_support import *
@@ -102,27 +102,27 @@ omap = open('map_big5.h', 'w')
 printcopyright(omap)
 
 print "Generating BIG5 decode map..."
-codebunch = []
-genmap_decode(codebunch, "big5", BIG5_C1, BIG5_C2, big5decmap)
-print_decmap(omap, codebunch, "big5", big5decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "big5", BIG5_C1, BIG5_C2, big5decmap)
+print_decmap(omap, filler, "big5", big5decmap)
 
 print "Generating BIG5 encode map..."
-codebunch = []
-genmap_encode(codebunch, "big5", big5encmap)
-print_encmap(omap, codebunch, "big5", big5encmap)
+filler = BufferedFiller()
+genmap_encode(filler, "big5", big5encmap)
+print_encmap(omap, filler, "big5", big5encmap)
 
 omap = open('map_cp950ext.h', 'w')
 printcopyright(omap)
 
 print "Generating CP950 extension decode map..."
-codebunch = []
-genmap_decode(codebunch, "cp950ext", BIG5_C1, BIG5_C2, cp950decmap)
-print_decmap(omap, codebunch, "cp950ext", cp950decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "cp950ext", BIG5_C1, BIG5_C2, cp950decmap)
+print_decmap(omap, filler, "cp950ext", cp950decmap)
 
 print "Generating CP950 extension encode map..."
-codebunch = []
-genmap_encode(codebunch, "cp950ext", cp950encmap)
-print_encmap(omap, codebunch, "cp950ext", cp950encmap)
+filler = BufferedFiller()
+genmap_encode(filler, "cp950ext", cp950encmap)
+print_encmap(omap, filler, "cp950ext", cp950encmap)
 
 print "\nDone!"
 # ex: ts=8 sts=4 et

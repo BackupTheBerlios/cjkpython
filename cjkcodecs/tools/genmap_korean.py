@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_korean.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+# $Id: genmap_korean.py,v 1.3 2004/06/17 18:31:21 perky Exp $
 #
 
 from genmap_support import *
@@ -66,26 +66,26 @@ omap = open('map_ksx1001.h', 'w')
 printcopyright(omap)
 
 print "Generating KS X 1001 decode map..."
-codebunch = []
-genmap_decode(codebunch, "ksx1001", KSX1001_C1, KSX1001_C2, ksx1001decmap)
-print_decmap(omap, codebunch, "ksx1001", ksx1001decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "ksx1001", KSX1001_C1, KSX1001_C2, ksx1001decmap)
+print_decmap(omap, filler, "ksx1001", ksx1001decmap)
 
 omap = open('map_cp949ext.h', 'w')
 printcopyright(omap)
 
 print "Generating UHC decode map..."
-codebunch = []
-genmap_decode(codebunch, "cp949ext", UHCL1_C1, UHCL1_C2, uhcdecmap)
-genmap_decode(codebunch, "cp949ext", UHCL2_C1, UHCL2_C2, uhcdecmap)
-print_decmap(omap, codebunch, "cp949ext", uhcdecmap)
+filler = BufferedFiller()
+genmap_decode(filler, "cp949ext", UHCL1_C1, UHCL1_C2, uhcdecmap)
+genmap_decode(filler, "cp949ext", UHCL2_C1, UHCL2_C2, uhcdecmap)
+print_decmap(omap, filler, "cp949ext", uhcdecmap)
 
 omap = open('map_cp949.h', 'w')
 printcopyright(omap)
 
 print "Generating CP949 (includes KS X 1001) encode map..."
-codebunch =[]
-genmap_encode(codebunch, "cp949", cp949encmap)
-print_encmap(omap, codebunch, "cp949", cp949encmap)
+filler = BufferedFiller()
+genmap_encode(filler, "cp949", cp949encmap)
+print_encmap(omap, filler, "cp949", cp949encmap)
 
 print "\nDone!"
 # ex: ts=8 sts=4 et

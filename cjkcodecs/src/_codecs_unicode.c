@@ -1,5 +1,5 @@
 /*
- * cjkcommon.h: Common Constants and Macroes for CJK Character Sets
+ * _codecs_unicode.c: Codecs collection for Unicode encodings
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,60 +26,22 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkcommon.h,v 1.2 2003/12/31 05:46:55 perky Exp $
+ * $Id: _codecs_unicode.c,v 1.1 2004/06/17 18:31:20 perky Exp $
  */
 
-#ifndef _CJKCOMMON_H_
-#define _CJKCOMMON_H_
+#include "cjkc_prelude.h"
+#include "cjkc_interlude.h"
+#include "codecimpl_utf_7.h"
+#include "codecimpl_utf_8.h"
 
-#ifdef uint32_t
-typedef uint32_t ucs4_t;
-#else
-typedef unsigned int ucs4_t;
-#endif
+BEGIN_MAPPING_LIST
+END_MAPPING_LIST
 
-#ifdef uint16_t
-typedef uint16_t ucs2_t, DBCHAR;
-#else
-typedef unsigned short ucs2_t, DBCHAR;
-#endif
+BEGIN_CODEC_LIST
+  CODEC_STATEFUL(utf_7)
+  CODEC_STATELESS(utf_8)
+END_CODEC_LIST
 
-#define UNIINV  Py_UNICODE_REPLACEMENT_CHARACTER
-#define NOCHAR  0xFFFF
-#define MULTIC  0xFFFE
-#define DBCINV  0xFFFD
+#include "cjkc_postlude.h"
 
-struct dbcs_index {
-    const ucs2_t   *map;
-    unsigned char   bottom, top;
-};
-typedef struct dbcs_index decode_map;
-
-struct widedbcs_index {
-    const ucs4_t   *map;
-    unsigned char   bottom, top;
-};
-typedef struct widedbcs_index widedecode_map;
-
-struct unim_index {
-    const DBCHAR   *map;
-    unsigned char   bottom, top;
-};
-typedef struct unim_index encode_map;
-
-struct dbcs_map {
-    const char *charset;
-    const struct unim_index *encmap;
-    const struct dbcs_index *decmap;
-};
-
-struct pair_encodemap {
-    ucs4_t   uniseq;
-    DBCHAR   code;
-};
-
-#endif
-
-/*
- * ex: ts=8 sts=4 et
- */
+I_AM_A_MODULE_FOR(unicode)

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.h,v 1.2 2003/12/31 05:46:55 perky Exp $
+ * $Id: multibytecodec.h,v 1.3 2004/06/17 18:31:20 perky Exp $
  */
 
 #ifndef _PYTHON_MULTIBYTECODEC_H_
@@ -35,7 +35,17 @@
 extern "C" {
 #endif
 
-#include "cjkcommon.h"
+#ifdef uint32_t
+typedef uint32_t ucs4_t;
+#else
+typedef unsigned int ucs4_t;
+#endif
+
+#ifdef uint16_t
+typedef uint16_t ucs2_t, DBCHAR;
+#else
+typedef unsigned short ucs2_t, DBCHAR;
+#endif
 
 typedef union {
     void            *p;

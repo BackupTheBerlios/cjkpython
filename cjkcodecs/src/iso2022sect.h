@@ -1,5 +1,5 @@
 /*
- * iso2022common.h: Common Codec Routines for ISO-2022 codecs.
+ * iso2022sect.h: Common Codec Routines for ISO-2022 codecs.
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,11 +26,14 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022common.h,v 1.9 2004/03/10 07:44:09 perky Exp $
+ * $Id: iso2022sect.h,v 1.1 2004/06/17 18:31:20 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
  * rather than RFCs itself */
+
+#ifndef _ISO2022COMMON_H_ONCE_
+#define _ISO2022COMMON_H_ONCE_
 
 #define ESC     0x1b
 #define SO      0x0e
@@ -112,6 +115,25 @@
     else /* G1 */                                                   \
         (charset) = STATE_GETG0(state);                             \
 
+#endif /* def _ISO2022COMMON_H_ONCE_ */
+
+/* -*-*-*- */
+
+#ifdef _ISO2022_TOGGLED_ON_
+/* this section undefines all iso-2022 related macros and functions */
+#undef _ISO2022_TOGGLED_ON_
+#undef ISO2022_DESIGNATIONS
+#undef ISO2022_USE_G2_DESIGNATION
+#undef ISO2022_USE_JISX0208EXT
+#undef ISO2022_NO_SHIFT
+#undef SHIFT_CASES
+#undef SS2_ROUTINE
+#undef ISO2022_BASECASES
+#undef ISO2022_ESCTHROUGHOUT
+#undef ISO2022_LOOP_BEGIN
+#undef ISO2022_LOOP_END
+#else /* !_ISO2022_TOGGLED_ON_ */
+#define _ISO2022_TOGGLED_ON_
 #ifdef ISO2022_USE_G2_DESIGNATION
 /* hardcoded for iso-2022-jp-2 for now. we'll need to generalize it
    when we have more G2 designating encodings */
@@ -278,7 +300,8 @@ iso2022processesc(MultibyteCodec_State *state,
     (*inbuf) += esclen;
     return 0;
 }
+#endif /* _ISO2022_TOGGLED_ON_ */
 
 /*
- * ex: ts=8 sts=4 et
+ * ex: ts=8 sts=4 sw=4 et
  */

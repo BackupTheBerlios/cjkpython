@@ -26,21 +26,51 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_support.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+# $Id: genmap_support.py,v 1.3 2004/06/17 18:31:21 perky Exp $
 #
 
 import re
 
 COPYRIGHT_HEADER = """\
 /*
- * $Id: genmap_support.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+ * $Id: genmap_support.py,v 1.3 2004/06/17 18:31:21 perky Exp $
  */
 """
+
+class BufferedFiller:
+    def __init__(self, column=78):
+        self.column = column
+        self.buffered = []
+        self.cline = []
+        self.clen = 0
+        self.count = 0
+    def write(self, *data):
+        for s in data:
+            if len(s) > self.column:
+                raise ValueError, "token is too long"
+            if len(s) + self.clen > self.column:
+                self.flush()
+            self.clen += len(s)
+            self.cline.append(s)
+            self.count += 1
+    def flush(self):
+        if not self.cline:
+            return
+        self.buffered.append(''.join(self.cline))
+        self.clen = 0
+        del self.cline[:]
+    def printout(self, fp):
+        self.flush()
+        for l in self.buffered:
+            print >> fp, l
+        del self.buffered[:]
+    def __len__(self):
+        return self.count
 
 def printcopyright(fo):
     print >> fo, COPYRIGHT_HEADER
 
-def genmap_encode(codebunch, prefix, emap):
+def genmap_encode(filler, prefix, emap):
     for c1 in range(0, 256):
         if not emap.has_key(c1):
             continue
@@ -53,26 +83,22 @@ def genmap_encode(codebunch, prefix, emap):
         c2map[prefix] = True
         c2map['min'] = rc2values[0]
         c2map['max'] = rc2values[-1]
-        c2map['midx'] = len(codebunch)
+        c2map['midx'] = len(filler)
 
         for v in range(rc2values[0], rc2values[-1] + 1):
             if not c2map.has_key(v):
-                codebunch.append('NOCHAR,')
+                filler.write('N,')
             elif isinstance(c2map[v], int):
-                codebunch.append('0x%04x,' % c2map[v])
+                filler.write(str(c2map[v]) + ',')
             elif isinstance(c2map[v], tuple):
-                codebunch.append('MULTIC,')
+                filler.write('M,')
             else:
                 raise ValueError
 
-def print_encmap(fo, codebunch, fmapprefix, fmap, f2map={}, f2mapprefix=''):
+def print_encmap(fo, filler, fmapprefix, fmap, f2map={}, f2mapprefix=''):
     print >> fo, ("static const DBCHAR __%s_encmap[%d] = {" % (
-                        fmapprefix, len(codebunch)))
-    i = 0
-    while i < len(codebunch):
-        dp = codebunch[i:i+8]
-        i += 8
-        print >> fo, ' ', ' '.join(dp)
+                        fmapprefix, len(filler)))
+    filler.printout(fo)
     print >> fo, "};"
     print >> fo
 
@@ -85,16 +111,17 @@ def print_encmap(fo, codebunch, fmapprefix, fmap, f2map={}, f2mapprefix=''):
             map = f2map
             prefix = f2mapprefix
         else:
-            print >> fo, "/* 0x%02X */ {0, 0, 0}," % i
+            filler.write("{", "0,", "0,", "0", "},")
             continue
 
-        print >> fo, "/* 0x%02X */ {__%s_encmap+%d, 0x%02x, 0x%02x}," % (
-                    i, prefix, map[i]['midx'], map[i]['min'], map[i]['max'])
+        filler.write("{", "__%s_encmap" % prefix, "+", "%d" % map[i]['midx'],
+                     ",", "%d," % map[i]['min'], "%d," % map[i]['max'], "},")
+    filler.printout(fo)
     print >> fo, "};"
     print >> fo
 
-def genmap_decode(codebunch, prefix, c1range, c2range,
-                  dmap, onlymask=(), wide=0):
+def genmap_decode(filler, prefix, c1range, c2range, dmap, onlymask=(),
+                  wide=0):
     c2width  = c2range[1] - c2range[0] + 1
     c2values = range(c2range[0], c2range[1] + 1)
 
@@ -109,35 +136,25 @@ def genmap_decode(codebunch, prefix, c1range, c2range,
         c2map[prefix] = True
         c2map['min'] = rc2values[0]
         c2map['max'] = rc2values[-1]
-        c2map['midx'] = len(codebunch)
+        c2map['midx'] = len(filler)
 
         for v in range(rc2values[0], rc2values[-1] + 1):
             if c2map.has_key(v):
-                if not wide:
-                    codebunch.append('0x%04x,' % c2map[v])
-                else:
-                    codebunch.append('0x%08x,' % c2map[v])
+                filler.write('%d,' % c2map[v])
             else:
-                if not wide:
-                    codebunch.append('UNIINV,')
-                else:
-                    codebunch.append('    UNIINV,')
+                filler.write('U,')
 
-def print_decmap(fo, codebunch, fmapprefix, fmap, f2map={},
-                 f2mapprefix='', wide=0):
+def print_decmap(fo, filler, fmapprefix, fmap, f2map={}, f2mapprefix='',
+                 wide=0):
     if not wide:
         print >> fo, ("static const ucs2_t __%s_decmap[%d] = {" % (
-                        fmapprefix, len(codebunch)))
+                        fmapprefix, len(filler)))
         width = 8
     else:
         print >> fo, ("static const ucs4_t __%s_decmap[%d] = {" % (
-                        fmapprefix, len(codebunch)))
+                        fmapprefix, len(filler)))
         width = 4
-    i = 0
-    while i < len(codebunch):
-        dp = codebunch[i:i+width]
-        i += width
-        print >> fo, ' ', ' '.join(dp)
+    filler.printout(fo)
     print >> fo, "};"
     print >> fo
 
@@ -156,11 +173,12 @@ def print_decmap(fo, codebunch, fmapprefix, fmap, f2map={},
             map = f2map
             prefix = f2mapprefix
         else:
-            print >> fo, "/* 0x%02X */ {0, 0, 0}," % i
+            filler.write("{", "0,", "0,", "0", "},")
             continue
 
-        print >> fo, "/* 0x%02X */ {__%s_decmap+%d, 0x%02x, 0x%02x}," % (
-                    i, prefix, map[i]['midx'], map[i]['min'], map[i]['max'])
+        filler.write("{", "__%s_decmap" % prefix, "+", "%d" % map[i]['midx'],
+                     ",", "%d," % map[i]['min'], "%d," % map[i]['max'], "},")
+    filler.printout(fo)
     print >> fo, "};"
     print >> fo
 

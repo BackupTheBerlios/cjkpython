@@ -1,5 +1,5 @@
 /*
- * _cp950.c: the CP950 codec
+ * codecimpl_euc_kr.h: the EUC-KR codec implementation
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,75 +26,56 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _cp950.c,v 1.3 2004/03/10 07:44:09 perky Exp $
+ * $Id: codecimpl_euc_kr.h,v 1.1 2004/06/17 18:31:20 perky Exp $
  */
 
-#include "codeccommon.h"
-
-ENCMAP(big5)
-ENCMAP(cp950ext)
-DECMAP(big5)
-DECMAP(cp950ext)
-
-ENCODER(cp950)
+ENCODER(euc_kr)
 {
-    while (inleft > 0) {
-        Py_UNICODE  c = IN1;
-        DBCHAR      code;
+	while (inleft > 0) {
+		Py_UNICODE c = IN1;
+		DBCHAR code;
 
-        if (c < 0x80) {
-            WRITE1((unsigned char)c)
-            NEXT(1, 1)
-            continue;
-        }
-        UCS4INVALID(c)
+		if (c < 0x80) {
+			WRITE1((unsigned char)c)
+			NEXT(1, 1)
+			continue;
+		}
+		UCS4INVALID(c)
 
-        RESERVE_OUTBUF(2)
-        TRYMAP_ENC(cp950ext, code, c);
-        else TRYMAP_ENC(big5, code, c);
-        else return 1;
+		RESERVE_OUTBUF(2)
+		TRYMAP_ENC(cp949, code, c);
+		else return 1;
 
-        OUT1(code >> 8)
-        OUT2(code & 0xFF)
-        NEXT(1, 2)
-    }
+		if (code & 0x8000) /* MSB set: CP949 */
+			return 1;
 
-    return 0;
+		OUT1((code >> 8) | 0x80)
+		OUT2((code & 0xFF) | 0x80)
+		NEXT(1, 2)
+	}
+
+	return 0;
 }
 
-DECODER(cp950)
+DECODER(euc_kr)
 {
-    while (inleft > 0) {
-        unsigned char    c = IN1;
+	while (inleft > 0) {
+		unsigned char c = IN1;
 
-        RESERVE_OUTBUF(1)
+		RESERVE_OUTBUF(1)
 
-        if (c < 0x80) {
-            OUT1(c)
-            NEXT(1, 1)
-            continue;
-        }
+		if (c < 0x80) {
+			OUT1(c)
+			NEXT(1, 1)
+			continue;
+		}
 
-        RESERVE_INBUF(2)
+		RESERVE_INBUF(2)
 
-        TRYMAP_DEC(cp950ext, **outbuf, c, IN2);
-        else TRYMAP_DEC(big5, **outbuf, c, IN2);
-        else return 2;
+		TRYMAP_DEC(ksx1001, **outbuf, c ^ 0x80, IN2 ^ 0x80) {
+			NEXT(2, 1)
+		} else return 2;
+	}
 
-        NEXT(2, 1)
-    }
-
-    return 0;
+	return 0;
 }
-
-#include "codecentry.h"
-BEGIN_CODEC_REGISTRY(cp950)
-    MAPOPEN(zh_TW)
-        IMPORTMAP_ENCDEC(big5)
-        IMPORTMAP_ENCDEC(cp950ext)
-    MAPCLOSE()
-END_CODEC_REGISTRY(cp950)
-
-/*
- * ex: ts=8 sts=4 et
- */

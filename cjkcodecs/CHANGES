@@ -2,6 +2,9 @@ Changes with CJKCodecs 1.1
 
   *) StreamWriter.write now can write non-unicode objects.
 
+  *) C codec modules are merged into a few per-locale modules with
+     its dependent mapping table holder modules.
+
 
 Changes with CJKCodecs 1.0.3
 

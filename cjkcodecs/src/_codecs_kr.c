@@ -1,5 +1,5 @@
 /*
- * mapdata_ko_KR.c: Map Provider for Korean Encodings
+ * _codecs_kr.c: Codecs collection for Korean encodings
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,45 +26,33 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: mapdata_ko_KR.c,v 1.3 2004/01/17 11:26:10 perky Exp $
+ * $Id: _codecs_kr.c,v 1.1 2004/06/17 18:31:20 perky Exp $
  */
 
-#include "Python.h"
-#include "../cjkcommon.h"
-#include "map_ksx1001.h"
-#include "map_cp949.h"
-#include "map_cp949ext.h"
+#include "cjkc_prelude.h"
+#include "maps/map_ksx1001.h"
+#include "maps/map_cp949.h"
+#include "maps/map_cp949ext.h"
 
-static struct dbcs_map mapholders[] = {
-    {"ksx1001",         NULL,           ksx1001_decmap},
-    {"cp949",           cp949_encmap,   NULL},
-    {"cp949ext",        NULL,           cp949ext_decmap},
-    {"",                NULL,           NULL},
-};
+#include "cjkc_interlude.h"
+#include "codecimpl_euc_kr.h"
+#include "codecimpl_cp949.h"
+#include "codecimpl_iso_2022_kr.h"
+#include "codecimpl_johab.h"
 
-static struct PyMethodDef __methods[] = {
-    {NULL, NULL},
-};
+BEGIN_MAPPING_LIST
+  MAPPING_DECONLY(ksx1001)
+  MAPPING_ENCONLY(cp949)
+  MAPPING_DECONLY(cp949ext)
+END_MAPPING_LIST
 
-void
-init_codecs_mapdata_ko_KR(void)
-{
-    struct dbcs_map *h;
-    PyObject        *m;
+BEGIN_CODEC_LIST
+  CODEC_STATELESS(euc_kr)
+  CODEC_STATELESS(cp949)
+  CODEC_STATEFUL(iso_2022_kr)
+  CODEC_STATELESS(johab)
+END_CODEC_LIST
 
-    m = Py_InitModule("_codecs_mapdata_ko_KR", __methods);
+#include "cjkc_postlude.h"
 
-    for (h = mapholders; h->charset[0] != '\0'; h++) {
-        char     mhname[256] = "__map_";
-
-        strcpy(mhname + sizeof("__map_") - 1, h->charset);
-        PyModule_AddObject(m, mhname, PyCObject_FromVoidPtr(h, NULL));
-    }
-
-    if (PyErr_Occurred())
-        Py_FatalError("can't initialize the _codecs_mapdata_ko_KR module");
-}
-
-/*
- * ex: ts=8 sts=4 et
- */
+I_AM_A_MODULE_FOR(kr)

@@ -1,5 +1,5 @@
 /*
- * _cp949.c: the CP949 codec
+ * _codecs_jp.c: Codecs collection for Japanese encodings
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,76 +26,49 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _cp949.c,v 1.3 2004/03/10 07:44:09 perky Exp $
+ * $Id: _codecs_jp.c,v 1.1 2004/06/17 18:31:20 perky Exp $
  */
 
-#include "codeccommon.h"
+#define USING_BINARY_PAIR_SEARCH
+#define EMPBASE 0x20000
 
-ENCMAP(cp949)
-DECMAP(ksx1001)
-DECMAP(cp949ext)
+#include "cjkc_prelude.h"
+#include "maps/map_jisx0208.h"
+#include "maps/map_jisx0212.h"
+#include "maps/map_jisx0213.h"
+#include "maps/map_jisxcommon.h"
+#include "maps/map_cp932ext.h"
+#include "maps/map_jisx0213_pairs.h"
+#include "maps/alg_jisx0201.h"
 
-ENCODER(cp949)
-{
-    while (inleft > 0) {
-        Py_UNICODE  c = IN1;
-        DBCHAR      code;
+#include "cjkc_interlude.h"
+#include "codecimpl_cp932.h"
+#include "codecimpl_euc_jisx0213.h"
+#include "codecimpl_euc_jp.h"
+#include "codecimpl_shift_jis.h"
+#include "codecimpl_shift_jisx0213.h"
 
-        if (c < 0x80) {
-            WRITE1((unsigned char)c)
-            NEXT(1, 1)
-            continue;
-        }
-        UCS4INVALID(c)
+BEGIN_MAPPING_LIST
+  MAPPING_DECONLY(jisx0208)
+  MAPPING_DECONLY(jisx0212)
+  MAPPING_ENCONLY(jisxcommon)
+  MAPPING_DECONLY(jisx0213_1_bmp)
+  MAPPING_DECONLY(jisx0213_2_bmp)
+  MAPPING_ENCONLY(jisx0213_bmp)
+  MAPPING_DECONLY(jisx0213_1_emp)
+  MAPPING_DECONLY(jisx0213_2_emp)
+  MAPPING_ENCONLY(jisx0213_emp)
+  MAPPING_ENCDEC(cp932ext)
+END_MAPPING_LIST
 
-        RESERVE_OUTBUF(2)
-        TRYMAP_ENC(cp949, code, c);
-        else return 1;
+BEGIN_CODEC_LIST
+  CODEC_STATELESS(shift_jis)
+  CODEC_STATELESS(cp932)
+  CODEC_STATELESS(euc_jp)
+  CODEC_STATELESS(shift_jisx0213)
+  CODEC_STATELESS(euc_jisx0213)
+END_CODEC_LIST
 
-        OUT1((code >> 8) | 0x80)
-        if (code & 0x8000)
-            OUT2(code & 0xFF) /* MSB set: CP949 */
-        else
-            OUT2((code & 0xFF) | 0x80) /* MSB unset: ks x 1001 */
-        NEXT(1, 2)
-    }
+#include "cjkc_postlude.h"
 
-    return 0;
-}
-
-DECODER(cp949)
-{
-    while (inleft > 0) {
-        unsigned char    c = IN1;
-
-        RESERVE_OUTBUF(1)
-
-        if (c < 0x80) {
-            OUT1(c)
-            NEXT(1, 1)
-            continue;
-        }
-
-        RESERVE_INBUF(2)
-        TRYMAP_DEC(ksx1001, **outbuf, c ^ 0x80, IN2 ^ 0x80);
-        else TRYMAP_DEC(cp949ext, **outbuf, c, IN2);
-        else return 2;
-
-        NEXT(2, 1)
-    }
-
-    return 0;
-}
-
-#include "codecentry.h"
-BEGIN_CODEC_REGISTRY(cp949)
-    MAPOPEN(ko_KR)
-        IMPORTMAP_DEC(ksx1001)
-        IMPORTMAP_DEC(cp949ext)
-        IMPORTMAP_ENC(cp949)
-    MAPCLOSE()
-END_CODEC_REGISTRY(cp949)
-
-/*
- * ex: ts=8 sts=4 et
- */
+I_AM_A_MODULE_FOR(jp)

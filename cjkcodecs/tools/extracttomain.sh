@@ -1,6 +1,6 @@
 #!/bin/sh
 # extractmain.sh: extract CJKCodecs to merge into mainstream Python
-# $Id: extracttomain.sh,v 1.3 2004/01/17 12:51:38 perky Exp $
+# $Id: extracttomain.sh,v 1.4 2004/06/17 18:31:21 perky Exp $
 
 CJKCODECSROOT=..
 PYTHONROOT=../../python
@@ -22,6 +22,7 @@ for f in $PYCJKDIR/*.*; do
     -e 's,\$Id\(.*\)\$,$CJKCodecs\1$,g' $f |
   python -c 'import re,sys
 print re.compile("(\n\s*)*/\*\s*\n\s*\* ex:[^\n]*\n\s*\*/\s*", re.M).sub("", sys.stdin.read())' |
+  sed -e '$/^$/d' |
   awk 'BEGIN { output=1; }
 /Copyright.*Hye-Shik Chang/ { output=0; }
 /\$CJKCodecs/ {
@@ -51,6 +52,7 @@ for f in `ls $CJKCODECSROOT/cjkcodecs/*.py |
     -e 's,from cjkcodecs\.,from ,g' \
     -e 's,iso_2022,iso2022,g' $f |
   grep -v '^# ex:' |
+  sed -e '$/^$/d' |
   awk 'BEGIN { output=1; tignore=0; }
 /ACHTUNG/ { tignore=1; }
 /Copyright.*Hye-Shik Chang/ { output=0; }
@@ -76,6 +78,7 @@ for f in $CJKCODECSROOT/tests/test_*.py; do
     -e 's,cjkcodecs\.gb18030,gb18030,g' \
     -e 's,iso_2022,iso2022,g' \
     -e 's,^import test_,from test import test_,g' $f |
+  sed -e '$/^$/d' |
   grep -v '^# [e]x:' > $DESTPATH
 done
 

@@ -27,45 +27,31 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.14 2004/06/07 13:38:31 perky Exp $
+# $Id: setup.py,v 1.15 2004/06/17 18:31:20 perky Exp $
 #
 
-import os, shutil
+import os
 import sys
 from distutils.core import setup, Extension
 from distutils.command.install import install
 
 SRCDIR = 'src'
-TMPSRCDIR = 'build/tmpsrc'
-
 LIBDIRS = []
 extensions = []
-encodings = {
-'ja_JP':    ['shift_jis', 'cp932', 'euc_jp', 'iso_2022_jp', 'iso_2022_jp_1',
-             'iso_2022_jp_2', 'iso_2022_jp_3', 'iso_2022_jp_ext',
-             'shift_jisx0213', 'euc_jisx0213'],
-'ko_KR':    ['euc_kr', 'cp949', 'johab', 'iso_2022_kr'],
-'zh_CN':    ['gb2312', 'gbk', 'gb18030', 'hz'],
-'zh_TW':    ['big5', 'cp950'],
-'':         ['utf_7', 'utf_8'],
-}
-locales = encodings.keys()
-strictencodings = (
-'shift_jis', 'euc_jp',
-)
+locales = ['kr', 'jp', 'cn', 'tw', 'unicode']
 
 for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
     args = arg.split('=', 1)
-    if args[0] == '--disable-japanese':
-        locales.remove('ja_JP')
-    elif args[0] == '--disable-korean':
-        locales.remove('ko_KR')
+    if args[0] == '--disable-korean':
+        locales.remove('kr')
+    elif args[0] == '--disable-japanese':
+        locales.remove('jp')
     elif args[0] == '--disable-simplified-chinese':
-        locales.remove('zh_CN')
+        locales.remove('cn')
     elif args[0] == '--disable-traditional-chinese':
-        locales.remove('zh_TW')
+        locales.remove('tw')
     elif args[0] == '--disable-utf':
-        locales.remove('')
+        locales.remove('unicode')
     elif args[0] == '--help':
         print """\
 Language options:
@@ -84,28 +70,9 @@ Language options:
 if sys.platform == 'win32' and '--compiler=mingw32' in sys.argv:
     LIBDIRS.append('.') # libpython23.a and libpython23.def
 
-try:
-    os.makedirs(TMPSRCDIR)
-except OSError, why:
-    import errno
-    if why.errno != errno.EEXIST:
-        raise OSError, why
-
 for loc in locales:
-    if loc:
-        extensions.append(Extension('cjkcodecs._codecs_mapdata_'+loc,
-                    ['%s/maps/mapdata_%s.c' % (SRCDIR, loc)]))
-    for enc in encodings[loc]:
-        extensions.append(Extension('cjkcodecs._codecs_'+enc,
-                          ['%s/_%s.c' % (SRCDIR, enc)], library_dirs=LIBDIRS))
-        if enc in strictencodings:
-            shutil.copy('%s/_%s.c' % (SRCDIR, enc),
-                        '%s/_%s_strict.c' % (TMPSRCDIR, enc))
-            extensions.append(Extension('cjkcodecs._codecs_'+enc+'_strict',
-                ['%s/_%s_strict.c' % (TMPSRCDIR, enc)],
-                include_dirs=[SRCDIR], library_dirs=LIBDIRS,
-                define_macros=[('STRICT_BUILD', 1)]))
-
+    extensions.append(Extension('cjkcodecs._codecs_' + loc,
+                      ['%s/_codecs_%s.c' % (SRCDIR, loc)]))
 
 class Install(install):
     def initialize_options (self):
@@ -134,5 +101,3 @@ setup (name = "cjkcodecs",
                        ["%s/multibytecodec.c" % SRCDIR], library_dirs=LIBDIRS)]
             + extensions
        )
-
-# ex: ts=8 sts=4 et

@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_schinese.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+# $Id: genmap_schinese.py,v 1.3 2004/06/17 18:31:21 perky Exp $
 #
 
 from genmap_support import *
@@ -121,38 +121,38 @@ for c1, m in gb18030decmap.iteritems():
 omap = open('map_gb2312.h', 'w')
 printcopyright(omap)
 print "Generating GB2312 decode map..."
-codebunch = []
-genmap_decode(codebunch, "gb2312", GB2312_C1, GB2312_C2, gb2312decmap)
-print_decmap(omap, codebunch, "gb2312", gb2312decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "gb2312", GB2312_C1, GB2312_C2, gb2312decmap)
+print_decmap(omap, filler, "gb2312", gb2312decmap)
 
 omap = open('map_gbkext.h', 'w')
 printcopyright(omap)
 print "Generating GBK decode map..."
-codebunch = []
-genmap_decode(codebunch, "gbkext", GBKL1_C1, GBKL1_C2, gbkdecmap)
-genmap_decode(codebunch, "gbkext", GBKL2_C1, GBKL2_C2, gbkdecmap)
-print_decmap(omap, codebunch, "gbkext", gbkdecmap)
+filler = BufferedFiller()
+genmap_decode(filler, "gbkext", GBKL1_C1, GBKL1_C2, gbkdecmap)
+genmap_decode(filler, "gbkext", GBKL2_C1, GBKL2_C2, gbkdecmap)
+print_decmap(omap, filler, "gbkext", gbkdecmap)
 
 omap = open('map_gbcommon.h', 'w')
 printcopyright(omap)
 print "Generating GB2312 && GBK encode map..."
-codebunch =[]
-genmap_encode(codebunch, "gbcommon", gb2312_gbkencmap)
-print_encmap(omap, codebunch, "gbcommon", gb2312_gbkencmap)
+filler = BufferedFiller()
+genmap_encode(filler, "gbcommon", gb2312_gbkencmap)
+print_encmap(omap, filler, "gbcommon", gb2312_gbkencmap)
 
 omap = open('map_gb18030ext.h', 'w')
 printcopyright(omap)
 print "Generating GB18030 extension decode map..."
-codebunch = []
+filler = BufferedFiller()
 for i in range(1, 6):
-    genmap_decode(codebunch, "gb18030ext", eval("GB18030EXTP%d_C1" % i),
+    genmap_decode(filler, "gb18030ext", eval("GB18030EXTP%d_C1" % i),
                     eval("GB18030EXTP%d_C2" % i), gb18030decmap)
-print_decmap(omap, codebunch, "gb18030ext", gb18030decmap)
+print_decmap(omap, filler, "gb18030ext", gb18030decmap)
 
 print "Generating GB18030 extension encode map..."
-codebunch =[]
-genmap_encode(codebunch, "gb18030ext", gb18030encmap)
-print_encmap(omap, codebunch, "gb18030ext", gb18030encmap)
+filler = BufferedFiller()
+genmap_encode(filler, "gb18030ext", gb18030encmap)
+print_encmap(omap, filler, "gb18030ext", gb18030encmap)
 
 omap = open('map_gb18030uni.h', 'w')
 printcopyright(omap)
@@ -171,10 +171,9 @@ for uni in gb18030unilinear:
         ranges.append([uni, uni, gblinnum])
     gblinnum += 1
 for first, last, base in ranges[1:]:
-    print >> omap, "  { 0x%04x, 0x%04x, 0x%04x }," % (first, last, base)
-print >> omap, """\
-  { 0x0000, 0x0000, 0x%04x },
-};""" % (ranges[-1][2] + ranges[-1][1] - ranges[-1][0] + 1)
+    print >> omap, "{%d,%d,%d}," % (first, last, base)
+print >> omap, "{0,0,%d}};" % (
+    ranges[-1][2] + ranges[-1][1] - ranges[-1][0] + 1)
 
 print "\nDone!"
 # ex: ts=8 sts=4 et

@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_japanese.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+# $Id: genmap_japanese.py,v 1.3 2004/06/17 18:31:21 perky Exp $
 #
 
 from genmap_support import *
@@ -204,81 +204,81 @@ omap = open("map_jisx0208.h", "w")
 printcopyright(omap)
 
 print "Generating JIS X 0208 decode map..."
-codebunch = []
-genmap_decode(codebunch, "jisx0208", JISX0208_C1, JISX0208_C2, jisx0208decmap)
-print_decmap(omap, codebunch, "jisx0208", jisx0208decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "jisx0208", JISX0208_C1, JISX0208_C2, jisx0208decmap)
+print_decmap(omap, filler, "jisx0208", jisx0208decmap)
 
 omap = open("map_jisx0212.h", "w")
 printcopyright(omap)
 print "Generating JIS X 0212 decode map..."
-codebunch = []
-genmap_decode(codebunch, "jisx0212", JISX0212_C1, JISX0212_C2, jisx0212decmap)
-print_decmap(omap, codebunch, "jisx0212", jisx0212decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "jisx0212", JISX0212_C1, JISX0212_C2, jisx0212decmap)
+print_decmap(omap, filler, "jisx0212", jisx0212decmap)
 
 omap = open("map_jisxcommon.h", "w")
 printcopyright(omap)
 print "Generating JIS X 0208 && JIS X 0212 encode map..."
-codebunch =[]
-genmap_encode(codebunch, "jisxcommon", jisx0208_0212encmap)
-print_encmap(omap, codebunch, "jisxcommon", jisx0208_0212encmap)
+filler = BufferedFiller()
+genmap_encode(filler, "jisxcommon", jisx0208_0212encmap)
+print_encmap(omap, filler, "jisxcommon", jisx0208_0212encmap)
 
 omap = open("map_cp932ext.h", "w")
 printcopyright(omap)
 print "Generating CP932 Extension decode map..."
-codebunch = []
-genmap_decode(codebunch, "cp932ext", CP932P0_C1, CP932P0_C2, cp932decmap)
-genmap_decode(codebunch, "cp932ext", CP932P1_C1, CP932P1_C2, cp932decmap)
-genmap_decode(codebunch, "cp932ext", CP932P2_C1, CP932P2_C2, cp932decmap)
-print_decmap(omap, codebunch, "cp932ext", cp932decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "cp932ext", CP932P0_C1, CP932P0_C2, cp932decmap)
+genmap_decode(filler, "cp932ext", CP932P1_C1, CP932P1_C2, cp932decmap)
+genmap_decode(filler, "cp932ext", CP932P2_C1, CP932P2_C2, cp932decmap)
+print_decmap(omap, filler, "cp932ext", cp932decmap)
 
 print "Generating CP932 Extension encode map..."
-codebunch =[]
-genmap_encode(codebunch, "cp932ext", cp932encmap)
-print_encmap(omap, codebunch, "cp932ext", cp932encmap)
+filler = BufferedFiller()
+genmap_encode(filler, "cp932ext", cp932encmap)
+print_encmap(omap, filler, "cp932ext", cp932encmap)
 
 omap = open("map_jisx0213.h", "w")
 printcopyright(omap)
 
 print "Generating JIS X 0213 Plane 1 BMP decode map..."
-codebunch =[]
-genmap_decode(codebunch, "jisx0213_1_bmp", JISX0213_C1, JISX0213_C2, jis3decmap)
-print_decmap(omap, codebunch, "jisx0213_1_bmp", jis3decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "jisx0213_1_bmp", JISX0213_C1, JISX0213_C2, jis3decmap)
+print_decmap(omap, filler, "jisx0213_1_bmp", jis3decmap)
 
 print "Generating JIS X 0213 Plane 2 BMP decode map..."
-codebunch =[]
-genmap_decode(codebunch, "jisx0213_2_bmp", JISX0213_C1, JISX0213_C2, jis4decmap)
-print_decmap(omap, codebunch, "jisx0213_2_bmp", jis4decmap)
+filler = BufferedFiller()
+genmap_decode(filler, "jisx0213_2_bmp", JISX0213_C1, JISX0213_C2, jis4decmap)
+print_decmap(omap, filler, "jisx0213_2_bmp", jis4decmap)
 
 print "Generating JIS X 0213 BMP encode map..."
-codebunch =[]
-genmap_encode(codebunch, "jisx0213_bmp", jisx0213bmpencmap)
-print_encmap(omap, codebunch, "jisx0213_bmp", jisx0213bmpencmap)
+filler = BufferedFiller()
+genmap_encode(filler, "jisx0213_bmp", jisx0213bmpencmap)
+print_encmap(omap, filler, "jisx0213_bmp", jisx0213bmpencmap)
 
 print "Generating JIS X 0213 Plane 1 EMP decode map..."
-codebunch =[]
-genmap_decode(codebunch, "jisx0213_1_emp",
+filler = BufferedFiller()
+genmap_decode(filler, "jisx0213_1_emp",
               JISX0213_C1, JISX0213_C2, jis3_2_decmap)
-print_decmap(omap, codebunch, "jisx0213_1_emp", jis3_2_decmap)
+print_decmap(omap, filler, "jisx0213_1_emp", jis3_2_decmap)
 
 print "Generating JIS X 0213 Plane 2 EMP decode map..."
-codebunch =[]
-genmap_decode(codebunch, "jisx0213_2_emp",
+filler = BufferedFiller()
+genmap_decode(filler, "jisx0213_2_emp",
               JISX0213_C1, JISX0213_C2, jis4_2_decmap)
-print_decmap(omap, codebunch, "jisx0213_2_emp", jis4_2_decmap)
+print_decmap(omap, filler, "jisx0213_2_emp", jis4_2_decmap)
 
 print "Generating JIS X 0213 EMP encode map..."
-codebunch =[]
-genmap_encode(codebunch, "jisx0213_emp", jisx0213empencmap)
-print_encmap(omap, codebunch, "jisx0213_emp", jisx0213empencmap)
+filler = BufferedFiller()
+genmap_encode(filler, "jisx0213_emp", jisx0213empencmap)
+print_encmap(omap, filler, "jisx0213_emp", jisx0213empencmap)
 
 omap = open("map_jisx0213_pairs.h", "w")
 printcopyright(omap)
 
 print "Generating JIS X 0213 unicode-pair decode map..."
-codebunch =[]
-genmap_decode(codebunch, "jisx0213_pair", JISX0213_C1, JISX0213_C2,
+filler = BufferedFiller()
+genmap_decode(filler, "jisx0213_pair", JISX0213_C1, JISX0213_C2,
               jisx0213pairdecmap, wide=1)
-print_decmap(omap, codebunch, "jisx0213_pair",
+print_decmap(omap, filler, "jisx0213_pair",
              jisx0213pairdecmap, wide=1)
 
 print "Generating JIS X 0213 unicode-pair encode map..."

@@ -1,5 +1,5 @@
 /*
- * _big5.c: the Big5 codec
+ * _codecs_cn.c: Codecs collection for Mainland Chinese encodings
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,70 +26,37 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _big5.c,v 1.3 2004/03/10 07:44:09 perky Exp $
+ * $Id: _codecs_cn.c,v 1.1 2004/06/17 18:31:20 perky Exp $
  */
 
-#include "codeccommon.h"
+#include "cjkc_prelude.h"
+#include "maps/map_gb2312.h"
+#include "maps/map_gbkext.h"
+#include "maps/map_gbcommon.h"
+#include "maps/map_gb18030ext.h"
+#include "maps/map_gb18030uni.h"
+#include "maps/tweak_gbk.h"
 
-ENCMAP(big5)
-DECMAP(big5)
+#include "cjkc_interlude.h"
+#include "codecimpl_gb2312.h"
+#include "codecimpl_gbk.h"
+#include "codecimpl_gb18030.h"
+#include "codecimpl_hz.h"
 
-ENCODER(big5)
-{
-    while (inleft > 0) {
-        Py_UNICODE  c = **inbuf;
-        DBCHAR      code;
+BEGIN_MAPPING_LIST
+  MAPPING_DECONLY(gb2312)
+  MAPPING_DECONLY(gbkext)
+  MAPPING_ENCONLY(gbcommon)
+  MAPPING_ENCDEC(gb18030ext)
+END_MAPPING_LIST
 
-        if (c < 0x80) {
-            RESERVE_OUTBUF(1)
-            **outbuf = (unsigned char)c;
-            NEXT(1, 1)
-            continue;
-        }
-        UCS4INVALID(c)
+BEGIN_CODEC_LIST
+  CODEC_STATELESS(gb2312)
+  CODEC_STATELESS(gbk)
+  CODEC_STATELESS(gb18030)
+  CODEC_STATEFUL(hz)
+END_CODEC_LIST
 
-        RESERVE_OUTBUF(2)
+#include "cjkc_postlude.h"
 
-        TRYMAP_ENC(big5, code, c);
-        else return 1;
-
-        (*outbuf)[0] = code >> 8;
-        (*outbuf)[1] = code & 0xFF;
-        NEXT(1, 2)
-    }
-
-    return 0;
-}
-
-DECODER(big5)
-{
-    while (inleft > 0) {
-        unsigned char    c = IN1;
-
-        RESERVE_OUTBUF(1)
-
-        if (c < 0x80) {
-            OUT1(c)
-            NEXT(1, 1)
-            continue;
-        }
-
-        RESERVE_INBUF(2)
-        TRYMAP_DEC(big5, **outbuf, c, IN2) {
-            NEXT(2, 1)
-        } else return 2;
-    }
-
-    return 0;
-}
-
-#include "codecentry.h"
-BEGIN_CODEC_REGISTRY(big5)
-    MAPOPEN(zh_TW)
-        IMPORTMAP_ENCDEC(big5)
-    MAPCLOSE()
-END_CODEC_REGISTRY(big5)
-
-/*
- * ex: ts=8 sts=4 et
- */
+I_AM_A_MODULE_FOR(cn)

@@ -1,5 +1,5 @@
 /*
- * mapdata_zh_TW.c: Map Provider for Traditional Chinese Encodings
+ * cjkc_prelude.h: prelude for cjkcodecs
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,43 +26,54 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: mapdata_zh_TW.c,v 1.3 2004/01/17 11:26:10 perky Exp $
+ * $Id: cjkc_prelude.h,v 1.1 2004/06/17 18:31:20 perky Exp $
  */
+
+#ifndef _CJKC_PRELUDE_H_
+#define _CJKC_PRELUDE_H_
 
 #include "Python.h"
-#include "../cjkcommon.h"
-#include "map_big5.h"
-#include "map_cp950ext.h"
+#include "multibytecodec.h"
+#include "multibytecodec_compat.h"
 
-static struct dbcs_map mapholders[] = {
-    {"big5",        big5_encmap,        big5_decmap},
-    {"cp950ext",    cp950ext_encmap,    cp950ext_decmap},
-    {"",            NULL,               NULL},
+#define UNIINV	Py_UNICODE_REPLACEMENT_CHARACTER
+#define NOCHAR	0xFFFF
+#define MULTIC	0xFFFE
+#define DBCINV	0xFFFD
+
+/* short macros to save source size of mapping tables */
+#define U UNIINV
+#define N NOCHAR
+#define M MULTIC
+#define D DBCINV
+
+struct dbcs_index {
+	const ucs2_t *map;
+	unsigned char bottom, top;
+};
+typedef struct dbcs_index decode_map;
+
+struct widedbcs_index {
+	const ucs4_t *map;
+	unsigned char bottom, top;
+};
+typedef struct widedbcs_index widedecode_map;
+
+struct unim_index {
+	const DBCHAR *map;
+	unsigned char bottom, top;
+};
+typedef struct unim_index encode_map;
+
+struct dbcs_map {
+	const char *charset;
+	const struct unim_index *encmap;
+	const struct dbcs_index *decmap;
 };
 
-static struct PyMethodDef __methods[] = {
-    {NULL, NULL},
+struct pair_encodemap {
+	ucs4_t uniseq;
+	DBCHAR code;
 };
 
-void
-init_codecs_mapdata_zh_TW(void)
-{
-    struct dbcs_map *h;
-    PyObject        *m;
-
-    m = Py_InitModule("_codecs_mapdata_zh_TW", __methods);
-
-    for (h = mapholders; h->charset[0] != '\0'; h++) {
-        char     mhname[256] = "__map_";
-
-        strcpy(mhname + sizeof("__map_") - 1, h->charset);
-        PyModule_AddObject(m, mhname, PyCObject_FromVoidPtr(h, NULL));
-    }
-
-    if (PyErr_Occurred())
-        Py_FatalError("can't initialize the _codecs_mapdata_zh_TW module");
-}
-
-/*
- * ex: ts=8 sts=4 et
- */
+#endif
