@@ -26,13 +26,14 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.3 2004/06/27 19:24:13 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.4 2004/06/27 19:55:46 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
 #include "cjkc_prelude.h"
 #include "maps/alg_iso8859_1.h"
 #include "maps/alg_iso8859_7.h"
+#include "maps/alg_jisx0201.h"
 #include "cjkc_interlude.h"
 
 /* STATE
@@ -141,7 +142,7 @@ CODEC_INIT(iso2022)
 {
 	const struct iso2022_designation *desig = CONFIG_DESIGNATIONS;
 	for (desig = CONFIG_DESIGNATIONS; desig->mark; desig++)
-		if (desig->initializer() != 0)
+		if (desig->initializer != NULL && desig->initializer() != 0)
 			return -1;
 	return 0;
 }
@@ -347,7 +348,8 @@ iso2022processesc(const void *config, MultibyteCodec_State *state,
 		return esclen;
 	}
 
-	{/* raise error when the charset is not designated for this encoding */
+	/* raise error when the charset is not designated for this encoding */
+	if (charset != CHARSET_ASCII) {
 		const struct iso2022_designation *dsg;
 
 		for (dsg = CONFIG_DESIGNATIONS; dsg->mark; dsg++)
@@ -522,13 +524,13 @@ DECMAP(gb2312)
 int
 ksx1001_init(void)
 {
-	static int ksx1001_initialized = 0;
+	static int initialized = 0;
 
-	if (!ksx1001_initialized && (
+	if (!initialized && (
 			IMPORT_MAP(kr, cp949, &cp949_encmap, NULL) ||
 			IMPORT_MAP(kr, ksx1001, NULL, &ksx1001_decmap)))
 		return -1;
-	ksx1001_initialized = 1;
+	initialized = 1;
 	return 0;
 }
 
@@ -553,6 +555,63 @@ ksx1001_encoder(const ucs4_t *data, int length)
 	return MAP_UNMAPPABLE;
 }
 
+int
+jisx0208_init(void)
+{
+	static int initialized = 0;
+
+	if (!initialized && (
+			IMPORT_MAP(jp, jisxcommon, &jisxcommon_encmap, NULL) ||
+			IMPORT_MAP(jp, jisx0208, NULL, &jisx0208_decmap)))
+		return -1;
+	initialized = 1;
+	return 0;
+}
+
+ucs4_t
+jisx0208_decoder(const unsigned char *data)
+{
+	ucs4_t u;
+	if (data[0] == 0x21 && data[1] == 0x40) /* F/W REVERSE SOLIDUS */
+		return 0xff3c;
+	else TRYMAP_DEC(jisx0208, u, data[0], data[1])
+		return u;
+	else
+		return MAP_UNMAPPABLE;
+}
+
+DBCHAR
+jisx0208_encoder(const ucs4_t *data, int length)
+{
+	DBCHAR coded;
+	assert(length == 1);
+	if (*data == 0xff3c) /* F/W REVERSE SOLIDUS */
+		return 0x2140;
+	else TRYMAP_ENC(jisxcommon, coded, *data) {
+		if (!(coded & 0x8000))
+			return coded;
+	}
+	return MAP_UNMAPPABLE;
+}
+
+ucs4_t
+jisx0201_r_decoder(const unsigned char *data)
+{
+	ucs4_t u;
+	JISX0201_R_DECODE(*data, u)
+	else return MAP_UNMAPPABLE;
+	return u;
+}
+
+DBCHAR
+jisx0201_r_encoder(const ucs4_t *data, int length)
+{
+	DBCHAR coded;
+	JISX0201_R_ENCODE(*data, coded)
+	else return MAP_UNMAPPABLE;
+	return coded;
+}
+
 /*-*- registry tables -*-*/
 
 static const struct iso2022_config iso2022_kr_config = {
@@ -562,15 +621,14 @@ static const struct iso2022_config iso2022_kr_config = {
 	 { 0, }},
 };
 
-/*
-struct iso2022_config iso2022_jp_3_config {
-	ISO2022_NO_SHIFT | ISO2022_USE_G2 | ISO2022_USE_JISX0208_EXT,
-	{{ CHARSET_ASCII, 0, 1, NULL, NULL },
-	 { CHARSET_JISX0208, 0, 2, jisx0208_decoder, jisx0208_encoder },
-	 { CHARSET_JISX0213_1, 0, 2, jisx0213_1_decoder, jisx0213_1_encoder },
-	 { CHARSET_JISX0213_2, 0, 2, jisx0213_2_decoder, jisx0213_2_encoder }},
+static const struct iso2022_config iso2022_jp_config = {
+	NO_SHIFT | USE_JISX0208_EXT,
+	{{ CHARSET_JISX0208, 0, 2,
+	   jisx0208_init, jisx0208_decoder, jisx0208_encoder },
+	 { CHARSET_JISX0201_R, 0, 1,
+	   NULL, jisx0201_r_decoder, jisx0201_r_encoder },
+	 { 0, }},
 };
-*/
 
 BEGIN_MAPPING_LIST
   /* no mapping table here */
@@ -585,6 +643,7 @@ END_MAPPING_LIST
 
 BEGIN_CODEC_LIST
   ISO2022_CODEC(kr)
+  ISO2022_CODEC(jp)
 END_CODEC_LIST
 
 #include "cjkc_postlude.h"
