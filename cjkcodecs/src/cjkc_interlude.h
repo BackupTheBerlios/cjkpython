@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_interlude.h,v 1.3 2004/06/26 09:49:51 perky Exp $
+ * $Id: cjkc_interlude.h,v 1.4 2004/06/26 16:50:44 perky Exp $
  */
 
 #ifndef _CJKC_INTERLUDE_H_
@@ -187,13 +187,11 @@
 	enc##_encode, NULL, NULL,	\
 	enc##_decode, NULL, NULL,
 #define CODEC_STATEFUL(enc) {		\
-	#enc,				\
-	NULL,				\
+	#enc, NULL, NULL,		\
 	_STATEFUL_METHODS(enc)		\
 },
 #define CODEC_STATELESS(enc) {		\
-	#enc,				\
-	NULL,				\
+	#enc, NULL, NULL,		\
 	_STATELESS_METHODS(enc)		\
 },
 #define END_CODEC_LIST {"", NULL,} };

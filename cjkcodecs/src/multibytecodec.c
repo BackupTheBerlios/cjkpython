@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.10 2004/06/26 09:49:51 perky Exp $
+ * $Id: multibytecodec.c,v 1.11 2004/06/26 16:50:44 perky Exp $
  */
 
 #include "Python.h"
@@ -1261,6 +1261,7 @@ __create_codec(PyObject *ignore, PyObject *args)
 #endif
 {
 	MultibyteCodecObject *self;
+	MultibyteCodec *codec;
 #ifdef NO_METH_O
 	PyObject *arg;
 
@@ -1273,11 +1274,14 @@ __create_codec(PyObject *ignore, PyObject *args)
 		return NULL;
 	}
 
+	codec = PyCObject_AsVoidPtr(arg);
+	if (codec->codecinit != NULL && codec->codecinit(codec->config) != 0)
+		return NULL;
+
 	self = PyObject_New(MultibyteCodecObject, &MultibyteCodec_Type);
 	if (self == NULL)
 		return NULL;
-
-	self->codec = PyCObject_AsVoidPtr(arg);
+	self->codec = codec;
 
 	return (PyObject *)self;
 }

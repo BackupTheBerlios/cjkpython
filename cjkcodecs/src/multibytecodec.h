@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.h,v 1.5 2004/06/26 09:49:51 perky Exp $
+ * $Id: multibytecodec.h,v 1.6 2004/06/26 16:50:44 perky Exp $
  */
 
 #ifndef _PYTHON_MULTIBYTECODEC_H_
@@ -55,6 +55,7 @@ typedef union {
 	ucs4_t u4[2];
 } MultibyteCodec_State;
 
+typedef int (*mbcodec_init)(void *config);
 typedef int (*mbencode_func)(MultibyteCodec_State *state, void *config,
 			     const Py_UNICODE **inbuf, size_t inleft,
 			     unsigned char **outbuf, size_t outleft,
@@ -71,6 +72,7 @@ typedef int (*mbdecodereset_func)(MultibyteCodec_State *state, void *config);
 typedef struct {
 	const char *encoding;
 	void *config;
+	mbcodec_init codecinit;
 	mbencode_func encode;
 	mbencodeinit_func encinit;
 	mbencodereset_func encreset;
