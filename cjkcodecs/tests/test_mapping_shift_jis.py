@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_mapping_shift_jis.py,v 1.1 2003/09/24 17:47:04 perky Exp $
+# $Id: test_mapping_shift_jis.py,v 1.2 2003/11/27 17:50:34 perky Exp $
 #
 
 from test import test_support
@@ -40,14 +40,28 @@ if not os.path.exists('SHIFTJIS.TXT'):
             'SHIFTJIS.TXT not found, download from http://www.unicode.'
             'org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/SHIFTJIS.TXT')
 
-class TestSJISMap(test_multibytecodec_support.TestBase_Mapping,
+class TestSJISCOMPATMap(test_multibytecodec_support.TestBase_Mapping,
                   unittest.TestCase):
     encoding = 'cjkcodecs.shift_jis'
+    mapfilename = 'SHIFTJIS.TXT'
+    pass_enctest = [
+        ('\x81_', u'\\'),
+    ]
+    pass_dectest = [
+        ('\\', u'\xa5'),
+        ('~', u'\u203e'),
+        ('\x81_', u'\\'),
+    ]
+
+class TestSJISSTRICTMap(test_multibytecodec_support.TestBase_Mapping,
+                  unittest.TestCase):
+    encoding = 'cjkcodecs.shift_jis_strict'
     mapfilename = 'SHIFTJIS.TXT'
 
 def test_main():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestSJISMap))
+    suite.addTest(unittest.makeSuite(TestSJISCOMPATMap))
+    suite.addTest(unittest.makeSuite(TestSJISSTRICTMap))
     test_support.run_suite(suite)
 
 if __name__ == "__main__":

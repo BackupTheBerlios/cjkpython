@@ -27,31 +27,41 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_encoding_shift_jis.py,v 1.1 2003/09/24 17:47:02 perky Exp $
+# $Id: test_encoding_shift_jis.py,v 1.2 2003/11/27 17:50:34 perky Exp $
 #
 
 from test import test_support
 import test_multibytecodec_support
 import unittest
 
-class Test_SJIS(test_multibytecodec_support.TestBase, unittest.TestCase):
+commonenctests = (
+    ("abc\x80\x80\x82\x84", "strict",  None),
+    ("abc\xf8", "strict",  None),
+    ("abc\x80\x80\x82\x84", "replace", u"abc\ufffd\uff44"),
+    ("abc\x80\x80\x82\x84\x88", "replace", u"abc\ufffd\uff44\ufffd"),
+    ("abc\x80\x80\x82\x84def", "ignore",  u"abc\uff44def"),
+)
+
+class Test_SJIS_COMPAT(test_multibytecodec_support.TestBase, unittest.TestCase):
     encoding = 'cjkcodecs.shift_jis'
     tstring = test_multibytecodec_support.load_teststring('shift_jis')
-    errortests = (
-        # invalid bytes
-        ("abc\x80\x80\x82\x84", "strict",  None),
-        ("abc\xf8", "strict",  None),
-        ("abc\x80\x80\x82\x84", "replace", u"abc\ufffd\uff44"),
-        ("abc\x80\x80\x82\x84\x88", "replace", u"abc\ufffd\uff44\ufffd"),
-        ("abc\x80\x80\x82\x84def", "ignore",  u"abc\uff44def"),
-        # sjis vs cp932
+    errortests = commonenctests + (
+        ("\\\x7e", "strict", u"\\\x7e"),
+        ("\x81\x5f\x81\x61\x81\x7c", "strict", u"\uff3c\u2016\u2212"),
+    )
+
+class Test_SJIS_STRICT(test_multibytecodec_support.TestBase, unittest.TestCase):
+    encoding = 'cjkcodecs.shift_jis_strict'
+    tstring = test_multibytecodec_support.load_teststring('shift_jis')
+    errortests = commonenctests + (
         ("\\\x7e", "replace", u"\xa5\u203e"),
         ("\x81\x5f\x81\x61\x81\x7c", "replace", u"\x5c\u2016\u2212"),
     )
 
 def test_main():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(Test_SJIS))
+    suite.addTest(unittest.makeSuite(Test_SJIS_COMPAT))
+    suite.addTest(unittest.makeSuite(Test_SJIS_STRICT))
     test_support.run_suite(suite)
 
 if __name__ == "__main__":
