@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.12 2004/06/27 19:24:13 perky Exp $
+ * $Id: multibytecodec.c,v 1.13 2004/08/19 16:57:19 perky Exp $
  */
 
 #include "Python.h"
@@ -407,7 +407,7 @@ errorexit:
 	/* use cached exception object if available */
 	if (buf->excobj == NULL) {
 		buf->excobj = PyUnicodeDecodeError_Create(codec->encoding,
-				buf->inbuf_top,
+				(const char *)buf->inbuf_top,
 				(int)(buf->inbuf_end - buf->inbuf_top),
 				start, end, reason);
 		if (buf->excobj == NULL)
@@ -1039,7 +1039,7 @@ mbstreamwriter_iwrite(MultibyteStreamWriterObject *self,
 		      PyObject *unistr)
 {
 	PyObject *wr, *ucvt, *r = NULL;
-	Py_UNICODE *inbuf, *inbuf_end, *data, *inbuf_tmp = NULL;
+	Py_UNICODE *inbuf, *inbuf_end, *inbuf_tmp = NULL;
 	int datalen;
 
 	if (PyUnicode_Check(unistr))
@@ -1056,7 +1056,6 @@ mbstreamwriter_iwrite(MultibyteStreamWriterObject *self,
 		}
 	}
 
-	data = PyUnicode_AS_UNICODE(unistr);
 	datalen = PyUnicode_GET_SIZE(unistr);
 	if (datalen == 0) {
 		Py_XDECREF(ucvt);

@@ -1,7 +1,9 @@
 Changes with CJKCodecs 1.1.1
 
-  *) Converted codes in C99 grammar to legacy C code for HP-UX cc
-     and old versions of gcc.
+  *) Converted codes in C99 grammar to legacy C code for IRIX,
+     HP-UX, Tru64 cc and old versions of gcc.
+
+  *) Fixed some warnings found by HP-UX and Tru64 C compilers.
 
 
 Changes with CJKCodecs 1.1
