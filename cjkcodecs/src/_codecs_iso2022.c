@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.12 2004/06/29 05:22:20 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.13 2004/06/29 05:36:01 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -767,11 +767,11 @@ jisx0213_encoder(const ucs4_t *data, int *length)
 		return coded;
 	case 2: /* second character of unicode pair */
 		coded = find_pairencmap((ucs2_t)data[0], (ucs2_t)data[1],
-				jisx0213_pairencmap, JISX0213_ENCPAIRS);
+				jisx0213_pair_encmap, JISX0213_ENCPAIRS);
 		if (coded == DBCINV) {
 			*length = 1;
 			coded = find_pairencmap((ucs2_t)data[0], 0,
-				  jisx0213_pairencmap, JISX0213_ENCPAIRS);
+				  jisx0213_pair_encmap, JISX0213_ENCPAIRS);
 			if (coded == DBCINV)
 				return MAP_UNMAPPABLE;
 		}
@@ -780,7 +780,7 @@ jisx0213_encoder(const ucs4_t *data, int *length)
 	case -1: /* flush unterminated */
 		*length = 1;
 		coded = find_pairencmap((ucs2_t)data[0], 0,
-				jisx0213_pairencmap, JISX0213_ENCPAIRS);
+				jisx0213_pair_encmap, JISX0213_ENCPAIRS);
 		if (coded == DBCINV)
 			return MAP_UNMAPPABLE;
 		else

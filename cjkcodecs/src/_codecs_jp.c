@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_jp.c,v 1.9 2004/06/27 21:41:15 perky Exp $
+ * $Id: _codecs_jp.c,v 1.10 2004/06/29 05:36:02 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
@@ -196,7 +196,7 @@ ENCODER(euc_jisx0213)
 						if (flags & MBENC_FLUSH) {
 							code = find_pairencmap(
 							    (ucs2_t)c, 0,
-							   jisx0213_pairencmap,
+							  jisx0213_pair_encmap,
 							    JISX0213_ENCPAIRS);
 							if (code == DBCINV)
 								return 1;
@@ -207,12 +207,12 @@ ENCODER(euc_jisx0213)
 					else {
 						code = find_pairencmap(
 							(ucs2_t)c, (*inbuf)[1],
-							jisx0213_pairencmap,
+							jisx0213_pair_encmap,
 							JISX0213_ENCPAIRS);
 						if (code == DBCINV) {
 							code = find_pairencmap(
 							    (ucs2_t)c, 0,
-							    jisx0213_pairencmap,
+							  jisx0213_pair_encmap,
 							    JISX0213_ENCPAIRS);
 							if (code == DBCINV)
 								return 1;
@@ -591,7 +591,7 @@ ENCODER(shift_jisx0213)
 						    if (flags & MBENC_FLUSH) {
 							code = find_pairencmap
 							    ((ucs2_t)c, 0,
-							    jisx0213_pairencmap,
+							  jisx0213_pair_encmap,
 							    JISX0213_ENCPAIRS);
 							if (code == DBCINV)
 							    return 1;
@@ -602,12 +602,12 @@ ENCODER(shift_jisx0213)
 						else {
 						    code = find_pairencmap(
 							    (ucs2_t)c, IN2,
-							    jisx0213_pairencmap,
+							  jisx0213_pair_encmap,
 							    JISX0213_ENCPAIRS);
 						    if (code == DBCINV) {
 							code = find_pairencmap(
 							    (ucs2_t)c, 0,
-							    jisx0213_pairencmap,
+							  jisx0213_pair_encmap,
 							    JISX0213_ENCPAIRS);
 							if (code == DBCINV)
 							    return 1;
