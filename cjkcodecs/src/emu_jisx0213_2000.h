@@ -1,4 +1,4 @@
-/* $Id: emu_jisx0213_2000.h,v 1.2 2004/07/07 18:30:17 perky Exp $ */
+/* $Id: emu_jisx0213_2000.h,v 1.3 2004/07/08 02:53:37 perky Exp $ */
 
 /* These routines may be quite inefficient, but it's used only to emulate old
  * standards. */
@@ -11,7 +11,7 @@
 	if (config == (void *)2000 && (					\
 			(c) == 0x9B1C || (c) == 0x4FF1 ||		\
 			(c) == 0x525D || (c) == 0x541E ||		\
-		 	(c) == 0x5653 || (c) == 0x59F8 ||		\
+			(c) == 0x5653 || (c) == 0x59F8 ||		\
 			(c) == 0x5C5B || (c) == 0x5E77 ||		\
 			(c) == 0x7626 || (c) == 0x7E6B))		\
 		return EMULATE_JISX0213_2000_ENCODE_INVALID;		\
