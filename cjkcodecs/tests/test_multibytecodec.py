@@ -3,7 +3,7 @@
 # test_multibytecodec.py
 #   Unit test for multibytecodec itself
 #
-# $Id: test_multibytecodec.py,v 1.6 2004/03/10 07:33:09 perky Exp $
+# $Id: test_multibytecodec.py,v 1.7 2004/06/07 13:36:45 perky Exp $
 
 from test import test_support
 import test_multibytecodec_support
@@ -68,6 +68,12 @@ class Test_StreamWriter(unittest.TestCase):
 
     def test_str_decode(self):
         self.assertEqual('abcd'.encode('cjkcodecs.gb18030'), 'abcd')
+
+    def test_streamwriter_strwrite(self):
+        s = StringIO.StringIO()
+        wr = codecs.getwriter('cjkcodecs.gb18030')(s)
+        wr.write('abcd')
+        self.assertEqual(s.getvalue(), 'abcd')
 
 def test_main():
     suite = unittest.TestSuite()

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.6 2004/01/17 11:26:10 perky Exp $
+ * $Id: multibytecodec.c,v 1.7 2004/06/07 13:36:45 perky Exp $
  */
 
 #include "Python.h"
@@ -523,7 +523,7 @@ MultibyteCodec_Encode(MultibyteCodecObject *self,
 {
     MultibyteCodec_State   state;
     Py_UNICODE  *data;
-    PyObject    *errorcb, *r, *arg;
+    PyObject    *errorcb, *r, *arg, *dob;
     const char  *errors = NULL;
     int          datalen;
 
@@ -532,18 +532,22 @@ MultibyteCodec_Encode(MultibyteCodecObject *self,
         return NULL;
 
     if (PyUnicode_Check(arg)) {
-        data = PyUnicode_AS_UNICODE(arg);
-        datalen = PyUnicode_GET_SIZE(arg);
-        arg = NULL; /* forget reference */
+        dob = arg;
+        arg = NULL;
     } else {
-        arg = PyObject_Unicode(arg);
-        if (arg == NULL || !PyUnicode_Check(arg)) {
-            Py_XDECREF(arg);
+        arg = dob = PyObject_Unicode(arg);
+        if (dob == NULL)
+            return NULL;
+        else if (!PyUnicode_Check(dob)) {
+            PyErr_SetString(PyExc_TypeError,
+                            "couldn't convert the object to unicode.");
+            Py_DECREF(dob);
             return NULL;
         }
-        data = PyUnicode_AS_UNICODE(arg);
-        datalen = PyUnicode_GET_SIZE(arg);
     }
+
+    data = PyUnicode_AS_UNICODE(dob);
+    datalen = PyUnicode_GET_SIZE(dob);
 
     errorcb = get_errorcallback(errors);
     if (errorcb == NULL) {
@@ -996,37 +1000,49 @@ static int
 mbstreamwriter_iwrite(MultibyteStreamWriterObject *self,
                       PyObject *unistr)
 {
-    PyObject    *wr, *r = NULL;
-    Py_UNICODE  *inbuf, *inbuf_end, *inbuf_tmp = NULL;
-    int          rsize;
+    PyObject    *wr, *dob, *r = NULL;
+    Py_UNICODE  *inbuf, *inbuf_end, *data, *inbuf_tmp = NULL;
+    int          datalen;
 
-    if (!PyUnicode_Check(unistr)) {
-        PyErr_SetString(PyExc_TypeError,
-                        "only unicode objects are encodable.");
-        return -1;
+    if (PyUnicode_Check(unistr)) {
+        dob = unistr;
+        unistr = NULL;
+    } else {
+        unistr = dob = PyObject_Unicode(unistr);
+        if (dob == NULL)
+            return -1;
+        else if (!PyUnicode_Check(dob)) {
+            PyErr_SetString(PyExc_TypeError,
+                            "couldn't convert the object to unicode.");
+            Py_DECREF(dob);
+            return -1;
+        }
     }
 
-    rsize = PyUnicode_GET_SIZE(unistr);
-    if (rsize == 0)
+    data = PyUnicode_AS_UNICODE(dob);
+    datalen = PyUnicode_GET_SIZE(dob);
+    if (datalen == 0) {
+        Py_XDECREF(unistr);
         return 0;
+    }
 
     if (self->pendingsize > 0) {
-        inbuf_tmp = PyMem_New(Py_UNICODE, rsize + self->pendingsize);
+        inbuf_tmp = PyMem_New(Py_UNICODE, datalen + self->pendingsize);
         if (inbuf_tmp == NULL)
             goto errorexit;
         memcpy(inbuf_tmp, self->pending, Py_UNICODE_SIZE * self->pendingsize);
         memcpy(inbuf_tmp + self->pendingsize, PyUnicode_AS_UNICODE(unistr),
-               Py_UNICODE_SIZE * rsize);
-        rsize += self->pendingsize;
+               Py_UNICODE_SIZE * datalen);
+        datalen += self->pendingsize;
         self->pendingsize = 0;
         inbuf = inbuf_tmp;
     } else
         inbuf = (Py_UNICODE *)PyUnicode_AS_UNICODE(unistr);
 
-    inbuf_end = inbuf + rsize;
+    inbuf_end = inbuf + datalen;
 
     r = multibytecodec_encode(self->codec, &self->state,
-                        (const Py_UNICODE **)&inbuf, rsize, self->errors, 0);
+                        (const Py_UNICODE **)&inbuf, datalen, self->errors, 0);
     if (r == NULL)
         goto errorexit;
 
@@ -1048,12 +1064,14 @@ mbstreamwriter_iwrite(MultibyteStreamWriterObject *self,
         PyMem_Del(inbuf_tmp);
     Py_DECREF(r);
     Py_DECREF(wr);
+    Py_XDECREF(dob);
     return 0;
 
 errorexit:
     if (inbuf_tmp != NULL)
         PyMem_Del(inbuf_tmp);
     Py_XDECREF(r);
+    Py_XDECREF(dob);
     return -1;
 }
 

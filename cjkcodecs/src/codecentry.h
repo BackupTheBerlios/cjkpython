@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecentry.h,v 1.5 2004/01/17 11:26:10 perky Exp $
+ * $Id: codecentry.h,v 1.6 2004/06/07 13:36:45 perky Exp $
  */
 
 #ifdef HAVE_ENCODER_INIT
@@ -188,14 +188,14 @@ importmap(PyObject *mod, const char *symbol,
 static PyObject *
 createcodec(PyObject *cofunc, MultibyteCodec *codec)
 {
-    PyObject    *args, *r;
+    PyObject *codecobj, *r;
 
-    args = PyTuple_New(1);
-    if (args == NULL) return NULL;
-    PyTuple_SET_ITEM(args, 0, PyCObject_FromVoidPtr(codec, NULL));
+    codecobj = PyCObject_FromVoidPtr(codec, NULL);
+    if (codecobj == NULL)
+        return NULL;
 
-    r = PyObject_CallObject(cofunc, args);
-    Py_DECREF(args);
+    r = PyObject_CallFunctionObjArgs(cofunc, codecobj, NULL);
+    Py_DECREF(codecobj);
 
     return r;
 }
