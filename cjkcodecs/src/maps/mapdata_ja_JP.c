@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: mapdata_ja_JP.c,v 1.2 2003/12/31 05:46:55 perky Exp $
+ * $Id: mapdata_ja_JP.c,v 1.3 2004/01/17 11:26:10 perky Exp $
  */
 
 #include "Python.h"
@@ -56,12 +56,12 @@ static struct PyMethodDef __methods[] = {
 };
 
 void
-initmapdata_ja_JP(void)
+init_codecs_mapdata_ja_JP(void)
 {
     struct dbcs_map *h;
     PyObject        *m;
 
-    m = Py_InitModule("mapdata_ja_JP", __methods);
+    m = Py_InitModule("_codecs_mapdata_ja_JP", __methods);
 
     for (h = mapholders; h->charset[0] != '\0'; h++) {
         char     mhname[256] = "__map_";
@@ -71,7 +71,7 @@ initmapdata_ja_JP(void)
     }
 
     if (PyErr_Occurred())
-        Py_FatalError("can't initialize the mapdata_ja_JP module");
+        Py_FatalError("can't initialize the _codecs_mapdata_ja_JP module");
 }
 
 /*

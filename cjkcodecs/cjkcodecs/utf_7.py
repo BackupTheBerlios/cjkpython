@@ -27,10 +27,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: utf_7.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+# $Id: utf_7.py,v 1.3 2004/01/17 11:26:10 perky Exp $
 #
 
-from cjkcodecs._utf_7 import codec
+from cjkcodecs._codecs_utf_7 import codec
 import codecs
 
 class Codec(codecs.Codec):

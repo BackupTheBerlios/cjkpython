@@ -27,10 +27,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: cp950.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+# $Id: cp950.py,v 1.3 2004/01/17 11:26:10 perky Exp $
 #
 
-from cjkcodecs._cp950 import codec
+from cjkcodecs._codecs_cp950 import codec
 import codecs
 
 class Codec(codecs.Codec):

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.5 2003/12/31 05:46:55 perky Exp $
+ * $Id: multibytecodec.c,v 1.6 2004/01/17 11:26:10 perky Exp $
  */
 
 #include "Python.h"
@@ -1288,12 +1288,12 @@ static struct PyMethodDef __methods[] = {
 };
 
 void
-initmultibytecodec(void)
+init_multibytecodec(void)
 {
-    Py_InitModule("multibytecodec", __methods);
+    Py_InitModule("_multibytecodec", __methods);
 
     if (PyErr_Occurred())
-        Py_FatalError("can't initialize the multibytecodec module");
+        Py_FatalError("can't initialize the _multibytecodec module");
 }
 
 /*

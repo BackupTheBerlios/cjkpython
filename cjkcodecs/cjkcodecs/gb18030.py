@@ -27,10 +27,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: gb18030.py,v 1.2 2003/12/31 05:46:55 perky Exp $
+# $Id: gb18030.py,v 1.3 2004/01/17 11:26:10 perky Exp $
 #
 
-from cjkcodecs._gb18030 import codec
+from cjkcodecs._codecs_gb18030 import codec
 import codecs
 
 class Codec(codecs.Codec):

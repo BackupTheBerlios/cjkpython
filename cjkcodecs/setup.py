@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.12 2003/12/31 05:46:55 perky Exp $
+# $Id: setup.py,v 1.13 2004/01/17 11:26:10 perky Exp $
 #
 
 import os, shutil
@@ -93,15 +93,15 @@ except OSError, why:
 
 for loc in locales:
     if loc:
-        extensions.append(Extension('cjkcodecs.mapdata_'+loc,
+        extensions.append(Extension('cjkcodecs._codecs_mapdata_'+loc,
                     ['%s/maps/mapdata_%s.c' % (SRCDIR, loc)]))
     for enc in encodings[loc]:
-        extensions.append(Extension('cjkcodecs._'+enc,
+        extensions.append(Extension('cjkcodecs._codecs_'+enc,
                           ['%s/_%s.c' % (SRCDIR, enc)], library_dirs=LIBDIRS))
         if enc in strictencodings:
             shutil.copy('%s/_%s.c' % (SRCDIR, enc),
                         '%s/_%s_strict.c' % (TMPSRCDIR, enc))
-            extensions.append(Extension('cjkcodecs._'+enc+'_strict',
+            extensions.append(Extension('cjkcodecs._codecs_'+enc+'_strict',
                 ['%s/_%s_strict.c' % (TMPSRCDIR, enc)],
                 include_dirs=[SRCDIR], library_dirs=LIBDIRS,
                 define_macros=[('STRICT_BUILD', 1)]))
@@ -130,7 +130,7 @@ setup (name = "cjkcodecs",
        cmdclass = {'install': Install},
        packages = ['cjkcodecs'],
        ext_modules =
-            [Extension("cjkcodecs.multibytecodec",
+            [Extension("cjkcodecs._multibytecodec",
                        ["%s/multibytecodec.c" % SRCDIR], library_dirs=LIBDIRS)]
             + extensions
        )

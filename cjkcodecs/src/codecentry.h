@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecentry.h,v 1.4 2003/12/31 05:46:55 perky Exp $
+ * $Id: codecentry.h,v 1.5 2004/01/17 11:26:10 perky Exp $
  */
 
 #ifdef HAVE_ENCODER_INIT
@@ -55,12 +55,11 @@
 
 #ifdef STRICT_BUILD
 #define BEGIN_CODEC_REGISTRY(encoding)                      \
-    __BEGIN_CODEC_REGISTRY(encoding, init_##encoding##_strict)
+    __BEGIN_CODEC_REGISTRY(encoding, init_codecs_##encoding##_strict)
 #else
 #define BEGIN_CODEC_REGISTRY(encoding)                      \
-    __BEGIN_CODEC_REGISTRY(encoding, init_##encoding)
+    __BEGIN_CODEC_REGISTRY(encoding, init_codecs_##encoding)
 #endif
-
 
 #define __BEGIN_CODEC_REGISTRY(encoding, initname)          \
     static MultibyteCodec __codec = {                       \
@@ -83,10 +82,10 @@
         PyObject    *codec;                                 \
         PyObject    *m = NULL, *mod = NULL, *o = NULL;      \
                                                             \
-        m = Py_InitModule("_" #encoding STRICT_SUFX, __methods);
+        m = Py_InitModule("_codecs_" #encoding STRICT_SUFX, __methods);
 
 #define MAPOPEN(locale)                                     \
-    mod = PyImport_ImportModule("mapdata_" #locale);        \
+    mod = PyImport_ImportModule("_codecs_mapdata_" #locale);\
     if (mod == NULL) goto errorexit;                        \
     if (
 #define IMPORTMAP_ENCDEC(charset)                           \
@@ -103,9 +102,9 @@
     Py_DECREF(mod);
 
 #define END_CODEC_REGISTRY(encoding)                        \
-    mod = PyImport_ImportModule("multibytecodec");          \
+    mod = PyImport_ImportModule("_multibytecodec");         \
     if (mod == NULL) goto errorexit;                        \
-        o = PyObject_GetAttrString(mod, "__create_codec");  \
+    o = PyObject_GetAttrString(mod, "__create_codec");      \
     if (o == NULL || !PyCallable_Check(o))                  \
         goto errorexit;                                     \
                                                             \
