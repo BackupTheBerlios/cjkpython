@@ -4,6 +4,10 @@ Changes with CJKCodecs 1.0.2
      represention of unicode object directly. Codecs now decode as default
      encoding before encoding str object.
 
+  *) Strict-flavored codecs are added. While main codecs include several
+     tweaks to cope with wild compatibility issues, -strict codecs enable
+     pedantic people live a standard life.
+
   *) Several aliases are added for compatibility.
      - ISO-2022-JP-1: ISO-2022-JP-EXT
      - BIG5: BIG5-TW

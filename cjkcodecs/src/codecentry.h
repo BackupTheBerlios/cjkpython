@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecentry.h,v 1.1 2003/09/24 17:44:51 perky Exp $
+ * $Id: codecentry.h,v 1.2 2003/11/27 15:09:50 perky Exp $
  */
 
 #ifdef HAVE_ENCODER_INIT
@@ -53,9 +53,18 @@
 #define DECODER_RESET_FUNC(encoding)    NULL
 #endif
 
+#ifdef STRICT_BUILD
 #define BEGIN_CODEC_REGISTRY(encoding)                      \
+    __BEGIN_CODEC_REGISTRY(encoding, init_##encoding##_strict)
+#else
+#define BEGIN_CODEC_REGISTRY(encoding)                      \
+    __BEGIN_CODEC_REGISTRY(encoding, init_##encoding)
+#endif
+
+
+#define __BEGIN_CODEC_REGISTRY(encoding, initname)          \
     static MultibyteCodec __codec = {                       \
-        #encoding,                                          \
+        #encoding STRICT_SUFX,                              \
         encoding##_encode,                                  \
         ENCODER_INIT_FUNC(encoding),                        \
         ENCODER_RESET_FUNC(encoding),                       \
@@ -69,12 +78,12 @@
     };                                                      \
                                                             \
     void                                                    \
-    init_##encoding(void)                                   \
+    initname(void)                                          \
     {                                                       \
         PyObject    *codec;                                 \
         PyObject    *m = NULL, *mod = NULL, *o = NULL;      \
                                                             \
-        m = Py_InitModule("_" #encoding, __methods);
+        m = Py_InitModule("_" #encoding STRICT_SUFX, __methods);
 
 #define MAPOPEN(locale)                                     \
     mod = PyImport_ImportModule("mapdata_" #locale);        \
@@ -108,7 +117,7 @@
                                                             \
     if (PyErr_Occurred())                                   \
         Py_FatalError("can't initialize the _" #encoding    \
-            " module");                                     \
+            STRICT_SUFX " module");                         \
                                                             \
     return;                                                 \
                                                             \

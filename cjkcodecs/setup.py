@@ -27,12 +27,13 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.2 2003/09/24 18:06:32 perky Exp $
+# $Id: setup.py,v 1.3 2003/11/27 15:09:50 perky Exp $
 #
 
 import sys
 from distutils.core import setup, Extension
 from distutils.command.install import install
+import shutil
 
 LIBDIRS = []
 extensions = []
@@ -46,6 +47,9 @@ encodings = {
 '':         ['utf_7', 'utf_8'],
 }
 locales = encodings.keys()
+strictencodings = (
+'shift_jis', 'euc_jp', 'euc_jisx0213',
+)
 
 for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
     args = arg.split('=', 1)
@@ -84,6 +88,12 @@ for loc in locales:
     for enc in encodings[loc]:
         extensions.append(Extension('cjkcodecs._'+enc, ['src/_%s.c'%enc],
             library_dirs=LIBDIRS))
+        if enc in strictencodings:
+            shutil.copy('src/_%s.c' % enc, 'src/_%s_strict.c' % enc)
+            extensions.append(Extension('cjkcodecs._'+enc+'_strict',
+                ['src/_%s_strict.c' % enc], library_dirs=LIBDIRS,
+                define_macros=[('STRICT_BUILD', 1)]))
+
 
 class Install(install):
     def initialize_options (self):

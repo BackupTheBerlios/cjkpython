@@ -1,4 +1,6 @@
-# Makefile: maintenance tool set
+# ACHTUNG: This file is generated automatically. Please do not edit.
+#
+# euc_jisx0213_strict.py: Python Unicode Codec for EUC_JISX0213_STRICT
 #
 # Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
 # All rights reserved.
@@ -25,26 +27,34 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: Makefile,v 1.2 2003/11/27 15:09:50 perky Exp $
+# $Id: euc_jisx0213_strict.py,v 1.1 2003/11/27 15:09:50 perky Exp $
 #
 
-GENERIC_ENCODINGS=	gb2312 gbk gb18030 hz \
-			big5 cp950 \
-			cp932 shift_jis euc_jp \
-			iso_2022_jp iso_2022_jp_1 iso_2022_jp_2 \
-			iso_2022_jp_3 euc_jisx0213 shift_jisx0213 \
-			shift_jis_strict euc_jp_strict euc_jisx0213_strict \
-			cp949 euc_kr johab iso_2022_kr \
-			utf_7 utf_8
+from cjkcodecs._euc_jisx0213_strict import codec
+import codecs
 
-all:
-	for cset in ${GENERIC_ENCODINGS}; do \
-		CSET=`echo $$cset|tr "[:lower:]" "[:upper:]"`; \
-		if [ ! -f $$cset.py ]; then \
-		sed -e "s/%%ENCODING%%/$$CSET/g" \
-		-e "s/%%encoding%%/$$cset/g" \
-		-e "s/%%__%%/ACHTUNG: This file is generated automatically.\
-		Please do not edit./g" xxcodec.py.in \
-			> $$cset.py; \
-		fi \
-	done
+class Codec(codecs.Codec):
+    encode = codec.encode
+    decode = codec.decode
+
+class StreamReader(Codec, codecs.StreamReader):
+    def __init__(self, stream, errors='strict'):
+        codecs.StreamReader.__init__(self, stream, errors)
+        __codec = codec.StreamReader(stream, errors)
+        self.read = __codec.read
+        self.readline = __codec.readline
+        self.readlines = __codec.readlines
+        self.reset = __codec.reset
+
+class StreamWriter(Codec, codecs.StreamWriter):
+    def __init__(self, stream, errors='strict'):
+        codecs.StreamWriter.__init__(self, stream, errors)
+        __codec = codec.StreamWriter(stream, errors)
+        self.write = __codec.write
+        self.writelines = __codec.writelines
+        self.reset = __codec.reset
+
+def getregentry():
+    return (Codec().encode,Codec().decode,StreamReader,StreamWriter)
+
+# ex: ts=8 sts=4 et
