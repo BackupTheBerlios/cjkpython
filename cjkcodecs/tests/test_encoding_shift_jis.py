@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_encoding_shift_jis.py,v 1.2 2003/11/27 17:50:34 perky Exp $
+# $Id: test_encoding_shift_jis.py,v 1.3 2003/11/27 18:55:34 perky Exp $
 #
 
 from test import test_support
@@ -45,7 +45,7 @@ commonenctests = (
 class Test_SJIS_COMPAT(test_multibytecodec_support.TestBase, unittest.TestCase):
     encoding = 'cjkcodecs.shift_jis'
     tstring = test_multibytecodec_support.load_teststring('shift_jis')
-    errortests = commonenctests + (
+    codectests = commonenctests + (
         ("\\\x7e", "strict", u"\\\x7e"),
         ("\x81\x5f\x81\x61\x81\x7c", "strict", u"\uff3c\u2016\u2212"),
     )
@@ -53,7 +53,7 @@ class Test_SJIS_COMPAT(test_multibytecodec_support.TestBase, unittest.TestCase):
 class Test_SJIS_STRICT(test_multibytecodec_support.TestBase, unittest.TestCase):
     encoding = 'cjkcodecs.shift_jis_strict'
     tstring = test_multibytecodec_support.load_teststring('shift_jis')
-    errortests = commonenctests + (
+    codectests = commonenctests + (
         ("\\\x7e", "replace", u"\xa5\u203e"),
         ("\x81\x5f\x81\x61\x81\x7c", "replace", u"\x5c\u2016\u2212"),
     )

@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_multibytecodec_support.py,v 1.1 2003/09/24 17:47:05 perky Exp $
+# $Id: test_multibytecodec_support.py,v 1.2 2003/11/27 18:55:34 perky Exp $
 #
 
 import sys, codecs, os.path
@@ -39,7 +39,7 @@ class TestBase:
     codec           = None # codec tuple (with 4 elements)
     tstring         = ''   # string to test StreamReader
 
-    errortests      = None # must set. error test tuple
+    codectests      = None # must set. codec test tuple
     roundtriptest   = 1    # set if roundtrip is possible with unicode
     has_iso10646    = 0    # set if this encoding contains whole iso10646 map
     xmlcharnametest = None # string to test xmlcharrefreplace
@@ -58,7 +58,7 @@ class TestBase:
                 self.assertEqual(native, self.encode(u)[0])
 
     def test_errorhandle(self):
-        for source, scheme, expected in self.errortests:
+        for source, scheme, expected in self.codectests:
             if type(source) == type(''):
                 func = self.decode
             else:

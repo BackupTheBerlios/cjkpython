@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_encoding_shift_jisx0213.py,v 1.1 2003/09/24 17:47:03 perky Exp $
+# $Id: test_encoding_shift_jisx0213.py,v 1.2 2003/11/27 18:55:34 perky Exp $
 #
 
 from test import test_support
@@ -37,7 +37,7 @@ import unittest
 class Test_SJISX0213(test_multibytecodec_support.TestBase, unittest.TestCase):
     encoding = 'cjkcodecs.shift_jisx0213'
     tstring = test_multibytecodec_support.load_teststring('shift_jisx0213')
-    errortests = (
+    codectests = (
         # invalid bytes
         ("abc\x80\x80\x82\x84", "strict",  None),
         ("abc\xf8", "strict",  None),

@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_encoding_gb18030.py,v 1.1 2003/09/24 17:47:02 perky Exp $
+# $Id: test_encoding_gb18030.py,v 1.2 2003/11/27 18:55:34 perky Exp $
 #
 
 from test import test_support
@@ -37,7 +37,7 @@ import unittest
 class Test_GB18030(test_multibytecodec_support.TestBase, unittest.TestCase):
     encoding = 'cjkcodecs.gb18030'
     tstring = test_multibytecodec_support.load_teststring('gb18030')
-    errortests = (
+    codectests = (
         # invalid bytes
         ("abc\x80\x80\xc1\xc4", "strict",  None),
         ("abc\xc8", "strict",  None),

@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_encoding_gb2312.py,v 1.1 2003/09/24 17:47:02 perky Exp $
+# $Id: test_encoding_gb2312.py,v 1.2 2003/11/27 18:55:34 perky Exp $
 #
 
 from test import test_support
@@ -37,7 +37,7 @@ import unittest
 class Test_GB2312(test_multibytecodec_support.TestBase, unittest.TestCase):
     encoding = 'cjkcodecs.gb2312'
     tstring = test_multibytecodec_support.load_teststring('gb2312')
-    errortests = (
+    codectests = (
         # invalid bytes
         ("abc\x81\x81\xc1\xc4", "strict",  None),
         ("abc\xc8", "strict",  None),

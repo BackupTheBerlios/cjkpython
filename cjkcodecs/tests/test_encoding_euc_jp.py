@@ -27,31 +27,47 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_encoding_euc_jp.py,v 1.1 2003/09/24 17:47:02 perky Exp $
+# $Id: test_encoding_euc_jp.py,v 1.2 2003/11/27 18:55:34 perky Exp $
 #
 
 from test import test_support
 import test_multibytecodec_support
 import unittest
 
-class Test_EUC_JP(test_multibytecodec_support.TestBase, unittest.TestCase):
+commontests = (
+    ("abc\x80\x80\xc1\xc4", "strict",  None),
+    ("abc\xc8", "strict",  None),
+    ("abc\x80\x80\xc1\xc4", "replace", u"abc\ufffd\u7956"),
+    ("abc\x80\x80\xc1\xc4\xc8", "replace", u"abc\ufffd\u7956\ufffd"),
+    ("abc\x80\x80\xc1\xc4", "ignore",  u"abc\u7956"),
+    ("abc\x8f\x83\x83", "replace", u"abc\ufffd"),
+    ("\xc1\x64", "strict", None),
+)
+
+class Test_EUC_JP_COMPAT(test_multibytecodec_support.TestBase,
+                         unittest.TestCase):
     encoding = 'cjkcodecs.euc_jp'
     tstring = test_multibytecodec_support.load_teststring('euc_jp')
-    errortests = (
-        # invalid bytes
-        ("abc\x80\x80\xc1\xc4", "strict",  None),
-        ("abc\xc8", "strict",  None),
-        ("abc\x80\x80\xc1\xc4", "replace", u"abc\ufffd\u7956"),
-        ("abc\x80\x80\xc1\xc4\xc8", "replace", u"abc\ufffd\u7956\ufffd"),
-        ("abc\x80\x80\xc1\xc4", "ignore",  u"abc\u7956"),
-        ("abc\x8f\x83\x83", "replace", u"abc\ufffd"),
-        ("\xc1\x64", "strict", None),
-        ("\xa1\xc0", "strict", u"\uff3c"),
+    codectests = commontests + (
+        ("\xa1\xc0\\", "strict", u"\uff3c\\"),
+        (u"\xa5", "strict", "\x5c"),
+        (u"\u203e", "strict", "\x7e"),
+    )
+
+class Test_EUC_JP_STRICT(test_multibytecodec_support.TestBase,
+                         unittest.TestCase):
+    encoding = 'cjkcodecs.euc_jp_strict'
+    tstring = test_multibytecodec_support.load_teststring('euc_jp')
+    codectests = commontests + (
+        ("\xa1\xc0\\", "strict", u"\\\\"),
+        (u"\xa5", "strict", None),
+        (u"\u203e", "strict", None),
     )
 
 def test_main():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(Test_EUC_JP))
+    suite.addTest(unittest.makeSuite(Test_EUC_JP_COMPAT))
+    suite.addTest(unittest.makeSuite(Test_EUC_JP_STRICT))
     test_support.run_suite(suite)
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_encoding_big5.py,v 1.1 2003/09/24 17:47:01 perky Exp $
+# $Id: test_encoding_big5.py,v 1.2 2003/11/27 18:55:34 perky Exp $
 #
 
 from test import test_support
@@ -37,7 +37,7 @@ import unittest
 class Test_Big5(test_multibytecodec_support.TestBase, unittest.TestCase):
     encoding = 'cjkcodecs.big5'
     tstring = test_multibytecodec_support.load_teststring('big5')
-    errortests = (
+    codectests = (
         # invalid bytes
         ("abc\x80\x80\xc1\xc4", "strict",  None),
         ("abc\xc8", "strict",  None),
