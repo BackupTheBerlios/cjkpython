@@ -1,7 +1,13 @@
 /*
- * $Id: map_jisx0213_pairs.h,v 1.4 2004/07/06 17:05:24 perky Exp $
+ * $Id: map_jisx0213_pairs.h,v 1.5 2004/07/07 02:33:55 perky Exp $
  */
 
+#define JISX0213_ENCPAIRS   46
+
+#ifdef EXTERN_JISX0213_PAIR
+static const struct widedbcs_index *jisx0213_pair_decmap;
+static const struct pair_encodemap *jisx0213_pair_encmap;
+#else
 static const ucs4_t __jisx0213_pair_decmap[49] = {
 810234010,810365082,810496154,810627226,810758298,816525466,816656538,
 816787610,816918682,817049754,817574042,818163866,818426010,838283418,
@@ -40,7 +46,6 @@ static const struct widedbcs_index jisx0213_pair_decmap[256] = {
 },{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},
 };
 
-#define JISX0213_ENCPAIRS   46
 static const struct pair_encodemap jisx0213_pair_encmap[JISX0213_ENCPAIRS] = {
     { 0x00e60000, 0x295c },
     { 0x00e60300, 0x2b44 },
@@ -89,3 +94,4 @@ static const struct pair_encodemap jisx0213_pair_encmap[JISX0213_ENCPAIRS] = {
     { 0x31f70000, 0x2675 },
     { 0x31f7309a, 0x2678 },
 };
+#endif

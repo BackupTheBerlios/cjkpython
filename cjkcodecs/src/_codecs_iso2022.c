@@ -26,11 +26,12 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.15 2004/07/06 17:00:18 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.16 2004/07/07 02:33:55 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
 #define USING_BINARY_PAIR_SEARCH
+#define EXTERN_JISX0213_PAIR
 
 #include "cjkcodecs.h"
 #include "alg_jisx0201.h"
@@ -714,7 +715,9 @@ jisx0213_init(void)
 			IMPORT_MAP(jp, jisx0213_1_emp,
 				   NULL, &jisx0213_1_emp_decmap) ||
 			IMPORT_MAP(jp, jisx0213_2_emp,
-				   NULL, &jisx0213_2_emp_decmap)))
+				   NULL, &jisx0213_2_emp_decmap) ||
+			IMPORT_MAP(jp, jisx0213_pair, &jisx0213_pair_encmap,
+				   &jisx0213_pair_decmap)))
 		return -1;
 	initialized = 1;
 	return 0;
@@ -810,6 +813,29 @@ jisx0213_1_encoder(const ucs4_t *data, int *length)
 		return MAP_UNMAPPABLE;
 	else
 		return coded;
+}
+
+static DBCHAR
+jisx0213_1_encoder_paironly(const ucs4_t *data, int *length)
+{
+	DBCHAR coded;
+	int ilength = *length;
+
+	coded = jisx0213_encoder(data, length);
+	switch (ilength) {
+	case 1:
+		if (coded == MAP_MULTIPLE_AVAIL)
+			return MAP_MULTIPLE_AVAIL;
+		else
+			return MAP_UNMAPPABLE;
+	case 2:
+		if (*length != 2)
+			return MAP_UNMAPPABLE;
+		else
+			return coded;
+	default:
+		return MAP_UNMAPPABLE;
+	}
 }
 
 static DBCHAR
@@ -1023,6 +1049,10 @@ dummy_encoder(const ucs4_t *data, int *length)
 #define REGISTRY_JISX0213_1	{ CHARSET_JISX0213_1, 0, 2,		\
 				  jisx0213_init,			\
 				  jisx0213_1_decoder, jisx0213_1_encoder }
+#define REGISTRY_JISX0213_1_PAIRONLY { CHARSET_JISX0213_1, 0, 2,	\
+				  jisx0213_init,			\
+				  jisx0213_1_decoder,			\
+				  jisx0213_1_encoder_paironly }
 #define REGISTRY_JISX0213_2	{ CHARSET_JISX0213_2, 0, 2,		\
 				  jisx0213_init,			\
 				  jisx0213_2_decoder, jisx0213_2_encoder }
@@ -1067,8 +1097,8 @@ static const struct iso2022_config iso2022_jp_2_config = {
 
 static const struct iso2022_config iso2022_jp_3_config = {
 	NO_SHIFT | USE_JISX0208_EXT,
-	{ REGISTRY_JISX0208, REGISTRY_JISX0213_1, REGISTRY_JISX0213_2,
-	  REGISTRY_SENTINEL },
+	{ REGISTRY_JISX0213_1_PAIRONLY, REGISTRY_JISX0208,
+	  REGISTRY_JISX0213_1, REGISTRY_JISX0213_2, REGISTRY_SENTINEL },
 };
 
 static const struct iso2022_config iso2022_jp_ext_config = {
