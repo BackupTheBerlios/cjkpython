@@ -2,7 +2,7 @@ Python Iconv Codec version 1.1.2
 ================================
 
 Copyright(C) Hye-Shik Chang, 2003.
-$Id: README,v 1.2 2003/11/27 09:18:05 perky Exp $
+$Id: README,v 1.3 2003/11/27 09:19:29 perky Exp $
 
 
 
@@ -40,7 +40,6 @@ python setup.py install [options ...]
 'options' are:
   --with-libc			Force to build with iconv in the libc
   --with-libiconv[=path]	Use a separated libiconv on the path
-				(default)
 
 You can specify another options for distutils, also.
 
