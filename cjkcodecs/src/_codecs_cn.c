@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_cn.c,v 1.2 2004/06/20 05:10:51 perky Exp $
+ * $Id: _codecs_cn.c,v 1.3 2004/06/27 21:03:54 perky Exp $
  */
 
 #include "cjkc_prelude.h"
@@ -46,10 +46,10 @@
 	else if ((code) == 0x00b7) (assi) = 0xa1a4;
 
 #include "cjkc_interlude.h"
-#include "codecimpl_gb2312.h"
-#include "codecimpl_gbk.h"
-#include "codecimpl_gb18030.h"
-#include "codecimpl_hz.h"
+#include "impl_gb2312.h"
+#include "impl_gbk.h"
+#include "impl_gb18030.h"
+#include "impl_hz.h"
 
 BEGIN_MAPPING_LIST
   MAPPING_DECONLY(gb2312)

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_tw.c,v 1.3 2004/06/20 18:55:36 perky Exp $
+ * $Id: _codecs_tw.c,v 1.4 2004/06/27 21:03:54 perky Exp $
  */
 
 #include "cjkc_prelude.h"
@@ -37,10 +37,10 @@
 #endif
 
 #include "cjkc_interlude.h"
-#include "codecimpl_big5.h"
-#include "codecimpl_cp950.h"
+#include "impl_big5.h"
+#include "impl_cp950.h"
 #ifndef NO_EXTRA_ENCODINGS
-# include "codecimpl_euc_tw.h"
+# include "impl_euc_tw.h"
 #endif
 
 BEGIN_MAPPING_LIST

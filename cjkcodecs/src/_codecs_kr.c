@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_kr.c,v 1.2 2004/06/27 10:39:28 perky Exp $
+ * $Id: _codecs_kr.c,v 1.3 2004/06/27 21:03:54 perky Exp $
  */
 
 #include "cjkc_prelude.h"
@@ -35,9 +35,9 @@
 #include "maps/map_cp949ext.h"
 
 #include "cjkc_interlude.h"
-#include "codecimpl_euc_kr.h"
-#include "codecimpl_cp949.h"
-#include "codecimpl_johab.h"
+#include "impl_euc_kr.h"
+#include "impl_cp949.h"
+#include "impl_johab.h"
 
 BEGIN_MAPPING_LIST
   MAPPING_DECONLY(ksx1001)

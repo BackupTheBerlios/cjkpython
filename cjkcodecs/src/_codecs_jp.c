@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_jp.c,v 1.4 2004/06/27 10:39:28 perky Exp $
+ * $Id: _codecs_jp.c,v 1.5 2004/06/27 21:03:54 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
@@ -42,11 +42,11 @@
 #include "maps/alg_jisx0201.h"
 
 #include "cjkc_interlude.h"
-#include "codecimpl_cp932.h"
-#include "codecimpl_euc_jisx0213.h"
-#include "codecimpl_euc_jp.h"
-#include "codecimpl_shift_jis.h"
-#include "codecimpl_shift_jisx0213.h"
+#include "impl_cp932.h"
+#include "impl_euc_jisx0213.h"
+#include "impl_euc_jp.h"
+#include "impl_shift_jis.h"
+#include "impl_shift_jisx0213.h"
 
 BEGIN_MAPPING_LIST
   MAPPING_DECONLY(jisx0208)
