@@ -1,0 +1,4 @@
+# $Id: MANIFEST.in,v 1.1 2003/11/27 09:04:45 perky Exp $
+
+include COPYRIGHT MANIFEST.in AUTHORS README THANKS
+include test_iconv_codec.py _iconv_codec_compat.h

@@ -1,0 +1,64 @@
+Python Iconv Codec version 1.1.1
+================================
+
+Copyright(C) Hye-Shik Chang, 2003.
+$Id: README,v 1.1 2003/11/27 09:04:45 perky Exp $
+
+
+
+Introduction
+------------
+
+This package provides a Universal Unicode Codec for Python.
+
+
+Requirement
+-----------
+
+This package requires Python 2.1+.
+
+
+Compatibilities
+---------------
+
+The following iconv implementations are known to be compatible with iconvcodec:
+
+ - GNU libiconv:
+	http://www.gnu.org/software/libiconv/ (recommended)
+ - FreeBSD iconv:
+	http://www.freshports.org/converters/iconv/
+ - GNU libc
+ - Solaris libc
+ - HP-UX libc
+
+
+Installation
+------------
+
+python setup.py install [options ...]
+
+'options' are:
+  --with-libc			Force to build with iconv in the libc
+  --with-libiconv[=path]	Use a separated libiconv on the path
+				(default)
+
+You can specify another options for distutils, also.
+
+
+Notes
+-----
+
+If you are using Python 2.3a2, you'll need to delete 2 files to run iconvcodec
+correctly:
+
+ ${PREFIX}/lib/python2.3/encodings/iconv_codec.py{,s} for POSIX users
+ C:\Python23\Lib\encodings\iconv_codec.py{,s} for Windows users
+
+
+Author
+------
+
+Hye-Shik Chang <perky@FreeBSD.org>
+
+Any comments, suggestions, and/or patches are very welcome.
+Thank you for using iconvcodec!
