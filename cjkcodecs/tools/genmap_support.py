@@ -26,14 +26,14 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_support.py,v 1.5 2004/06/20 18:42:09 perky Exp $
+# $Id: genmap_support.py,v 1.6 2004/06/29 05:55:09 perky Exp $
 #
 
 import re
 
 COPYRIGHT_HEADER = """\
 /*
- * $Id: genmap_support.py,v 1.5 2004/06/20 18:42:09 perky Exp $
+ * $Id: genmap_support.py,v 1.6 2004/06/29 05:55:09 perky Exp $
  */
 """
 
@@ -143,7 +143,7 @@ class EncodeMapWriter:
                 self.filler.write("{", "__%s_encmap" % self.prefix, "+",
                                   "%d" % fmap[i]['midx'], ",",
                                   "%d," % fmap[i]['min'],
-                                  "%d," % fmap[i]['max'], "},")
+                                  "%d" % fmap[i]['max'], "},")
             else:
                 self.filler.write("{", "0,", "0,", "0", "},")
                 continue
@@ -197,7 +197,7 @@ def print_encmap(fo, filler, fmapprefix, fmap, f2map={}, f2mapprefix=''):
             continue
 
         filler.write("{", "__%s_encmap" % prefix, "+", "%d" % map[i]['midx'],
-                     ",", "%d," % map[i]['min'], "%d," % map[i]['max'], "},")
+                     ",", "%d," % map[i]['min'], "%d" % map[i]['max'], "},")
     filler.printout(fo)
     print >> fo, "};"
     print >> fo
@@ -259,7 +259,7 @@ def print_decmap(fo, filler, fmapprefix, fmap, f2map={}, f2mapprefix='',
             continue
 
         filler.write("{", "__%s_decmap" % prefix, "+", "%d" % map[i]['midx'],
-                     ",", "%d," % map[i]['min'], "%d," % map[i]['max'], "},")
+                     ",", "%d," % map[i]['min'], "%d" % map[i]['max'], "},")
     filler.printout(fo)
     print >> fo, "};"
     print >> fo
