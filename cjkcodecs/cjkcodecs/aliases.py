@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.6 2004/06/18 03:45:22 perky Exp $
+# $Id: aliases.py,v 1.7 2004/06/19 06:14:25 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -170,5 +170,3 @@ aliases.update({
     #'utf_8'             : 'cjkcodecs.utf_8',
 })
 del aliases
-
-# ex: ts=8 sts=4 et

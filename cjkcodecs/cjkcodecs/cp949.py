@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: cp949.py,v 1.4 2004/06/18 19:13:24 perky Exp $
+# $Id: cp949.py,v 1.5 2004/06/19 06:13:53 perky Exp $
 #
 
 from cjkcodecs import _codecs_kr
@@ -57,6 +57,4 @@ class StreamWriter(Codec, codecs.StreamWriter):
         self.reset = __codec.reset
 
 def getregentry():
-    return (Codec().encode,Codec().decode,StreamReader,StreamWriter)
-
-# ex: ts=8 sts=4 sw=4 et
+    return (codec.encode, codec.decode, StreamReader, StreamWriter)
