@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: test_mapping_euc_jp.py,v 1.1 2003/09/24 17:47:03 perky Exp $
+# $Id: test_mapping_euc_jp.py,v 1.2 2003/11/27 18:57:26 perky Exp $
 #
 
 from test import test_support
@@ -40,14 +40,14 @@ if not os.path.exists('EUC-JP.TXT'):
             'EUC-JP.TXT not found, download from http://people.freebsd'
             '.org/~perky/i18n/EUC-JP.TXT')
 
-class TestEUCJPMap(test_multibytecodec_support.TestBase_Mapping,
+class TestEUCJPCOMPATMap(test_multibytecodec_support.TestBase_Mapping,
                    unittest.TestCase):
     encoding = 'cjkcodecs.euc_jp'
     mapfilename = 'EUC-JP.TXT'
 
 def test_main():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestEUCJPMap))
+    suite.addTest(unittest.makeSuite(TestEUCJPCOMPATMap))
     test_support.run_suite(suite)
 
 if __name__ == "__main__":
