@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.21 2004/08/07 08:19:00 perky Exp $
+# $Id: setup.py,v 1.22 2004/08/19 17:11:58 perky Exp $
 #
 
 import os
@@ -98,7 +98,7 @@ class Install(install):
             org_install_lib or self.install_purelib
 
 setup (name = "cjkcodecs",
-       version = "1.1",
+       version = "1.1.1",
        description = "Python Unicode Codecs Collection for CJK Encodings",
        author = "Hye-Shik Chang",
        author_email = "perky@FreeBSD.org",
