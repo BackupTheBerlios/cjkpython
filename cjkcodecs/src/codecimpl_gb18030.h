@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_gb18030.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_gb18030.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(gb18030)
@@ -51,7 +51,7 @@ ENCODER(gb18030)
 		else if (c >= 0x10000) {
 			ucs4_t tc = c - 0x10000;
 
-			RESERVE_OUTBUF(4)
+			REQUIRE_OUTBUF(4)
 
 			OUT4((unsigned char)(tc % 10) + 0x30)
 			tc /= 10;
@@ -69,7 +69,7 @@ ENCODER(gb18030)
 			continue;
 		}
 
-		RESERVE_OUTBUF(2)
+		REQUIRE_OUTBUF(2)
 
 		GBK_PREENCODE(c, code)
 		else TRYMAP_ENC(gbcommon, code, c);
@@ -77,7 +77,7 @@ ENCODER(gb18030)
 		else {
 			const struct _gb18030_to_unibmp_ranges *utrrange;
 
-			RESERVE_OUTBUF(4)
+			REQUIRE_OUTBUF(4)
 
 			for (utrrange = gb18030_to_unibmp_ranges;
 			     utrrange->first != 0;
@@ -126,7 +126,7 @@ DECODER(gb18030)
 	while (inleft > 0) {
 		unsigned char c = IN1, c2;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 
 		if (c < 0x80) {
 			OUT1(c)
@@ -134,7 +134,7 @@ DECODER(gb18030)
 			continue;
 		}
 
-		RESERVE_INBUF(2)
+		REQUIRE_INBUF(2)
 
 		c2 = IN2;
 		if (c2 >= 0x30 && c2 <= 0x39) { /* 4 bytes seq */
@@ -142,7 +142,7 @@ DECODER(gb18030)
 			unsigned char c3, c4;
 			ucs4_t lseq;
 
-			RESERVE_INBUF(4)
+			REQUIRE_INBUF(4)
 			c3 = IN3;
 			c4 = IN4;
 			if (c < 0x81 || c3 < 0x81 || c4 < 0x30 || c4 > 0x39)
@@ -166,7 +166,7 @@ DECODER(gb18030)
 				lseq = 0x10000 + (((ucs4_t)c-15) * 10 + c2)
 					* 1260 + (ucs4_t)c3 * 10 + c4;
 				if (lseq <= 0x10FFFF) {
-					PUTUCS4(lseq);
+					WRITEUCS4(lseq);
 					NEXT_IN(4)
 					continue;
 				}

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.2 2004/06/27 19:17:47 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.3 2004/06/27 19:24:13 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -413,7 +413,7 @@ DECODER(iso2022)
 
 		switch (c) {
 		case ESC:
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			if (IS_ISO2022ESC(IN2)) {
 				err = iso2022processesc(config, state,
 							inbuf, &inleft);
@@ -421,7 +421,7 @@ DECODER(iso2022)
 					return err;
 			}
 			else if (CONFIG_ISSET(USE_G2) && IN2 == 'N') {/* SS2 */
-				RESERVE_INBUF(3)
+				REQUIRE_INBUF(3)
 				err = iso2022processg2(config, state,
 					inbuf, &inleft, outbuf, &outleft);
 				if (err != 0)
@@ -486,7 +486,7 @@ bypass:					WRITE1(c)
 					dsgcache = dsg;
 				}
 
-				RESERVE_INBUF(dsg->width)
+				REQUIRE_INBUF(dsg->width)
 				decoded = dsg->decoder(*inbuf);
 				if (decoded == MAP_UNMAPPABLE)
 					return dsg->width;

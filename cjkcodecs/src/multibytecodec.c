@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.11 2004/06/26 16:50:44 perky Exp $
+ * $Id: multibytecodec.c,v 1.12 2004/06/27 19:24:13 perky Exp $
  */
 
 #include "Python.h"
@@ -144,7 +144,7 @@ expand_encodebuffer(MultibyteEncodeBuffer *buf, int esize)
 
 	return 0;
 }
-#define RESERVE_ENCODEBUFFER(buf, s) {					\
+#define REQUIRE_ENCODEBUFFER(buf, s) {					\
 	if ((s) < 1 || (buf)->outbuf + (s) > (buf)->outbuf_end)		\
 		if (expand_encodebuffer(buf, s) == -1)			\
 			goto errorexit;					\
@@ -167,7 +167,7 @@ expand_decodebuffer(MultibyteDecodeBuffer *buf, int esize)
 
 	return 0;
 }
-#define RESERVE_DECODEBUFFER(buf, s) {					\
+#define REQUIRE_DECODEBUFFER(buf, s) {					\
 	if ((s) < 1 || (buf)->outbuf + (s) > (buf)->outbuf_end)		\
 		if (expand_decodebuffer(buf, s) == -1)			\
 			goto errorexit;					\
@@ -194,7 +194,7 @@ multibytecodec_encerror(MultibyteCodec *codec,
 	else {
 		switch (e) {
 		case MBERR_TOOSMALL:
-			RESERVE_ENCODEBUFFER(buf, -1);
+			REQUIRE_ENCODEBUFFER(buf, -1);
 			return 0; /* retry it */
 		case MBERR_TOOFEW:
 			reason = "incomplete multibyte sequence";
@@ -222,7 +222,7 @@ multibytecodec_encerror(MultibyteCodec *codec,
 			r = codec->encode(state, codec->config, &inbuf, 1,
 					  &buf->outbuf, outleft, 0);
 			if (r == MBERR_TOOSMALL) {
-				RESERVE_ENCODEBUFFER(buf, -1);
+				REQUIRE_ENCODEBUFFER(buf, -1);
 				continue;
 			}
 			else
@@ -230,7 +230,7 @@ multibytecodec_encerror(MultibyteCodec *codec,
 		}
 
 		if (r != 0) {
-			RESERVE_ENCODEBUFFER(buf, 1);
+			REQUIRE_ENCODEBUFFER(buf, 1);
 			*buf->outbuf++ = '?';
 		}
 	}
@@ -315,7 +315,7 @@ errorexit:
 	}
 
 	retstrsize = PyString_GET_SIZE(retstr);
-	RESERVE_ENCODEBUFFER(buf, retstrsize);
+	REQUIRE_ENCODEBUFFER(buf, retstrsize);
 
 	memcpy(buf->outbuf, PyString_AS_STRING(retstr), retstrsize);
 	buf->outbuf += retstrsize;
@@ -363,7 +363,7 @@ multibytecodec_decerror(MultibyteCodec *codec,
 	else {
 		switch (e) {
 		case MBERR_TOOSMALL:
-			RESERVE_DECODEBUFFER(buf, -1);
+			REQUIRE_DECODEBUFFER(buf, -1);
 			return 0; /* retry it */
 		case MBERR_TOOFEW:
 			reason = "incomplete multibyte sequence";
@@ -381,7 +381,7 @@ multibytecodec_decerror(MultibyteCodec *codec,
 	}
 
 	if (errors == ERROR_REPLACE) {
-		RESERVE_DECODEBUFFER(buf, 1);
+		REQUIRE_DECODEBUFFER(buf, 1);
 		*buf->outbuf++ = Py_UNICODE_REPLACEMENT_CHARACTER;
 	}
 	if (errors == ERROR_IGNORE || errors == ERROR_REPLACE) {
@@ -446,7 +446,7 @@ errorexit:
 
 	retunisize = PyUnicode_GET_SIZE(retuni);
 	if (retunisize > 0) {
-		RESERVE_DECODEBUFFER(buf, retunisize);
+		REQUIRE_DECODEBUFFER(buf, retunisize);
 		memcpy((char *)buf->outbuf, PyUnicode_AS_DATA(retuni),
 				retunisize * Py_UNICODE_SIZE);
 		buf->outbuf += retunisize;

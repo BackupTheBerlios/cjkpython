@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_cp949.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_cp949.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(cp949)
@@ -42,7 +42,7 @@ ENCODER(cp949)
 		}
 		UCS4INVALID(c)
 
-		RESERVE_OUTBUF(2)
+		REQUIRE_OUTBUF(2)
 		TRYMAP_ENC(cp949, code, c);
 		else return 1;
 
@@ -62,7 +62,7 @@ DECODER(cp949)
 	while (inleft > 0) {
 		unsigned char c = IN1;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 
 		if (c < 0x80) {
 			OUT1(c)
@@ -70,7 +70,7 @@ DECODER(cp949)
 			continue;
 		}
 
-		RESERVE_INBUF(2)
+		REQUIRE_INBUF(2)
 		TRYMAP_DEC(ksx1001, **outbuf, c ^ 0x80, IN2 ^ 0x80);
 		else TRYMAP_DEC(cp949ext, **outbuf, c, IN2);
 		else return 2;

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_hz.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_hz.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER_INIT(hz)
@@ -106,7 +106,7 @@ DECODER(hz)
 		if (c == '~') {
 			unsigned char c2 = IN2;
 
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			if (c2 == '~') {
 				WRITE1('~')
 				NEXT(2, 1)
@@ -132,8 +132,8 @@ DECODER(hz)
 			NEXT(1, 1)
 		}
 		else { /* GB mode */
-			RESERVE_INBUF(2)
-			RESERVE_OUTBUF(1)
+			REQUIRE_INBUF(2)
+			REQUIRE_OUTBUF(1)
 			TRYMAP_DEC(gb2312, **outbuf, c, IN2) {
 				NEXT(2, 1)
 			}

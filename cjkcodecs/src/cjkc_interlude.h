@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_interlude.h,v 1.6 2004/06/27 19:17:47 perky Exp $
+ * $Id: cjkc_interlude.h,v 1.7 2004/06/27 19:24:13 perky Exp $
  */
 
 #ifndef _CJKC_INTERLUDE_H_
@@ -83,10 +83,10 @@
 #define NEXT(i, o)				\
 	NEXT_IN(i) NEXT_OUT(o)
 
-#define RESERVE_INBUF(n)			\
+#define REQUIRE_INBUF(n)			\
 	if (inleft < (n))			\
 		return MBERR_TOOFEW;
-#define RESERVE_OUTBUF(n)			\
+#define REQUIRE_OUTBUF(n)			\
 	if (outleft < (n))			\
 		return MBERR_TOOSMALL;
 
@@ -101,33 +101,33 @@
 #define OUT4(c) ((*outbuf)[3]) = (c);
 
 #define WRITE1(c1)		\
-	RESERVE_OUTBUF(1)	\
+	REQUIRE_OUTBUF(1)	\
 	(*outbuf)[0] = (c1);
 #define WRITE2(c1, c2)		\
-	RESERVE_OUTBUF(2)	\
+	REQUIRE_OUTBUF(2)	\
 	(*outbuf)[0] = (c1);	\
 	(*outbuf)[1] = (c2);
 #define WRITE3(c1, c2, c3)	\
-	RESERVE_OUTBUF(3)	\
+	REQUIRE_OUTBUF(3)	\
 	(*outbuf)[0] = (c1);	\
 	(*outbuf)[1] = (c2);	\
 	(*outbuf)[2] = (c3);
 #define WRITE4(c1, c2, c3, c4)	\
-	RESERVE_OUTBUF(4)	\
+	REQUIRE_OUTBUF(4)	\
 	(*outbuf)[0] = (c1);	\
 	(*outbuf)[1] = (c2);	\
 	(*outbuf)[2] = (c3);	\
 	(*outbuf)[3] = (c4);
 
 #if Py_UNICODE_SIZE == 2
-# define PUTUCS4(c)						\
-	RESERVE_OUTBUF(2)					\
+# define WRITEUCS4(c)						\
+	REQUIRE_OUTBUF(2)					\
 	(*outbuf)[0] = 0xd800 + (((c) - 0x10000) >> 10);	\
 	(*outbuf)[1] = 0xdc00 + (((c) - 0x10000) & 0x3ff);	\
 	NEXT_OUT(2)
 #else
-# define PUTUCS4(c)						\
-	RESERVE_OUTBUF(1)					\
+# define WRITEUCS4(c)						\
+	REQUIRE_OUTBUF(1)					\
 	**outbuf = (Py_UNICODE)(c);				\
 	NEXT_OUT(1)
 #endif
@@ -160,7 +160,7 @@
 #if Py_UNICODE_SIZE == 2
 #define DECODE_SURROGATE(c)					\
 	if (c >> 10 == 0xd800 >> 10) { /* high surrogate */	\
-		RESERVE_INBUF(2)				\
+		REQUIRE_INBUF(2)				\
 		if (IN2 >> 10 == 0xdc00 >> 10) { /* low surrogate */ \
 		    c = 0x10000 + ((ucs4_t)(c - 0xd800) << 10) + \
 			((ucs4_t)(IN2) - 0xdc00);		\

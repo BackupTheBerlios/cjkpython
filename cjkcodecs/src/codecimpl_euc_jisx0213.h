@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_euc_jisx0213.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_euc_jisx0213.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(euc_jisx0213)
@@ -121,7 +121,7 @@ DECODER(euc_jisx0213)
 		unsigned char c = IN1;
 		ucs4_t code;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 
 		if (c < 0x80) {
 			OUT1(c)
@@ -133,7 +133,7 @@ DECODER(euc_jisx0213)
 			/* JIS X 0201 half-width katakana */
 			unsigned char c2;
 
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			c2 = IN2;
 			if (c2 >= 0xa1 && c2 <= 0xdf) {
 				OUT1(0xfec0 + c2)
@@ -145,14 +145,14 @@ DECODER(euc_jisx0213)
 		else if (c == 0x8f) {
 			unsigned char c2, c3;
 
-			RESERVE_INBUF(3)
+			REQUIRE_INBUF(3)
 			c2 = IN2 ^ 0x80;
 			c3 = IN3 ^ 0x80;
 
 			/* JIS X 0213 Plane 2 or JIS X 0212 (see NOTES) */
 			TRYMAP_DEC(jisx0213_2_bmp, **outbuf, c2, c3) ;
 			else TRYMAP_DEC(jisx0213_2_emp, code, c2, c3) {
-				PUTUCS4(EMPBASE | code)
+				WRITEUCS4(EMPBASE | code)
 				NEXT_IN(3)
 				continue;
 			}
@@ -163,7 +163,7 @@ DECODER(euc_jisx0213)
 		else {
 			unsigned char c2;
 
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			c ^= 0x80;
 			c2 = IN2 ^ 0x80;
 
@@ -173,7 +173,7 @@ DECODER(euc_jisx0213)
 			else TRYMAP_DEC(jisx0208, **outbuf, c, c2);
 			else TRYMAP_DEC(jisx0213_1_bmp, **outbuf, c, c2);
 			else TRYMAP_DEC(jisx0213_1_emp, code, c, c2) {
-				PUTUCS4(EMPBASE | code)
+				WRITEUCS4(EMPBASE | code)
 				NEXT_IN(2)
 				continue;
 			}

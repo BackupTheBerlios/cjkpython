@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_utf_7.h,v 1.2 2004/06/19 16:20:49 perky Exp $
+ * $Id: codecimpl_utf_7.h,v 1.3 2004/06/27 19:24:13 perky Exp $
  */
 
 #define SET_DIRECT      1
@@ -110,7 +110,7 @@ ENCODER(utf_7)
 
 #if Py_UNICODE_SIZE == 2
 		if (c1 >> 10 == 0xd800 >> 10) { /* high surrogate */
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			if (IN2 >> 10 != 0xdc00 >> 10) /* low surrogate */
 				return 2; /* invalid surrogate pair */
 			c2 = IN2;
@@ -314,7 +314,7 @@ DECODER(utf_7)
 
 		if (!DSTATE_ISSHIFTED(state)) {
 			if (c == '+') {
-				RESERVE_INBUF(2)
+				REQUIRE_INBUF(2)
 				if (inleft >= 2 && IN2 == '-') {
 					WRITE1('+')
 					NEXT(2, 1)
@@ -334,7 +334,7 @@ DECODER(utf_7)
 		else if (B64CHAR(c)) {
 			unsigned char tb;
 
-			RESERVE_OUTBUF(1)
+			REQUIRE_OUTBUF(1)
 			c = UB64(c);
 			assert(DSTATE_GETULENGTH(state) < 4);
 

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_shift_jisx0213.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_shift_jisx0213.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(shift_jisx0213)
@@ -46,7 +46,7 @@ ENCODER(shift_jisx0213)
 			continue;
 		}
 
-		RESERVE_OUTBUF(2)
+		REQUIRE_OUTBUF(2)
 		insize = GET_INSIZE(c);
 
 		if (code == NOCHAR) {
@@ -119,13 +119,13 @@ DECODER(shift_jisx0213)
 	while (inleft > 0) {
 		unsigned char c = IN1;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 		JISX0201_DECODE(c, **outbuf)
 		else if ((c >= 0x81 && c <= 0x9f) || (c >= 0xe0 && c <= 0xfc)){
 			unsigned char c1, c2 = IN2;
 			ucs4_t code;
 
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			if (c2 < 0x40 || (c2 > 0x7e && c2 < 0x80) || c2 > 0xfc)
 				return 2;
 
@@ -144,7 +144,7 @@ DECODER(shift_jisx0213)
 					NEXT_OUT(1)
 				}
 				else TRYMAP_DEC(jisx0213_1_emp, code, c1, c2) {
-					PUTUCS4(EMPBASE | code)
+					WRITEUCS4(EMPBASE | code)
 				}
 				else TRYMAP_DEC(jisx0213_pair, code, c1, c2) {
 					WRITE2(code >> 16, code & 0xffff)
@@ -163,7 +163,7 @@ DECODER(shift_jisx0213)
 					NEXT_OUT(1)
 				}
 				else TRYMAP_DEC(jisx0213_2_emp, code, c1, c2) {
-					PUTUCS4(EMPBASE | code)
+					WRITEUCS4(EMPBASE | code)
 				}
 				else
 					return 2;

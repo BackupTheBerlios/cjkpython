@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_euc_jp.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_euc_jp.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(euc_jp)
@@ -85,7 +85,7 @@ DECODER(euc_jp)
 	while (inleft > 0) {
 		unsigned char c = IN1;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 
 			if (c < 0x80) {
 				OUT1(c)
@@ -97,7 +97,7 @@ DECODER(euc_jp)
 			/* JIS X 0201 half-width katakana */
 			unsigned char c2;
 
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			c2 = IN2;
 			if (c2 >= 0xa1 && c2 <= 0xdf) {
 				OUT1(0xfec0 + c2)
@@ -109,7 +109,7 @@ DECODER(euc_jp)
 		else if (c == 0x8f) {
 			unsigned char c2, c3;
 
-			RESERVE_INBUF(3)
+			REQUIRE_INBUF(3)
 			c2 = IN2;
 			c3 = IN3;
 			/* JIS X 0212 */
@@ -122,7 +122,7 @@ DECODER(euc_jp)
 		else {
 			unsigned char c2;
 
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			c2 = IN2;
 			/* JIS X 0208 */
 #ifndef STRICT_BUILD

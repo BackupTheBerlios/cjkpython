@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_johab.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_johab.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 static const unsigned char u2johabidx_choseong[32] = {
@@ -69,7 +69,7 @@ ENCODER(johab)
 		}
 		UCS4INVALID(c)
 
-		RESERVE_OUTBUF(2)
+		REQUIRE_OUTBUF(2)
 
 		if (c >= 0xac00 && c <= 0xd7a3) {
 			c -= 0xac00;
@@ -158,7 +158,7 @@ DECODER(johab)
 	while (inleft > 0) {
 		unsigned char    c = IN1, c2;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 
 		if (c < 0x80) {
 			OUT1(c)
@@ -166,7 +166,7 @@ DECODER(johab)
 			continue;
 		}
 
-		RESERVE_INBUF(2)
+		REQUIRE_INBUF(2)
 		c2 = IN2;
 
 		if (c < 0xd8) {

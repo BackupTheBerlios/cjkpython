@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_utf_8.h,v 1.2 2004/06/19 16:20:50 perky Exp $
+ * $Id: codecimpl_utf_8.h,v 1.3 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(utf_8)
@@ -58,7 +58,7 @@ ENCODER(utf_8)
 			else outsize = 6;
 		}
 
-		RESERVE_OUTBUF(outsize)
+		REQUIRE_OUTBUF(outsize)
 
 		switch (outsize) {
 		case 6:
@@ -101,7 +101,7 @@ DECODER(utf_8)
 	while (inleft > 0) {
 		unsigned char c = **inbuf;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 
 		if (c < 0x80) {
 			(*outbuf)[0] = (unsigned char)c;
@@ -113,7 +113,7 @@ DECODER(utf_8)
 		else if (c < 0xe0) {
 			unsigned char c2;
 
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 				c2 = (*inbuf)[1];
 			if (!((c2 ^ 0x80) < 0x40))
 				return 2;
@@ -124,7 +124,7 @@ DECODER(utf_8)
 		else if (c < 0xf0) {
 			unsigned char c2, c3;
 
-			RESERVE_INBUF(3)
+			REQUIRE_INBUF(3)
 			c2 = (*inbuf)[1]; c3 = (*inbuf)[2];
 			if (!((c2 ^ 0x80) < 0x40 &&
 			    (c3 ^ 0x80) < 0x40 && (c >= 0xe1 || c2 >= 0xa0)))
@@ -138,7 +138,7 @@ DECODER(utf_8)
 			unsigned char c2, c3, c4;
 			ucs4_t code;
 
-			RESERVE_INBUF(4)
+			REQUIRE_INBUF(4)
 			c2 = (*inbuf)[1]; c3 = (*inbuf)[2];
 			c4 = (*inbuf)[3];
 			if (!((c2 ^ 0x80) < 0x40 &&
@@ -149,14 +149,14 @@ DECODER(utf_8)
 				| ((ucs4_t)(c2 ^ 0x80) << 12)
 				| ((ucs4_t)(c3 ^ 0x80) << 6)
 				| (ucs4_t)(c4 ^ 0x80);
-			PUTUCS4(code)
+			WRITEUCS4(code)
 			NEXT_IN(4)
 		}
 		else if (c < 0xfc) {
 			unsigned char c2, c3, c4, c5;
 			ucs4_t code;
 
-			RESERVE_INBUF(5)
+			REQUIRE_INBUF(5)
 			c2 = (*inbuf)[1]; c3 = (*inbuf)[2];
 			c4 = (*inbuf)[3]; c5 = (*inbuf)[4];
 			if (!((c2 ^ 0x80) < 0x40 &&
@@ -168,14 +168,14 @@ DECODER(utf_8)
 				| ((ucs4_t)(c3 ^ 0x80) << 12)
 				| ((ucs4_t)(c4 ^ 0x80) << 6)
 				| (ucs4_t)(c5 ^ 0x80);
-			PUTUCS4(code)
+			WRITEUCS4(code)
 			NEXT_IN(5)
 		}
 		else if (c < 0xff) {
 			unsigned char c2, c3, c4, c5, c6;
 			ucs4_t code;
 
-			RESERVE_INBUF(6)
+			REQUIRE_INBUF(6)
 			c2 = (*inbuf)[1]; c3 = (*inbuf)[2];
 			c4 = (*inbuf)[3]; c5 = (*inbuf)[4];
 			c6 = (*inbuf)[5];
@@ -190,7 +190,7 @@ DECODER(utf_8)
 				| ((ucs4_t)(c4 ^ 0x80) << 12)
 				| ((ucs4_t)(c5 ^ 0x80) << 6)
 				| (ucs4_t)(c6 ^ 0x80);
-			PUTUCS4(code)
+			WRITEUCS4(code)
 			NEXT_IN(6)
 		}
 		else

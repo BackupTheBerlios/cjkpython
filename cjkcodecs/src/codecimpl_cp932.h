@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_cp932.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_cp932.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(cp932)
@@ -48,7 +48,7 @@ ENCODER(cp932)
 		}
 		else if (c >= 0xf8f0 && c <= 0xf8f3) {
 			/* Windows compatability */
-			RESERVE_OUTBUF(1)
+			REQUIRE_OUTBUF(1)
 			if (c == 0xf8f0)
 				OUT1(0xa0)
 			else
@@ -58,7 +58,7 @@ ENCODER(cp932)
 		}
 
 		UCS4INVALID(c)
-		RESERVE_OUTBUF(2)
+		REQUIRE_OUTBUF(2)
 
 		TRYMAP_ENC(cp932ext, code, c) {
 			OUT1(code >> 8)
@@ -97,7 +97,7 @@ DECODER(cp932)
 	while (inleft > 0) {
 		unsigned char c = IN1, c2;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 		if (c <= 0x80) {
 			OUT1(c)
 			NEXT(1, 1)
@@ -118,7 +118,7 @@ DECODER(cp932)
 			continue;
 		}
 
-		RESERVE_INBUF(2)
+		REQUIRE_INBUF(2)
 		c2 = IN2;
 
 		TRYMAP_DEC(cp932ext, **outbuf, c, c2);

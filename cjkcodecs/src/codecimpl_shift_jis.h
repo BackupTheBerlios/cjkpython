@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_shift_jis.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_shift_jis.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(shift_jis)
@@ -48,14 +48,14 @@ ENCODER(shift_jis)
 		else code = NOCHAR;
 
 		if (code < 0x80 || (code >= 0xa1 && code <= 0xdf)) {
-			RESERVE_OUTBUF(1)
+			REQUIRE_OUTBUF(1)
 
 			OUT1((unsigned char)code)
 			NEXT(1, 1)
 			continue;
 		}
 
-		RESERVE_OUTBUF(2)
+		REQUIRE_OUTBUF(2)
 
 		if (code == NOCHAR) {
 			TRYMAP_ENC(jisxcommon, code, c);
@@ -87,7 +87,7 @@ DECODER(shift_jis)
 	while (inleft > 0) {
 		unsigned char c = IN1;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 
 #ifdef STRICT_BUILD
 		JISX0201_R_DECODE(c, **outbuf)
@@ -98,7 +98,7 @@ DECODER(shift_jis)
 		else if ((c >= 0x81 && c <= 0x9f) || (c >= 0xe0 && c <= 0xea)){
 			unsigned char c1, c2;
 
-			RESERVE_INBUF(2)
+			REQUIRE_INBUF(2)
 			c2 = IN2;
 			if (c2 < 0x40 || (c2 > 0x7e && c2 < 0x80) || c2 > 0xfc)
 				return 2;

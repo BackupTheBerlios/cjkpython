@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_euc_tw.h,v 1.1 2004/06/20 18:42:09 perky Exp $
+ * $Id: codecimpl_euc_tw.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(euc_tw)
@@ -78,7 +78,7 @@ DECODER(euc_tw)
 		ucs4_t code;
 		int plane, insize;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 		if (c1 < 0x80) {
 			OUT1(c1)
 			NEXT(1, 1)
@@ -86,7 +86,7 @@ DECODER(euc_tw)
 		}
 
 		if (c1 == 0x8e) {
-			RESERVE_INBUF(4)
+			REQUIRE_INBUF(4)
 			plane = IN2;
 			if (plane < 0x81 || plane > 0x87)
 				return 4;
@@ -108,7 +108,7 @@ DECODER(euc_tw)
 		}
 		else TRYMAP_DEC_MPLANE(cns11643, code, plane,
 				       c1, c2 ^ 0x80) { /* non-BMP */
-			PUTUCS4(0x20000 | code)
+			WRITEUCS4(0x20000 | code)
 			NEXT_IN(insize)
 		}
 		else

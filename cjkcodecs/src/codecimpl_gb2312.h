@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_gb2312.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_gb2312.h,v 1.2 2004/06/27 19:24:13 perky Exp $
  */
 
 ENCODER(gb2312)
@@ -42,7 +42,7 @@ ENCODER(gb2312)
 		}
 		UCS4INVALID(c)
 
-		RESERVE_OUTBUF(2)
+		REQUIRE_OUTBUF(2)
 		TRYMAP_ENC(gbcommon, code, c);
 		else return 1;
 
@@ -62,7 +62,7 @@ DECODER(gb2312)
 	while (inleft > 0) {
 		unsigned char c = **inbuf;
 
-		RESERVE_OUTBUF(1)
+		REQUIRE_OUTBUF(1)
 
 		if (c < 0x80) {
 			OUT1(c)
@@ -70,7 +70,7 @@ DECODER(gb2312)
 			continue;
 		}
 
-		RESERVE_INBUF(2)
+		REQUIRE_INBUF(2)
 		TRYMAP_DEC(gb2312, **outbuf, c ^ 0x80, IN2 ^ 0x80) {
 			NEXT(2, 1)
 		}
