@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.9 2004/06/27 19:28:55 perky Exp $
+# $Id: aliases.py,v 1.10 2004/06/27 20:47:24 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -116,32 +116,32 @@ aliases.update({
     'hz_gb'              : 'cjkcodecs.hz',
     'hz_gb_2312'         : 'cjkcodecs.hz',
 
-    # iso_2022_jp codec
+    # iso2022_jp codec
     'iso_2022_jp'        : 'cjkcodecs.iso2022_jp',
     'iso2022_jp'         : 'cjkcodecs.iso2022_jp',
     'iso2022jp'          : 'cjkcodecs.iso2022_jp',
 
-    # iso_2022_jp_1 codec
+    # iso2022_jp_1 codec
     'iso_2022_jp_1'      : 'cjkcodecs.iso2022_jp_1',
     'iso2022_jp_1'       : 'cjkcodecs.iso2022_jp_1',
     'iso2022jp_1'        : 'cjkcodecs.iso2022_jp_1',
 
-    # iso_2022_jp_2 codec
+    # iso2022_jp_2 codec
     'iso_2022_jp_2'      : 'cjkcodecs.iso2022_jp_2',
     'iso2022_jp_2'       : 'cjkcodecs.iso2022_jp_2',
     'iso2022jp_2'        : 'cjkcodecs.iso2022_jp_2',
 
-    # iso_3022_jp_3 codec
+    # iso2022_jp_3 codec
     'iso_2022_jp_3'      : 'cjkcodecs.iso2022_jp_3',
     'iso2022_jp_3'       : 'cjkcodecs.iso2022_jp_3',
     'iso2022jp_3'        : 'cjkcodecs.iso2022_jp_3',
 
-    # iso_2022_jp_ext codec
+    # iso2022_jp_ext codec
     'iso_2022_jp_ext'    : 'cjkcodecs.iso2022_jp_ext',
     'iso2022_jp_ext'     : 'cjkcodecs.iso2022_jp_ext',
     'iso2022jp_ext'      : 'cjkcodecs.iso2022_jp_ext',
 
-    # iso_2022_kr codec
+    # iso2022_kr codec
     'iso_2022_kr'        : 'cjkcodecs.iso2022_kr',
     'iso2022_kr'         : 'cjkcodecs.iso2022_kr',
     'iso2022kr'          : 'cjkcodecs.iso2022_kr',
