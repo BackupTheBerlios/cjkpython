@@ -1,5 +1,5 @@
 /*
- * $Id: map_big5hkscs.h,v 1.1 2004/06/28 18:16:03 perky Exp $
+ * $Id: map_big5hkscs.h,v 1.2 2004/06/29 05:46:09 perky Exp $
  */
 
 static const ucs2_t __big5hkscs_decmap[6095] = {
@@ -2348,4 +2348,3 @@ __big5hkscs_nonbmp_encmap+27875,169,169,},{__big5hkscs_nonbmp_encmap+27876,52,
 205,},{__big5hkscs_nonbmp_encmap+28260,148,212,},{0,0,0},{0,0,0},{0,0,0},{0,0,
 0},{0,0,0},{0,0,0},
 };
-

@@ -1,5 +1,5 @@
 /*
- * $Id: map_gbcommon.h,v 1.1 2004/06/27 21:19:24 perky Exp $
+ * $Id: map_gbcommon.h,v 1.2 2004/06/29 05:46:10 perky Exp $
  */
 
 static const DBCHAR __gbcommon_encmap[23231] = {
@@ -1782,4 +1782,3 @@ __gbcommon_encmap+22548,0,165,},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0
 241,},{__gbcommon_encmap+22912,12,41,},{0,0,0},{0,0,0},{0,0,0},{
 __gbcommon_encmap+22942,48,107,},{__gbcommon_encmap+23002,1,229,},
 };
-

@@ -1,5 +1,5 @@
 /*
- * $Id: map_gbkext.h,v 1.1 2004/06/27 21:19:24 perky Exp $
+ * $Id: map_gbkext.h,v 1.2 2004/06/29 05:46:10 perky Exp $
  */
 
 static const ucs2_t __gbkext_decmap[14531] = {
@@ -1189,4 +1189,3 @@ __gbkext_decmap+14127,64,160,},{__gbkext_decmap+14224,64,160,},{
 __gbkext_decmap+14321,64,160,},{__gbkext_decmap+14418,64,160,},{
 __gbkext_decmap+14515,64,79,},{0,0,0},
 };
-
