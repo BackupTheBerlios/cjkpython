@@ -3,6 +3,9 @@ Changed with CJKCodecs 1.0.1
   *) Fixed a bug that decoders' returning u'' not (u'', 0) when decoding
      empty string. [Tae-Wook Kang]
 
+  *) ISO-2022-JP-2 codec now can process both of G2-assigning 96-charsets;
+     ISO-8859-1 and ISO-8859-7.
+
 
 Changes with CJKCodecs 1.0
 

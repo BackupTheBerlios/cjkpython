@@ -26,18 +26,21 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp_2.c,v 1.1 2003/09/24 17:44:48 perky Exp $
+ * $Id: _iso_2022_jp_2.c,v 1.2 2003/09/26 04:25:53 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
         CHARSET_ASCII, CHARSET_JISX0201_R, CHARSET_JISX0208, \
         CHARSET_JISX0208_O, CHARSET_JISX0212, CHARSET_GB2312, \
-        CHARSET_KSX1001, CHARSET_JISX0212
-        /* XXX: NotImplmented CHARSET_ISO8859_1, CHARSET_ISO8859_7 */
+        CHARSET_KSX1001, CHARSET_JISX0212, \
+        CHARSET_ISO8859_1, CHARSET_ISO8859_7
+#define ISO2022_USE_G2_DESIGNATION  yo!
 
 #include "codeccommon.h"
 #include "iso2022common.h"
 #include "maps/alg_jisx0201.h"
+#include "maps/alg_iso8859_1.h"
+#include "maps/alg_iso8859_7.h"
 
 ENCMAP(jisxcommon)
 DECMAP(jisx0208)
@@ -149,8 +152,40 @@ ENCODER(iso_2022_jp_2)
                 NEXT(1, 2)
             } else {
                 JISX0201_R_ENCODE(c, code)
-                else
+                else {
+#if 0
+/* This code is useless. JIS X 0212 includes all characters on ISO-8859-1 and
+ * ISO-8859-7! */
+                    ISO8859_1_ENCODE(c, code)
+                    else {
+                        ISO8859_7_ENCODE(c, code)
+                        else
+                            return 1;
+
+                        /* encode as ISO8859-7 */
+                        if (STATE_GETG2(state) != CHARSET_ISO8859_7) {
+                            WRITE3(ESC, '.', 'F')
+                            STATE_SETG2(state, CHARSET_ISO8859_7)
+                            NEXT_OUT(3)
+                        }
+                        WRITE3(ESC, 'N', code & 0x7f)
+                        NEXT(1, 3)
+                        continue;
+                    }
+
+                    /* encode as ISO8859-1 */
+                    if (STATE_GETG2(state) != CHARSET_ISO8859_1) {
+                        WRITE3(ESC, '.', 'A')
+                        STATE_SETG2(state, CHARSET_ISO8859_1)
+                        NEXT_OUT(3)
+                    }
+                    WRITE3(ESC, 'N', code & 0x7f)
+                    NEXT(1, 3)
+                    continue;
+#else
                     return 1;
+#endif
+                }
                 /* if (charset == CHARSET_JISX0201_R) : already checked */
                 WRITE4(ESC, '(', 'J', code)
                 STATE_SETG0(state, CHARSET_JISX0201_R)

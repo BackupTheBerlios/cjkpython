@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022common.h,v 1.1 2003/09/24 17:44:52 perky Exp $
+ * $Id: iso2022common.h,v 1.2 2003/09/26 04:25:53 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
@@ -39,7 +39,8 @@
 #define MAX_ESCSEQLEN       16
 
 #define IS_ESCEND(c)        ((c) >= 'A' && (c) <= 'Z')
-#define IS_ISO2022ESC(c2)   ((c2) == '(' || (c2) == ')' || (c2) == '$')
+#define IS_ISO2022ESC(c2)   ((c2) == '(' || (c2) == ')' || (c2) == '$' || \
+                             (c2) == '.')
         /* this is not a full list of ISO-2022 escape sequence headers.
          * but, it's enough to implement CJK instances of iso-2022. */
 
@@ -112,6 +113,29 @@
         (c2mask) = 0xff;                                            \
     }
 
+#ifdef ISO2022_USE_G2_DESIGNATION
+/* hardcoded for iso-2022-jp-2 for now. we'll need to generalize it
+   when we have more G2 designating encodings */
+#define SS2_ROUTINE                                                 \
+    if (IN2 == 'N') { /* SS2 */                                     \
+        RESERVE_INBUF(3)                                            \
+        if (STATE_GETG2(state) == CHARSET_ISO8859_1) {              \
+            ISO8859_1_DECODE(IN3 ^ 0x80, **outbuf)                  \
+            else return 3;                                          \
+        } else if (STATE_GETG2(state) == CHARSET_ISO8859_7) {       \
+            ISO8859_7_DECODE(IN3 ^ 0x80, **outbuf)                  \
+            else return 3;                                          \
+        } else if (STATE_GETG2(state) == CHARSET_ASCII) {           \
+            if (IN3 & 0x80) return 3;                               \
+            else **outbuf = IN3;                                    \
+        } else                                                      \
+            return MBERR_INTERNAL;                                  \
+        NEXT(3, 1)                                                  \
+    } else
+#else
+#define SS2_ROUTINE
+#endif
+
 #define ISO2022_BASECASES(c1)                                       \
     case ESC:                                                       \
         RESERVE_INBUF(2)                                            \
@@ -120,7 +144,7 @@
             err = iso2022processesc(state, inbuf, &inleft);         \
             if (err != 0)                                           \
                 return err;                                         \
-        } else {                                                    \
+        } else SS2_ROUTINE {                                        \
             STATE_SETFLAG(state, F_ESCTHROUGHOUT)                   \
             OUT1(ESC)                                               \
             NEXT(1, 1)                                              \
@@ -197,6 +221,9 @@ iso2022processesc(MultibyteCodec_State *state,
             charset = IN3;
             if (IN2 == '(') designation = 0;
             else if (IN2 == ')') designation = 1;
+#ifdef ISO2022_USE_G2_DESIGNATION
+            else if (IN2 == '.') designation = 2;
+#endif
             else return 3;
         }
         break;
