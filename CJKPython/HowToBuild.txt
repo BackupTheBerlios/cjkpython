@@ -1,0 +1,64 @@
+Prerequisites
+=============
+
+  *) Microsoft Visual C++ 6.0 (to build Python)
+
+  *) NSIS, the Nullsoft SuperPiMP Installation System.
+     http://nsis.sourceforge.net/
+
+  *) Python HTML Documentation
+     (from Python standard distribution)
+
+  *) Cygwin (for patchutils and running shell scripts)
+     http://www.cygwin.com/
+
+  *) CJKCodecs source distribution (cjkcodecs-1.0.zip)
+     http://sourceforge.net/projects/koco
+
+  *) PureKoCo source distribution (KoreanCodecs-pure-1.0b1.tar.gz)
+     http://sourceforge.net/projects/koco
+
+  *) PyKf source distribution (pykf-0.3.0.tgz)
+     http://www.gembook.jp/html/download/
+
+  *) ctypes source distribution (ctypes-0.6.2.zip)
+     http://sourceforge.net/projects/ctypes
+
+  *) wxPython binary distribution (no unicode, wxPythonWIN32-2.4.1.2-Py23.exe)
+     http://www.wxpython.org/download.php
+
+  *) BoA Constructor source distribution (boa-constructor-0.2.3.src.zip)
+     http://sourceforge.net/projects/boa-constructor/
+
+
+Build
+=====
+
+ 1) Python
+
+    Read and follow PCbuild\README.txt
+
+
+ 2) CJKCodecs
+
+    Unzip the distribution in dist\ and run
+
+    python setup.py build
+
+
+ 3) ctypes
+
+    same as 2)
+
+
+ 4) wxPython
+
+    Run wxPython binary installer and install into dist\wxPython\ (not C:\Python23)
+    Copy C:\Python23\Scripts directory to dist\wxPython\
+    And, run distpatch.sh to fix problems on wxPython binary distribution.
+
+    *** Need to regenerate batch files after installation **
+
+
+ 5) BoA Constructor
+
