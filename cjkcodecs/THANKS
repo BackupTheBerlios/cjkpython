@@ -1,0 +1,8 @@
+	Thanks to				  for
+
+Jason R. Mastaler <jason@mastaler.com>		MacOS X porting
+Kazuhiro ABE <abee.abe@nifty.ne.jp>		advice on JIS X 0213
+Martin v. Loewis <martin@v.loewis.de>		comments on mapping differences
+Son, Kyung-uk <vvs740@chol.com>			reported a bug on ucs4 mode
+Yoshiki Ohshima <Yoshiki.Ohshima@acm.org>	advice on JIS X 0213
+Young-Sik Won <monpetit@dreamwiz.com>		mingw32 compilation fix

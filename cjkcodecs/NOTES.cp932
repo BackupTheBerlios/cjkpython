@@ -1,0 +1,11 @@
+To conform to Windows's real mapping, cp932 codec maps the following
+codepoints in addition of the official cp932 mapping.
+
+  CP932     Unicode     Description
+
+  0x80      0x80        UNDEFINED
+  0xA0      0xF8F0      UNDEFINED
+  0xFD      0xF8F1      UNDEFINED
+  0xFE      0xF8F2      UNDEFINED
+  0xFF      0xF8F3      UNDEFINED
+

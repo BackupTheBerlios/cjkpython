@@ -1,0 +1,33 @@
+Planned Updates
+
+Authority       0.9             1.0             1.1
+==================================================================
+China (PRC)     gb2312                          iso-2022-cn
+                gbk(cp936)                      iso-2022-cn-ext
+                gb18030
+                hz
+
+Hong Kong                                       hkscs
+
+Japan           shift-jis       iso-2022-jp-2   iso-2022-int-1
+                euc-jp          iso-2022-jp-3   mac_japanese
+                cp932           euc-jisx0213
+                iso-2022-jp     shift-jisx0213
+                iso-2022-jp-1
+
+Korea (DPRK)                                    euc-kp
+
+Korea (ROK)     euc-kr                          mac_korean
+                cp949(uhc)                      unijohab
+                johab
+                iso-2022-kr
+
+Taiwan          big5                            iso-2022-cn
+                cp950                           iso-2022-cn-ext
+                                                euc-tw
+
+Unicode.org     utf-8           utf-7
+
+
+# $Id: ROADMAP,v 1.1 2003/09/24 17:44:41 perky Exp $
+# ex: ts=8 sts=4 et

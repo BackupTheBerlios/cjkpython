@@ -1,0 +1,51 @@
+Changes with CJKCodecs 1.0
+
+  *) UTF-16 codecs are removed from distribution.
+
+  *) Fixed UTF-7 codec's bug that fails to decode surrogate pair on
+     ucs4-python
+
+
+Changes with CJKCodecs 1.0b1
+
+  *) SHIFT-JISX0213, EUC-JISX0213, ISO-2022-JP-2 and ISO-2022-JP-3
+     codec is added.
+
+  *) UTF-7, UTF-16, UTF-16BE and UTF-16LE codec is added.
+
+  *) Changed a few characters of a big5 codepoint mapping to cp950's
+     rather than 0xfffd. (documented on NOTES.big5)
+
+  *) Fixed a bug that JIS X 0201 routine doesn't encode and decode 0x7f.
+
+  *) Tweaked some mapping for cp932 and cp950 to make more consistency
+     with MS Windows.
+     - CP932: Added single byte "UNDEFINED" characters 0x80, 0xa0, 0xfd,
+              0xfe, 0xff (documented on NOTES.cp932)
+     - CP950: Changed encode mappings to another more popular for
+              duplicated unicode points: 5341 -> A451, 5345 -> A4CA
+
+  *) A unittest for big5 mapping is added.
+
+  *) Fixed a bug that cp932 codec couldn't decode half-width katakana.
+
+  *) Added a workaround for PyObject_GenericGetAttr to enable compiling
+     with mingw32. [Young-Sik Won]
+
+  *) Enable gb18030 and utf-8 codec encode and decode iso-10646-2
+     characters using surrogate pair.
+
+  *) Fixed gb18030 codec's syntax error that disturbs compilation on
+     python compiled with --with-unicode=ucs4 option. [Son, Kyung-uk]
+
+  *) StreamWriter became to be able to buffer incomplete sequences.
+     (this feature is used for surrogate-pair and mapping from unicode
+      character with a following modifier)
+
+  *) EUC-JP codec's mapping for 0xA1C0 is changed from U+005C to
+     U+FF3C because EUC-JP 0x5C is also a REVERSE SOLIDUS and 0xA1C0 is
+     FULLWIDTH REVERSE SOLIDUS on japanese environments.
+
+  *) Fixed hz codec's bug that doesn't initialize the encoding mode to
+     ASCII.
+

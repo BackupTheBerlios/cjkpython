@@ -1,0 +1,10 @@
+# $Id: MANIFEST.in,v 1.1 2003/09/24 17:44:41 perky Exp $
+
+include README ROADMAP AUTHORS COPYRIGHT THANKS
+include MANIFEST.in NOTES.*
+
+recursive-include src *.h *.c
+recursive-include tests *.py *.txt *.utf8 *.sh
+recursive-include tools *.py
+
+global-exclude */CVS/* *.pyc *.pyo

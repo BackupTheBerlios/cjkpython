@@ -1,0 +1,15 @@
+- euc-jisx0213 codec maps JIS X 0213 Plane 1 code 0x2140 into
+  unicode U+FF3C instead of U+005C as on unicode.org's mapping.
+  Because euc-jisx0213 has REVERSE SOLIDUS on 0x5c already and A140
+  is shown as a full width character, mapping to U+FF3C can make
+  more sense.
+
+- euc-jisx0213 codec is enabled to decode JIS X 0212 codes on
+  codeset 2. Because JIS X 0212 and JIS X 0213 Plane 2 don't
+  have overlapped by each other, it doesn't bother standard
+  conformations (and JIS X 0213 Plane 2 is intended to use so.)
+  On encoding sessions, the codec will try to encode kanji
+  characters in this order:
+
+    JIS X 0213 Plane 1 -> JIS X 0213 Plane 2 -> JIS X 0212
+

@@ -1,0 +1,57 @@
+CJK Codecs 1.0
+==============
+
+Copyright(C) 2002-2003 Hye-Shik Chang.
+$Id: README,v 1.1 2003/09/24 17:44:41 perky Exp $
+
+
+Introduction
+------------
+
+This package provides Unicode codecs that make Python aware of
+CJK (Chinese, Japanese and Korean) encodings such as EUC-JP,
+ISO-2022-KR, BIG5 and GB18030. By using this package, their
+characters can be treated as a character string instead of a
+byte sequence.
+
+The Unicode-related API in Python was proposed by Marc-Andre
+Lemburg and defined in the following specification:
+
+  http://starship.python.net/crew/lemburg/unicode-proposal.txt
+
+The provided codecs follow the proposal version 1.8.  Please
+consult the specification for the details of the codecs.
+
+The latest version of this package is available at:
+
+  http://sourceforge.net/projects/koco/
+
+
+Requirement
+-----------
+
+This package requires Python 2.1 or later.
+
+
+This package can be easily installed by means of the Distutils
+(Python Distribution Utilities).  Simply issue the following
+command, after being root if necessary:
+
+  python setup.py install
+
+If you don't need full supports for all the encodings, you can
+specify the following options:
+
+  --disable-japanese                don't install Japanese codecs
+  --disable-korean                  don't install Korean codecs
+  --disable-simplified-chinese      don't install Simplified Chinese codecs
+  --disable-traditional-chinese     don't install Traditional Chinese codecs
+
+
+Author
+------
+
+Hye-Shik Chang <perky@FreeBSD.org>
+
+Any comments, suggestions, and/or patches are very welcome.
+Thank you for using CJK Codecs!

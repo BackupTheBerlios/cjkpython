@@ -1,0 +1,26 @@
+CJKCodecs is distributed with utf-7 and utf-8 codec in spite of Python
+has their own already. Here're my cowardly rationales for that.
+
+ - Python UTF-7 codec can't encode and/or decode surrogate pair.
+
+ - Python UTF-7 codec can't decode long shifted sequence.
+
+ - Python UTF-7 codec isn't stateful, so its StreamReader and
+   StreamWriter can't work correctly.
+
+ - Python UTF-8 codec is slightly broken for StreamReader's readline
+   and readlines method calls. For example,
+
+    >>> import StringIO, codecs
+    >>> c = codecs.getreader('utf-8')(StringIO.StringIO("Python\xed\x8c\x8c\xec\x9d\xb4\xec\x8d\xac"))
+    >>> c.readline(1), c.readline(1), c.readline(1)
+    u'P', u'y', u't'
+    >>> c.readline(1), c.readline(1), c.readline(1)
+    (u'h', u'o', u'n')
+    >>> c.readline(1), c.readline(1), c.readline(1)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in ?
+      File "/usr/local/lib/python2.2/codecs.py", line 252, in readline
+        return self.decode(line, self.errors)[0]
+    UnicodeError: UTF-8 decoding error: unexpected end of data
+
