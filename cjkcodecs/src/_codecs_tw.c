@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_tw.c,v 1.8 2004/06/27 21:41:15 perky Exp $
+ * $Id: _codecs_tw.c,v 1.9 2004/07/06 17:00:18 perky Exp $
  */
 
 #include "cjkcodecs.h"
@@ -246,9 +246,8 @@ BEGIN_MAPPINGS_LIST
   MAPPING_ENCDEC(big5)
   MAPPING_ENCDEC(cp950ext)
 #ifndef NO_EXTRA_ENCODINGS
-  /* these are non-regular tables and not used by external codecs yet.
   MAPPING_ENCONLY(cns11643_bmp)
-  MAPPING_ENCONLY(cns11643_nonbmp)*/
+  MAPPING_ENCONLY(cns11643_nonbmp)
   MAPPING_DECONLY(cns11643_1)
   MAPPING_DECONLY(cns11643_2)
   MAPPING_DECONLY(cns11643_3)

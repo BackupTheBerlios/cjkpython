@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.11 2004/06/28 18:16:03 perky Exp $
+# $Id: aliases.py,v 1.12 2004/07/06 17:00:18 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -120,6 +120,11 @@ aliases.update({
     'hzgb'               : 'cjkcodecs.hz',
     'hz_gb'              : 'cjkcodecs.hz',
     'hz_gb_2312'         : 'cjkcodecs.hz',
+
+    # iso2022_cn codec
+    'iso_2022_cn'        : 'cjkcodecs.iso2022_cn',
+    'iso2022_cn'         : 'cjkcodecs.iso2022_cn',
+    'iso2022cn'          : 'cjkcodecs.iso2022_cn',
 
     # iso2022_jp codec
     'iso_2022_jp'        : 'cjkcodecs.iso2022_jp',

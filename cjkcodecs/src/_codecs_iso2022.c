@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.14 2004/06/29 05:42:08 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.15 2004/07/06 17:00:18 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -71,6 +71,8 @@
 #define CHARSET_KSX1001		('C'|CHARSET_DBCS)
 #define CHARSET_JISX0212	('D'|CHARSET_DBCS)
 #define CHARSET_GB2312_8565	('E'|CHARSET_DBCS)
+#define CHARSET_CNS11643_1	('G'|CHARSET_DBCS)
+#define CHARSET_CNS11643_2	('H'|CHARSET_DBCS)
 #define CHARSET_JISX0213_1	('O'|CHARSET_DBCS)
 #define CHARSET_JISX0213_2	('P'|CHARSET_DBCS)
 #define CHARSET_JISX0208_O	('@'|CHARSET_DBCS)
@@ -576,6 +578,14 @@ DECMAP(jisx0213_2_emp)
 ENCMAP(gbcommon)
 DECMAP(gb2312)
 
+/* tw */
+#ifndef NO_EXTRA_ENCODINGS
+ENCMAP(cns11643_bmp)
+ENCMAP(cns11643_nonbmp)
+DECMAP(cns11643_1)
+DECMAP(cns11643_2)
+#endif
+
 /*-*- mapping access functions -*-*/
 
 static int
@@ -885,6 +895,99 @@ gb2312_encoder(const ucs4_t *data, int *length)
 	return MAP_UNMAPPABLE;
 }
 
+#ifndef NO_EXTRA_ENCODINGS
+static int
+cns11643_init(void)
+{
+	static int initialized = 0;
+
+	if (!initialized && (
+			IMPORT_MAP(tw, cns11643_bmp,
+					&cns11643_bmp_encmap, NULL) ||
+			IMPORT_MAP(tw, cns11643_nonbmp,
+					&cns11643_nonbmp_encmap, NULL) ||
+			IMPORT_MAP(tw, cns11643_1, NULL, &cns11643_1_decmap) ||
+			IMPORT_MAP(tw, cns11643_2, NULL, &cns11643_2_decmap)))
+		return -1;
+	initialized = 1;
+	return 0;
+}
+
+static ucs4_t
+cns11643_1_decoder(const unsigned char *data)
+{
+	ucs4_t u;
+	TRYMAP_DEC(cns11643_1, u, data[0], data[1])
+		return u;
+	else TRYMAP_DEC(cns11643_1, u, data[0] | 0x80, data[1])
+		return u | 0x20000;
+	else
+		return MAP_UNMAPPABLE;
+}
+
+static ucs4_t
+cns11643_2_decoder(const unsigned char *data)
+{
+	ucs4_t u;
+	TRYMAP_DEC(cns11643_2, u, data[0], data[1])
+		return u;
+	else TRYMAP_DEC(cns11643_2, u, data[0] | 0x80, data[1])
+		return u | 0x20000;
+	else
+		return MAP_UNMAPPABLE;
+}
+
+static DBCHAR
+cns11643_encoder(const ucs4_t *data, int *length)
+{
+	unsigned char whi, wlo;
+	int plane;
+
+	assert(*length == 1);
+
+	if (*data <= 0xFFFF) {
+		TRYMAP_ENC_MPLANE(cns11643_bmp, plane, whi, wlo, *data);
+		else return MAP_UNMAPPABLE;
+	}
+	else if (0x20000 <= *data && *data < 0x30000) {
+		TRYMAP_ENC_MPLANE(cns11643_nonbmp, plane, whi, wlo,
+				  (*data) & 0xffff);
+		else return MAP_UNMAPPABLE;
+	}
+	else
+		return MAP_UNMAPPABLE;
+
+	switch (plane) {
+	case 1:
+		return (whi << 16) | wlo;
+	case 2:
+		return 0x8000 | (whi << 16) | wlo;
+	default:
+		return MAP_UNMAPPABLE;
+	}
+}
+
+static DBCHAR
+cns11643_1_encoder(const ucs4_t *data, int *length)
+{
+	DBCHAR coded = cns11643_encoder(data, length);
+	if (coded == MAP_UNMAPPABLE || (coded & 0x8000))
+		return MAP_UNMAPPABLE;
+	else
+		return coded;
+}
+
+static DBCHAR
+cns11643_2_encoder(const ucs4_t *data, int *length)
+{
+	DBCHAR coded = cns11643_encoder(data, length);
+	if (coded == MAP_UNMAPPABLE || !(coded & 0x8000))
+		return MAP_UNMAPPABLE;
+	else
+		return coded;
+}
+#endif
+
 static ucs4_t
 dummy_decoder(const unsigned char *data)
 {
@@ -926,6 +1029,12 @@ dummy_encoder(const ucs4_t *data, int *length)
 #define REGISTRY_GB2312		{ CHARSET_GB2312, 1, 2,			\
 				  gb2312_init,				\
 				  gb2312_decoder, gb2312_encoder }
+#define REGISTRY_CNS11643_1	{ CHARSET_CNS11643_1, 1, 2,		\
+				  cns11643_init,			\
+				  cns11643_1_decoder, cns11643_1_encoder }
+#define REGISTRY_CNS11643_2	{ CHARSET_CNS11643_2, 2, 2,		\
+				  cns11643_init,			\
+				  cns11643_2_decoder, cns11643_2_encoder }
 #define REGISTRY_ISO8859_1	{ CHARSET_ISO8859_1, 2, 1,		\
 				  NULL, dummy_decoder, dummy_encoder }
 #define REGISTRY_ISO8859_7	{ CHARSET_ISO8859_7, 2, 1,		\
@@ -968,6 +1077,14 @@ static const struct iso2022_config iso2022_jp_ext_config = {
 	  REGISTRY_JISX0201_K, REGISTRY_JISX0208_O, REGISTRY_SENTINEL },
 };
 
+#ifndef NO_EXTRA_ENCODINGS
+static const struct iso2022_config iso2022_cn_config = {
+	NO_SHIFT | USE_G2,
+	{ REGISTRY_GB2312, REGISTRY_CNS11643_1, REGISTRY_CNS11643_2,
+	  REGISTRY_SENTINEL },
+};
+#endif
+
 BEGIN_MAPPINGS_LIST
   /* no mapping table here */
 END_MAPPINGS_LIST
@@ -986,6 +1103,9 @@ BEGIN_CODECS_LIST
   ISO2022_CODEC(jp_2)
   ISO2022_CODEC(jp_3)
   ISO2022_CODEC(jp_ext)
+#ifndef NO_EXTRA_ENCODINGS
+  ISO2022_CODEC(cn)
+#endif
 END_CODECS_LIST
 
 I_AM_A_MODULE_FOR(iso2022)

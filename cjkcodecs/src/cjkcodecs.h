@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkcodecs.h,v 1.3 2004/06/28 18:16:03 perky Exp $
+ * $Id: cjkcodecs.h,v 1.4 2004/07/06 17:00:18 perky Exp $
  */
 
 #ifndef _CJKCODECS_H_
@@ -220,9 +220,9 @@ static const struct dbcs_map mapping_list[];
 #endif
 
 #define BEGIN_MAPPINGS_LIST static const struct dbcs_map mapping_list[] = {
-#define MAPPING_ENCONLY(enc) {#enc, enc##_encmap, NULL},
-#define MAPPING_DECONLY(enc) {#enc, NULL, enc##_decmap},
-#define MAPPING_ENCDEC(enc) {#enc, enc##_encmap, enc##_decmap},
+#define MAPPING_ENCONLY(enc) {#enc, (void*)enc##_encmap, NULL},
+#define MAPPING_DECONLY(enc) {#enc, NULL, (void*)enc##_decmap},
+#define MAPPING_ENCDEC(enc) {#enc, (void*)enc##_encmap, (void*)enc##_decmap},
 #define END_MAPPINGS_LIST {"", NULL, NULL} };
 
 #define BEGIN_CODECS_LIST static const MultibyteCodec codec_list[] = {
@@ -372,11 +372,12 @@ find_pairencmap(ucs2_t body, ucs2_t modifier,
 
 #ifdef USING_IMPORTED_MAPS
 #define IMPORT_MAP(locale, charset, encmap, decmap) \
-	importmap("_codecs_" #locale, "__map_" #charset, encmap, decmap)
+	importmap("_codecs_" #locale, "__map_" #charset, \
+		  (const void**)encmap, (const void**)decmap)
 
 static int
 importmap(const char *modname, const char *symbol,
-	  const struct unim_index **encmap, const struct dbcs_index **decmap)
+	  const void **encmap, const void **decmap)
 {
 	PyObject *o, *mod;
 
