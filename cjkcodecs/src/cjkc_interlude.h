@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_interlude.h,v 1.2 2004/06/20 18:42:09 perky Exp $
+ * $Id: cjkc_interlude.h,v 1.3 2004/06/26 09:49:51 perky Exp $
  */
 
 #ifndef _CJKC_INTERLUDE_H_
@@ -39,28 +39,28 @@
 
 #define ENCODER_INIT(encoding)						\
 	static int encoding##_encode_init(				\
-		MultibyteCodec_State *state)
+		MultibyteCodec_State *state, void *config)
 #define ENCODER(encoding)						\
 	static int encoding##_encode(					\
-		MultibyteCodec_State *state,				\
+		MultibyteCodec_State *state, void *config,		\
 		const Py_UNICODE **inbuf, size_t inleft,		\
 		unsigned char **outbuf, size_t outleft, int flags)
 #define ENCODER_RESET(encoding)						\
 	static int encoding##_encode_reset(				\
-		MultibyteCodec_State *state,				\
+		MultibyteCodec_State *state, void *config,		\
 		unsigned char **outbuf, size_t outleft)
 
 #define DECODER_INIT(encoding)						\
 	static int encoding##_decode_init(				\
-		MultibyteCodec_State *state)
+		MultibyteCodec_State *state, void *config)
 #define DECODER(encoding)						\
 	static int encoding##_decode(					\
-		MultibyteCodec_State *state,				\
+		MultibyteCodec_State *state, void *config,		\
 		const unsigned char **inbuf, size_t inleft,		\
 		Py_UNICODE **outbuf, size_t outleft)
 #define DECODER_RESET(encoding)						\
 	static int encoding##_decode_reset(				\
-		MultibyteCodec_State *state)
+		MultibyteCodec_State *state, void *config)
 
 #if Py_UNICODE_SIZE == 4
 #define UCS4INVALID(code)	\
@@ -176,19 +176,25 @@
 #define END_MAPPING_LIST {"", NULL, NULL} };
 
 #define BEGIN_CODEC_LIST static const MultibyteCodec codec_list[] = {
-#define CODEC_STATEFUL(enc) {		\
-	#enc,				\
+#define _STATEFUL_METHODS(enc)		\
 	enc##_encode,			\
 	enc##_encode_init,		\
 	enc##_encode_reset,		\
 	enc##_decode,			\
 	enc##_decode_init,		\
-	enc##_decode_reset,		\
+	enc##_decode_reset,
+#define _STATELESS_METHODS(enc)		\
+	enc##_encode, NULL, NULL,	\
+	enc##_decode, NULL, NULL,
+#define CODEC_STATEFUL(enc) {		\
+	#enc,				\
+	NULL,				\
+	_STATEFUL_METHODS(enc)		\
 },
 #define CODEC_STATELESS(enc) {		\
 	#enc,				\
-	enc##_encode, NULL, NULL,	\
-	enc##_decode, NULL, NULL,	\
+	NULL,				\
+	_STATELESS_METHODS(enc)		\
 },
 #define END_CODEC_LIST {"", NULL,} };
 

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.9 2004/06/19 05:57:27 perky Exp $
+ * $Id: multibytecodec.c,v 1.10 2004/06/26 09:49:51 perky Exp $
  */
 
 #include "Python.h"
@@ -219,8 +219,8 @@ multibytecodec_encerror(MultibyteCodec *codec,
 			size_t outleft;
 
 			outleft = (size_t)(buf->outbuf_end - buf->outbuf);
-			r = codec->encode(state, &inbuf, 1, &buf->outbuf,
-					  outleft, 0);
+			r = codec->encode(state, codec->config, &inbuf, 1,
+					  &buf->outbuf, outleft, 0);
 			if (r == MBERR_TOOSMALL) {
 				RESERVE_ENCODEBUFFER(buf, -1);
 				continue;
@@ -499,8 +499,8 @@ multibytecodec_encode(MultibyteCodec *codec,
 		 * error callbacks can relocate the cursor anywhere on buffer*/
 		inleft = (size_t)(buf.inbuf_end - buf.inbuf);
 		outleft = (size_t)(buf.outbuf_end - buf.outbuf);
-		r = codec->encode(state, &buf.inbuf, inleft,
-				&buf.outbuf, outleft, flags);
+		r = codec->encode(state, codec->config, &buf.inbuf, inleft,
+				  &buf.outbuf, outleft, flags);
 		*data = buf.inbuf;
 		if ((r == 0) || (r == MBERR_TOOFEW && !(flags & MBENC_FLUSH)))
 			break;
@@ -515,7 +515,8 @@ multibytecodec_encode(MultibyteCodec *codec,
 			size_t outleft;
 
 			outleft = (size_t)(buf.outbuf_end - buf.outbuf);
-			r = codec->encreset(state, &buf.outbuf, outleft);
+			r = codec->encreset(state, codec->config, &buf.outbuf,
+					    outleft);
 			if (r == 0)
 				break;
 			else if (multibytecodec_encerror(codec, state,
@@ -575,7 +576,8 @@ MultibyteCodec_Encode(MultibyteCodecObject *self,
 		return NULL;
 	}
 
-	if (self->codec->encinit != NULL && self->codec->encinit(&state) != 0)
+	if (self->codec->encinit != NULL &&
+	    self->codec->encinit(&state, self->codec->config) != 0)
 		goto errorexit;
 	r = multibytecodec_encode(self->codec, &state,
 			(const Py_UNICODE **)&data, datalen, errorcb,
@@ -631,7 +633,8 @@ MultibyteCodec_Decode(MultibyteCodecObject *self,
 	buf.outbuf = PyUnicode_AS_UNICODE(buf.outobj);
 	buf.outbuf_end = buf.outbuf + PyUnicode_GET_SIZE(buf.outobj);
 
-	if (self->codec->decinit != NULL && self->codec->decinit(&state) != 0)
+	if (self->codec->decinit != NULL &&
+	    self->codec->decinit(&state, self->codec->config) != 0)
 		goto errorexit;
 
 	while (buf.inbuf < buf.inbuf_end) {
@@ -641,8 +644,8 @@ MultibyteCodec_Decode(MultibyteCodecObject *self,
 		inleft = (size_t)(buf.inbuf_end - buf.inbuf);
 		outleft = (size_t)(buf.outbuf_end - buf.outbuf);
 
-		r = self->codec->decode(&state, &buf.inbuf, inleft,
-				&buf.outbuf, outleft);
+		r = self->codec->decode(&state, self->codec->config,
+				&buf.inbuf, inleft, &buf.outbuf, outleft);
 		if (r == 0)
 			break;
 		else if (multibytecodec_decerror(self->codec, &state,
@@ -830,6 +833,7 @@ mbstreamreader_iread(MultibyteStreamReaderObject *self,
 				outleft = (size_t)(buf.outbuf_end -buf.outbuf);
 
 				r = self->codec->decode(&self->state,
+							self->codec->config,
 							&buf.inbuf, inleft,
 							&buf.outbuf, outleft);
 				if (r == 0 || r == MBERR_TOOFEW)
@@ -963,7 +967,7 @@ static PyObject *
 mbstreamreader_reset(MultibyteStreamReaderObject *self)
 {
 	if (self->codec->decreset != NULL &&
-	    self->codec->decreset(&self->state) != 0)
+	    self->codec->decreset(&self->state, self->codec->config) != 0)
 		return NULL;
 	self->pendingsize = 0;
 
@@ -1297,7 +1301,7 @@ mbstreamreader_create(MultibyteCodec *codec,
 	if (self->errors == NULL)
 		goto errorexit;
 	if (self->codec->decinit != NULL &&
-	    self->codec->decinit(&self->state) != 0)
+	    self->codec->decinit(&self->state, self->codec->config) != 0)
 		goto errorexit;
 
 	return (PyObject *)self;
@@ -1326,7 +1330,7 @@ mbstreamwriter_create(MultibyteCodec *codec,
 	if (self->errors == NULL)
 		goto errorexit;
 	if (self->codec->encinit != NULL &&
-	    self->codec->encinit(&self->state) != 0)
+	    self->codec->encinit(&self->state, self->codec->config) != 0)
 		goto errorexit;
 
 	return (PyObject *)self;
