@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.13 2004/06/29 05:36:01 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.14 2004/06/29 05:42:08 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -900,7 +900,7 @@ dummy_encoder(const ucs4_t *data, int *length)
 /*-*- registry tables -*-*/
 
 #define REGISTRY_KSX1001	{ CHARSET_KSX1001, 1, 2,		\
-	   			  ksx1001_init,				\
+				  ksx1001_init,				\
 				  ksx1001_decoder, ksx1001_encoder }
 #define REGISTRY_JISX0201_R	{ CHARSET_JISX0201_R, 0, 1,		\
 				  NULL,					\
