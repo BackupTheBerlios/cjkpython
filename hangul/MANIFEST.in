@@ -1,0 +1,5 @@
+# $Id: MANIFEST.in,v 1.1 2003/09/21 13:23:43 perky Exp $
+
+include AUTHORS COPYRIGHT MANIFEST.in
+
+global-exclude */CVS/* *.pyc *.pyo
