@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_jp.c,v 1.13 2004/07/07 17:40:27 perky Exp $
+ * $Id: _codecs_jp.c,v 1.14 2004/07/07 17:54:47 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
@@ -706,15 +706,15 @@ DECODER(shift_jis_2004)
 				EMULATE_JISX0213_2000_DECODE_PLANE2(**outbuf,
 						c1, c2)
 				else TRYMAP_DEC(jisx0213_2_bmp, **outbuf,
-						c1, c2) {
-					NEXT_OUT(1)
-				}
+						c1, c2) ;
 				else TRYMAP_DEC(jisx0213_2_emp, code, c1, c2) {
 					WRITEUCS4(EMPBASE | code)
+					NEXT_IN(2)
+					continue;
 				}
 				else
 					return 2;
-				NEXT_IN(2)
+				NEXT(2, 1)
 			}
 			continue;
 		}
