@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.11 2004/06/29 05:13:43 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.12 2004/06/29 05:22:20 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -212,8 +212,15 @@ ENCODER(iso2022)
 				}
 				else
 					length = 2;
-
-				encoded = dsg->encoder(*inbuf,&length);
+#if Py_UNICODE_SIZE == 2
+				if (length == 2) {
+					ucs4_t u4in[2] = {IN1, IN2};
+					encoded = dsg->encoder(u4in, &length);
+				} else
+					encoded = dsg->encoder(&c, &length);
+#else
+				encoded = dsg->encoder(*inbuf, &length);
+#endif
 				if (encoded != MAP_UNMAPPABLE) {
 					insize = length;
 					break;
