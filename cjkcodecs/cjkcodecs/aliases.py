@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.13 2004/07/07 16:24:16 perky Exp $
+# $Id: aliases.py,v 1.14 2004/07/18 04:44:27 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -61,7 +61,7 @@ aliases.update({
     'cp950'              : 'cjkcodecs.cp950',
     'ms950'              : 'cjkcodecs.cp950',
 
-    # euc_jisx0213 codec
+    # euc_jis_2004 codec
     'jisx0213'           : 'cjkcodecs.euc_jis_2004',
     'eucjis2004'         : 'cjkcodecs.euc_jis_2004',
     'euc_jis_2004'       : 'cjkcodecs.euc_jis_2004',

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.18 2004/07/07 18:30:17 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.19 2004/07/18 04:44:27 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -132,8 +132,8 @@ typedef DBCHAR (*iso2022_encode_func)(const ucs4_t *data, int *length);
 
 struct iso2022_designation {
 	unsigned char mark;
-	char plane;
-	char width;
+	unsigned char plane;
+	unsigned char width;
 	iso2022_init_func initializer;
 	iso2022_decode_func decoder;
 	iso2022_encode_func encoder;

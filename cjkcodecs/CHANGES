@@ -1,3 +1,12 @@
+Changes with CJKCodecs 1.1
+
+  *) Fixed a bug that BIG5HKSCS codec can't encode correctly
+     non-BMP unicode characters in UCS2 build.
+
+  *) Fixed standard C compiler errors and warnings for MSVC 7.1
+     compilation. (Merged fixes by Tim Peters from Python trunk)
+
+
 Changes with CJKCodecs 1.1b1
 
   *) StreamWriter.write now can write non-unicode objects.

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_hk.c,v 1.3 2004/07/07 14:59:26 perky Exp $
+ * $Id: _codecs_hk.c,v 1.4 2004/07/18 04:44:27 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -86,7 +86,7 @@ ENCODER(big5hkscs)
 
 		OUT1(code >> 8)
 		OUT2(code & 0xFF)
-		NEXT(1, 2)
+		NEXT(insize, 2)
 	}
 
 	return 0;
