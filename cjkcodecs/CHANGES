@@ -1,4 +1,12 @@
-Changed with CJKCodecs 1.0.1
+Changes with CJKCodecs 1.0.2
+
+  *) Several aliases are added for compatibility.
+     - ISO-2022-JP-1: ISO-2022-JP-EXT
+     - BIG5: BIG5-TW
+     - GB2312: EUCGB2312-CN
+
+
+Changes with CJKCodecs 1.0.1
 
   *) Fixed a bug that decoders' returning u'' not (u'', 0) when decoding
      empty string. [Tae-Wook Kang]
@@ -12,7 +20,7 @@ Changes with CJKCodecs 1.0
   *) UTF-16 codecs are removed from distribution.
 
   *) Fixed UTF-7 codec's bug that fails to decode surrogate pair on
-     ucs4-python
+     ucs4-python.
 
 
 Changes with CJKCodecs 1.0b1

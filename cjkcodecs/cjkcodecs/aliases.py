@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.1 2003/09/24 17:44:42 perky Exp $
+# $Id: aliases.py,v 1.2 2003/11/27 07:55:44 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -34,6 +34,7 @@ from encodings.aliases import aliases
 aliases.update({
     # big5 codec
     'big5'               : 'cjkcodecs.big5',
+    'big5_tw'            : 'cjkcodecs.big5',
     'csbig5'             : 'cjkcodecs.big5',
 
     # cp932 codec
@@ -80,14 +81,15 @@ aliases.update({
     'gb18030_2000'       : 'cjkcodecs.gb18030',
 
     # gb2312 codec
-    'euccn'              : 'cjkcodecs.gb2312',
-    'euc_cn'             : 'cjkcodecs.gb2312',
     'chinese'            : 'cjkcodecs.gb2312',
-    'gb2312'             : 'cjkcodecs.gb2312',
-    'gb2312_80'          : 'cjkcodecs.gb2312',
-    'gb2312_1980'        : 'cjkcodecs.gb2312',
-    'iso_ir_58'          : 'cjkcodecs.gb2312',
     'csISO58gb231280'    : 'cjkcodecs.gb2312',
+    'euc_cn'             : 'cjkcodecs.gb2312',
+    'euccn'              : 'cjkcodecs.gb2312',
+    'eucgb2312_cn'       : 'cjkcodecs.gb2312',
+    'gb2312'             : 'cjkcodecs.gb2312',
+    'gb2312_1980'        : 'cjkcodecs.gb2312',
+    'gb2312_80'          : 'cjkcodecs.gb2312',
+    'iso_ir_58'          : 'cjkcodecs.gb2312',
 
     # gbk codec
     '936'                : 'cjkcodecs.gbk',
@@ -108,8 +110,11 @@ aliases.update({
 
     # iso_2022_jp_1 codec
     'iso_2022_jp_1'      : 'cjkcodecs.iso_2022_jp_1',
+    'iso_2022_jp_ext'    : 'cjkcodecs.iso_2022_jp_1',
     'iso2022_jp_1'       : 'cjkcodecs.iso_2022_jp_1',
+    'iso2022_jp_ext'     : 'cjkcodecs.iso_2022_jp_1',
     'iso2022jp_1'        : 'cjkcodecs.iso_2022_jp_1',
+    'iso2022jp_ext'      : 'cjkcodecs.iso_2022_jp_1',
 
     # iso_2022_jp_2 codec
     'iso_2022_jp_2'      : 'cjkcodecs.iso_2022_jp_2',
