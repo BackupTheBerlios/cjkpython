@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.19 2004/07/08 02:55:49 perky Exp $
+# $Id: setup.py,v 1.20 2004/07/08 03:06:09 perky Exp $
 #
 
 import os
@@ -68,7 +68,7 @@ Language options:
   --disable-iso2022                 don't install ISO-2022 codecs
   --disable-utf                     don't install UTF codecs
   --disable-extra-encodings         disable building extra-expensive encodings:
-                                        euc-tw iso-2022-cn iso-2022-ext
+                                        euc-tw iso-2022-cn
 """
         continue
     else:
