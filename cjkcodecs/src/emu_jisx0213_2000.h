@@ -1,7 +1,11 @@
-/* $Id: emu_jisx0213_2000.h,v 1.1 2004/07/07 17:55:30 perky Exp $ */
+/* $Id: emu_jisx0213_2000.h,v 1.2 2004/07/07 18:30:17 perky Exp $ */
 
 /* These routines may be quite inefficient, but it's used only to emulate old
  * standards. */
+
+#ifndef EMULATE_JISX0213_2000_ENCODE_INVALID
+#define EMULATE_JISX0213_2000_ENCODE_INVALID 1
+#endif
 
 #define EMULATE_JISX0213_2000_ENCODE_BMP(assi, c)			\
 	if (config == (void *)2000 && (					\
@@ -10,13 +14,17 @@
 		 	(c) == 0x5653 || (c) == 0x59F8 ||		\
 			(c) == 0x5C5B || (c) == 0x5E77 ||		\
 			(c) == 0x7626 || (c) == 0x7E6B))		\
-		return 1;						\
+		return EMULATE_JISX0213_2000_ENCODE_INVALID;		\
 	else if (config == (void *)2000 && (c) == 0x9B1D)		\
 		(assi) = 0x8000 | 0x7d3b;				\
 
 #define EMULATE_JISX0213_2000_ENCODE_EMP(assi, c)			\
 	if (config == (void *)2000 && (c) == 0x20B9F)			\
-		return 1;
+		return EMULATE_JISX0213_2000_ENCODE_INVALID;
+
+#ifndef EMULATE_JISX0213_2000_DECODE_INVALID
+#define EMULATE_JISX0213_2000_DECODE_INVALID 2
+#endif
 
 #define EMULATE_JISX0213_2000_DECODE_PLANE1(assi, c1, c2)		\
 	if (config == (void *)2000 &&					\
@@ -30,7 +38,7 @@
 			 ((c1) == 0x7E && (c2) == 0x7C) ||		\
 			 ((c1) == 0x7E && (c2) == 0x7D) ||		\
 			 ((c1) == 0x7E && (c2) == 0x7E)))		\
-		return 2;
+		return EMULATE_JISX0213_2000_DECODE_INVALID;
 
 #define EMULATE_JISX0213_2000_DECODE_PLANE2(assi, c1, c2)		\
 	if (config == (void *)2000 && (c1) == 0x7D && (c2) == 0x3B)	\

@@ -26,15 +26,18 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.17 2004/07/07 14:59:26 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.18 2004/07/07 18:30:17 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
 #define USING_BINARY_PAIR_SEARCH
 #define EXTERN_JISX0213_PAIR
+#define EMULATE_JISX0213_2000_ENCODE_INVALID MAP_UNMAPPABLE
+#define EMULATE_JISX0213_2000_DECODE_INVALID MAP_UNMAPPABLE
 
 #include "cjkcodecs.h"
 #include "alg_jisx0201.h"
+#include "emu_jisx0213_2000.h"
 #include "mappings_jisx0213_pair.h"
 
 /* STATE
@@ -74,8 +77,9 @@
 #define CHARSET_GB2312_8565	('E'|CHARSET_DBCS)
 #define CHARSET_CNS11643_1	('G'|CHARSET_DBCS)
 #define CHARSET_CNS11643_2	('H'|CHARSET_DBCS)
-#define CHARSET_JISX0213_1	('O'|CHARSET_DBCS)
+#define CHARSET_JISX0213_2000_1	('O'|CHARSET_DBCS)
 #define CHARSET_JISX0213_2	('P'|CHARSET_DBCS)
+#define CHARSET_JISX0213_2004_1	('Q'|CHARSET_DBCS)
 #define CHARSET_JISX0208_O	('@'|CHARSET_DBCS)
 
 #define CHARSET_DBCS		0x80
@@ -723,8 +727,40 @@ jisx0213_init(void)
 	return 0;
 }
 
+#define config ((void *)2000)
 static ucs4_t
-jisx0213_1_decoder(const unsigned char *data)
+jisx0213_2000_1_decoder(const unsigned char *data)
+{
+	ucs4_t u;
+	EMULATE_JISX0213_2000_DECODE_PLANE1(u, data[0], data[1])
+	else if (data[0] == 0x21 && data[1] == 0x40) /* F/W REVERSE SOLIDUS */
+		return 0xff3c;
+	else TRYMAP_DEC(jisx0208, u, data[0], data[1]);
+	else TRYMAP_DEC(jisx0213_1_bmp, u, data[0], data[1]);
+	else TRYMAP_DEC(jisx0213_1_emp, u, data[0], data[1])
+		u |= 0x20000;
+	else TRYMAP_DEC(jisx0213_pair, u, data[0], data[1]);
+	else
+		return MAP_UNMAPPABLE;
+	return u;
+}
+
+static ucs4_t
+jisx0213_2000_2_decoder(const unsigned char *data)
+{
+	ucs4_t u;
+	EMULATE_JISX0213_2000_DECODE_PLANE2(u, data[0], data[1])
+	TRYMAP_DEC(jisx0213_2_bmp, u, data[0], data[1]);
+	else TRYMAP_DEC(jisx0213_2_emp, u, data[0], data[1])
+		u |= 0x20000;
+	else
+		return MAP_UNMAPPABLE;
+	return u;
+}
+#undef config
+
+static ucs4_t
+jisx0213_2004_1_decoder(const unsigned char *data)
 {
 	ucs4_t u;
 	if (data[0] == 0x21 && data[1] == 0x40) /* F/W REVERSE SOLIDUS */
@@ -740,7 +776,7 @@ jisx0213_1_decoder(const unsigned char *data)
 }
 
 static ucs4_t
-jisx0213_2_decoder(const unsigned char *data)
+jisx0213_2004_2_decoder(const unsigned char *data)
 {
 	ucs4_t u;
 	TRYMAP_DEC(jisx0213_2_bmp, u, data[0], data[1]);
@@ -752,7 +788,7 @@ jisx0213_2_decoder(const unsigned char *data)
 }
 
 static DBCHAR
-jisx0213_encoder(const ucs4_t *data, int *length)
+jisx0213_encoder(const ucs4_t *data, int *length, void *config)
 {
 	DBCHAR coded;
 
@@ -760,14 +796,16 @@ jisx0213_encoder(const ucs4_t *data, int *length)
 	case 1: /* first character */
 		if (*data >= 0x10000) {
 			if ((*data) >> 16 == 0x20000 >> 16) {
-				TRYMAP_ENC(jisx0213_emp, coded,
-					   (*data) & 0xffff)
+				EMULATE_JISX0213_2000_ENCODE_EMP(coded, *data)
+				else TRYMAP_ENC(jisx0213_emp, coded,
+						(*data) & 0xffff)
 					return coded;
 			}
 			return MAP_UNMAPPABLE;
 		}
 
-		TRYMAP_ENC(jisx0213_bmp, coded, *data) {
+		EMULATE_JISX0213_2000_ENCODE_BMP(coded, *data)
+		else TRYMAP_ENC(jisx0213_bmp, coded, *data) {
 			if (coded == MULTIC)
 				return MAP_MULTIPLE_AVAIL;
 		}
@@ -804,9 +842,9 @@ jisx0213_encoder(const ucs4_t *data, int *length)
 }
 
 static DBCHAR
-jisx0213_1_encoder(const ucs4_t *data, int *length)
+jisx0213_2000_1_encoder(const ucs4_t *data, int *length)
 {
-	DBCHAR coded = jisx0213_encoder(data, length);
+	DBCHAR coded = jisx0213_encoder(data, length, (void *)2000);
 	if (coded == MAP_UNMAPPABLE || coded == MAP_MULTIPLE_AVAIL)
 		return coded;
 	else if (coded & 0x8000)
@@ -816,12 +854,12 @@ jisx0213_1_encoder(const ucs4_t *data, int *length)
 }
 
 static DBCHAR
-jisx0213_1_encoder_paironly(const ucs4_t *data, int *length)
+jisx0213_2000_1_encoder_paironly(const ucs4_t *data, int *length)
 {
 	DBCHAR coded;
 	int ilength = *length;
 
-	coded = jisx0213_encoder(data, length);
+	coded = jisx0213_encoder(data, length, (void *)2000);
 	switch (ilength) {
 	case 1:
 		if (coded == MAP_MULTIPLE_AVAIL)
@@ -839,9 +877,56 @@ jisx0213_1_encoder_paironly(const ucs4_t *data, int *length)
 }
 
 static DBCHAR
-jisx0213_2_encoder(const ucs4_t *data, int *length)
+jisx0213_2000_2_encoder(const ucs4_t *data, int *length)
 {
-	DBCHAR coded = jisx0213_encoder(data, length);
+	DBCHAR coded = jisx0213_encoder(data, length, (void *)2000);
+	if (coded == MAP_UNMAPPABLE || coded == MAP_MULTIPLE_AVAIL)
+		return coded;
+	else if (coded & 0x8000)
+		return coded;
+	else
+		return MAP_UNMAPPABLE;
+}
+
+static DBCHAR
+jisx0213_2004_1_encoder(const ucs4_t *data, int *length)
+{
+	DBCHAR coded = jisx0213_encoder(data, length, NULL);
+	if (coded == MAP_UNMAPPABLE || coded == MAP_MULTIPLE_AVAIL)
+		return coded;
+	else if (coded & 0x8000)
+		return MAP_UNMAPPABLE;
+	else
+		return coded;
+}
+
+static DBCHAR
+jisx0213_2004_1_encoder_paironly(const ucs4_t *data, int *length)
+{
+	DBCHAR coded;
+	int ilength = *length;
+
+	coded = jisx0213_encoder(data, length, NULL);
+	switch (ilength) {
+	case 1:
+		if (coded == MAP_MULTIPLE_AVAIL)
+			return MAP_MULTIPLE_AVAIL;
+		else
+			return MAP_UNMAPPABLE;
+	case 2:
+		if (*length != 2)
+			return MAP_UNMAPPABLE;
+		else
+			return coded;
+	default:
+		return MAP_UNMAPPABLE;
+	}
+}
+
+static DBCHAR
+jisx0213_2004_2_encoder(const ucs4_t *data, int *length)
+{
+	DBCHAR coded = jisx0213_encoder(data, length, NULL);
 	if (coded == MAP_UNMAPPABLE || coded == MAP_MULTIPLE_AVAIL)
 		return coded;
 	else if (coded & 0x8000)
@@ -1046,16 +1131,30 @@ dummy_encoder(const ucs4_t *data, int *length)
 #define REGISTRY_JISX0212	{ CHARSET_JISX0212, 0, 2,		\
 				  jisx0212_init,			\
 				  jisx0212_decoder, jisx0212_encoder }
-#define REGISTRY_JISX0213_1	{ CHARSET_JISX0213_1, 0, 2,		\
+#define REGISTRY_JISX0213_2000_1 { CHARSET_JISX0213_2000_1, 0, 2,	\
 				  jisx0213_init,			\
-				  jisx0213_1_decoder, jisx0213_1_encoder }
-#define REGISTRY_JISX0213_1_PAIRONLY { CHARSET_JISX0213_1, 0, 2,	\
+				  jisx0213_2000_1_decoder,		\
+				  jisx0213_2000_1_encoder }
+#define REGISTRY_JISX0213_2000_1_PAIRONLY { CHARSET_JISX0213_2000_1, 0, 2, \
 				  jisx0213_init,			\
-				  jisx0213_1_decoder,			\
-				  jisx0213_1_encoder_paironly }
-#define REGISTRY_JISX0213_2	{ CHARSET_JISX0213_2, 0, 2,		\
+				  jisx0213_2000_1_decoder,		\
+				  jisx0213_2000_1_encoder_paironly }
+#define REGISTRY_JISX0213_2000_2 { CHARSET_JISX0213_2, 0, 2,		\
 				  jisx0213_init,			\
-				  jisx0213_2_decoder, jisx0213_2_encoder }
+				  jisx0213_2000_2_decoder,		\
+				  jisx0213_2000_2_encoder }
+#define REGISTRY_JISX0213_2004_1 { CHARSET_JISX0213_2004_1, 0, 2,	\
+				  jisx0213_init,			\
+				  jisx0213_2004_1_decoder,		\
+				  jisx0213_2004_1_encoder }
+#define REGISTRY_JISX0213_2004_1_PAIRONLY { CHARSET_JISX0213_2004_1, 0, 2, \
+				  jisx0213_init,			\
+				  jisx0213_2004_1_decoder,		\
+				  jisx0213_2004_1_encoder_paironly }
+#define REGISTRY_JISX0213_2004_2 { CHARSET_JISX0213_2, 0, 2,		\
+				  jisx0213_init,			\
+				  jisx0213_2004_2_decoder,		\
+				  jisx0213_2004_2_encoder }
 #define REGISTRY_GB2312		{ CHARSET_GB2312, 1, 2,			\
 				  gb2312_init,				\
 				  gb2312_decoder, gb2312_encoder }
@@ -1095,10 +1194,18 @@ static const struct iso2022_config iso2022_jp_2_config = {
 	  REGISTRY_ISO8859_1, REGISTRY_ISO8859_7, REGISTRY_SENTINEL },
 };
 
+static const struct iso2022_config iso2022_jp_2004_config = {
+	NO_SHIFT | USE_G2 | USE_JISX0208_EXT,
+	{ REGISTRY_JISX0213_2004_1_PAIRONLY, REGISTRY_JISX0208,
+	  REGISTRY_JISX0213_2004_1, REGISTRY_JISX0213_2004_2,
+	  REGISTRY_SENTINEL },
+};
+
 static const struct iso2022_config iso2022_jp_3_config = {
 	NO_SHIFT | USE_JISX0208_EXT,
-	{ REGISTRY_JISX0213_1_PAIRONLY, REGISTRY_JISX0208,
-	  REGISTRY_JISX0213_1, REGISTRY_JISX0213_2, REGISTRY_SENTINEL },
+	{ REGISTRY_JISX0213_2000_1_PAIRONLY, REGISTRY_JISX0208,
+	  REGISTRY_JISX0213_2000_1, REGISTRY_JISX0213_2000_2,
+	  REGISTRY_SENTINEL },
 };
 
 static const struct iso2022_config iso2022_jp_ext_config = {
@@ -1131,6 +1238,7 @@ BEGIN_CODECS_LIST
   ISO2022_CODEC(jp)
   ISO2022_CODEC(jp_1)
   ISO2022_CODEC(jp_2)
+  ISO2022_CODEC(jp_2004)
   ISO2022_CODEC(jp_3)
   ISO2022_CODEC(jp_ext)
 #ifndef NO_EXTRA_ENCODINGS

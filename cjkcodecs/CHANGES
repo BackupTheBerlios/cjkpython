@@ -17,6 +17,7 @@ Changes with CJKCodecs 1.1
 	- big5hkscs (Traditional Chinese - Hong Kong)
 	- euc-jis-2004 (Japanese)
 	- shift_jis-2004 (Japanese)
+	- iso-2022-jp-2004 (Japanese)
 
   *) Added new compatibility alias:
 	cp932: windows-31j
