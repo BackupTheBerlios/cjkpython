@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codeccommon.h,v 1.2 2003/11/27 15:09:50 perky Exp $
+ * $Id: codeccommon.h,v 1.3 2003/12/30 01:35:01 perky Exp $
  */
 
 #include "Python.h"
@@ -138,13 +138,13 @@
 #define _TRYMAP_ENC(m, assi, val)                           \
     if ((m)->map != NULL && (val) >= (m)->bottom &&         \
         (val)<= (m)->top && ((assi) = (m)->map[(val) -      \
-            (m)->bottom]) != NOCHAR)  
+            (m)->bottom]) != NOCHAR)
 #define TRYMAP_ENC(charset, assi, uni)                      \
     _TRYMAP_ENC(&charset##encmap[(uni) >> 8], assi, (uni) & 0xff)
 #define _TRYMAP_DEC(m, assi, val)                           \
     if ((m)->map != NULL && (val) >= (m)->bottom &&         \
         (val)<= (m)->top && ((assi) = (m)->map[(val) -      \
-            (m)->bottom]) != UNIINV)  
+            (m)->bottom]) != UNIINV)
 #define TRYMAP_DEC(charset, assi, c1, c2)                   \
     _TRYMAP_DEC(&charset##decmap[c1], assi, c2)
 

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _utf_7.c,v 1.1 2003/09/24 17:44:50 perky Exp $
+ * $Id: _utf_7.c,v 1.2 2003/12/30 01:35:01 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -51,7 +51,7 @@ static const char utf7_sets[128] = {
 #undef W
 #undef O
 #undef D
-    
+
 #define B64(n)  ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" \
                  "0123456789+/"[(n) & 0x3f])
 #define B64CHAR(c)  (((c) >= 'A' && (c) <= 'Z') || \

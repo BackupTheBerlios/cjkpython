@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _johab.c,v 1.1 2003/09/24 17:44:49 perky Exp $
+ * $Id: _johab.c,v 1.2 2003/12/30 01:35:01 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -202,7 +202,7 @@ DECODER(johab)
                 if (i_jung == FILL) {
                     if (i_jong == FILL)
                         OUT1(0x3100 | johabjamo_choseong[c_cho])
-                    else 
+                    else
                         return 2;
                 } else
                     OUT1(0xac00 +

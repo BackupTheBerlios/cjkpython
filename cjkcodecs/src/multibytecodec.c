@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.3 2003/11/27 08:51:54 perky Exp $
+ * $Id: multibytecodec.c,v 1.4 2003/12/30 01:35:01 perky Exp $
  */
 
 #include "Python.h"
@@ -244,7 +244,7 @@ multibytecodec_encerror(MultibyteCodec *codec,
             PyErr_Format(PyExc_UnicodeError,
                 "'%s' codec can't encode byte '\\U%08x' in position %d: %s",
                 codec->encoding, *buf->inbuf, start, reason);
-        else 
+        else
 #endif
             PyErr_Format(PyExc_UnicodeError,
                 "'%s' codec can't encode byte '\\u%04x' in position %d: %s",

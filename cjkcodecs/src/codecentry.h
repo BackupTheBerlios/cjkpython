@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecentry.h,v 1.2 2003/11/27 15:09:50 perky Exp $
+ * $Id: codecentry.h,v 1.3 2003/12/30 01:35:01 perky Exp $
  */
 
 #ifdef HAVE_ENCODER_INIT
@@ -149,13 +149,13 @@ find_pairencmap(ucs2_t body, ucs2_t modifier,
         } else if (value > haystack[pos].uniseq) {
             if (min == pos) break;
             else min = pos;
-        } else  
-            break;  
+        } else
+            break;
 
     if (value == haystack[pos].uniseq)
         return haystack[pos].code;
-    else    
-        return DBCINV; 
+    else
+        return DBCINV;
 }
 #endif
 
