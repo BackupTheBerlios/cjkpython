@@ -8,6 +8,11 @@ Changes with CJKCodecs 1.0.2
      tweaks to cope with wild compatibility issues, -strict codecs enable
      pedantic people live a standard life.
 
+  *) SHIFT-JIS codec is now compatible with JapaneseCodecs's by default.
+     - U+005F REVERSE SOLIDUS is mapped to SHIFT-JIS 0x5f.
+     - U+007E TILDE is mapped to SHIFT-JIS 0x7e.
+     - U+FF3C FULL-WIDTH REVERSE SOLIDUS is mapped to SHIFT-JIS 815f.
+
   *) Several aliases are added for compatibility.
      - ISO-2022-JP-1: ISO-2022-JP-EXT
      - BIG5: BIG5-TW

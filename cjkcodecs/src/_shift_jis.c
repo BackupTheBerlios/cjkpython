@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _shift_jis.c,v 1.1 2003/09/24 17:44:49 perky Exp $
+ * $Id: _shift_jis.c,v 1.2 2003/11/27 16:42:20 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -42,7 +42,14 @@ ENCODER(shift_jis)
         DBCHAR           code;
         unsigned char    c1, c2;
 
-        JISX0201_ENCODE(c, code)
+#ifdef STRICT_BUILD
+        JISX0201_R_ENCODE(c, code)
+#else
+        if (c < 0x80) code = c;
+        else if (c == 0x00a5) code = 0x5c; /* YEN SIGN */
+        else if (c == 0x203e) code = 0x7e; /* OVERLINE */
+#endif
+        else JISX0201_K_ENCODE(c, code)
         else UCS4INVALID(c)
         else code = NOCHAR;
 
@@ -66,7 +73,12 @@ ENCODER(shift_jis)
                 OUT2(c2 < 0x3f ? c2 + 0x40 : c2 + 0x41)
                 NEXT(1, 2)
                 continue;
-            } else
+            }
+#ifndef STRICT_BUILD
+            else if (c == 0xff3c)
+                code = 0x2140; /* FULL-WIDTH REVERSE SOLIDUS */
+#endif
+            else
                 return 1;
 
             if (code & 0x8000) /* MSB set: JIS X 0212 */
@@ -91,7 +103,13 @@ DECODER(shift_jis)
         unsigned char    c = IN1;
 
         RESERVE_OUTBUF(1)
-        JISX0201_DECODE(c, **outbuf)
+
+#ifdef STRICT_BUILD
+        JISX0201_R_DECODE(c, **outbuf)
+#else
+        if (c < 0x80) **outbuf = c;
+#endif
+        else JISX0201_K_DECODE(c, **outbuf)
         else if ((c >= 0x81 && c <= 0x9f) || (c >= 0xe0 && c <= 0xea)) {
             unsigned char    c1, c2;
 
@@ -105,6 +123,14 @@ DECODER(shift_jis)
             c1 = (2 * c1 + (c2 < 0x5e ? 0 : 1) + 0x21);
             c2 = (c2 < 0x5e ? c2 : c2 - 0x5e) + 0x21;
 
+#ifndef STRICT_BUILD
+            if (c1 == 0x21 && c2 == 0x40) {
+                /* FULL-WIDTH REVERSE SOLIDUS */
+                OUT1(0xff3c)
+                NEXT(2, 1)
+                continue;
+            }
+#endif
             TRYMAP_DEC(jisx0208, **outbuf, c1, c2) {
                 NEXT(2, 1)
                 continue;

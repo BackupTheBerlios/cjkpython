@@ -1,8 +1,7 @@
-/* $Id: alg_jisx0201.h,v 1.1 2003/09/24 17:44:55 perky Exp $ */
+/* $Id: alg_jisx0201.h,v 1.2 2003/11/27 16:42:20 perky Exp $ */
 
 #define JISX0201_R_ENCODE(c, assi)              \
-    if ((c) < 0x5c || (c) == 0x7f) (assi) = (c);\
-    else if ((c) > 0x5c && (c) < 0x7e)          \
+    if ((c) < 0x80 && (c) != 0x5c && (c) != 0x7e) \
         (assi) = (c);                           \
     else if ((c) == 0x00a5) (assi) = 0x5c;      \
     else if ((c) == 0x203e) (assi) = 0x7e;
