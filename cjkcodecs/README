@@ -1,8 +1,8 @@
-CJK Codecs 1.0
-==============
+CJK Codecs 1.0.1
+================
 
 Copyright(C) 2002-2003 Hye-Shik Chang.
-$Id: README,v 1.1 2003/09/24 17:44:41 perky Exp $
+$Id: README,v 1.2 2003/09/24 18:06:32 perky Exp $
 
 
 Introduction
@@ -24,7 +24,7 @@ consult the specification for the details of the codecs.
 
 The latest version of this package is available at:
 
-  http://sourceforge.net/projects/koco/
+  http://cjkpython.berlios.de/#CJKCodecs
 
 
 Requirement
