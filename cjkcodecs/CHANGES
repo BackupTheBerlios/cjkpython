@@ -5,6 +5,9 @@ Changes with CJKCodecs 1.1
   *) C codec modules are merged into a few per-locale modules with
      its dependent mapping table holder modules.
 
+  *) Add new compatibility alias:
+       cp932: windows-31j
+
 
 Changes with CJKCodecs 1.0.3
 

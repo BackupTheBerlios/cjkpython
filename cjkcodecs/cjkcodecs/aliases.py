@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.5 2003/12/31 05:46:55 perky Exp $
+# $Id: aliases.py,v 1.6 2004/06/18 03:45:22 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -43,6 +43,7 @@ aliases.update({
     'ms932'              : 'cjkcodecs.cp932',
     'mskanji'            : 'cjkcodecs.cp932',
     'ms_kanji'           : 'cjkcodecs.cp932',
+    'windows_31j'        : 'cjkcodecs.cp932',
 
     # cp949 codec
     '949'                : 'cjkcodecs.cp949',
