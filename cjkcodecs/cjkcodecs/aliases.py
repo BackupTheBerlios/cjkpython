@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.3 2003/11/27 16:54:09 perky Exp $
+# $Id: aliases.py,v 1.4 2003/12/30 05:47:12 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -116,11 +116,8 @@ aliases.update({
 
     # iso_2022_jp_1 codec
     'iso_2022_jp_1'      : 'cjkcodecs.iso_2022_jp_1',
-    'iso_2022_jp_ext'    : 'cjkcodecs.iso_2022_jp_1',
     'iso2022_jp_1'       : 'cjkcodecs.iso_2022_jp_1',
-    'iso2022_jp_ext'     : 'cjkcodecs.iso_2022_jp_1',
     'iso2022jp_1'        : 'cjkcodecs.iso_2022_jp_1',
-    'iso2022jp_ext'      : 'cjkcodecs.iso_2022_jp_1',
 
     # iso_2022_jp_2 codec
     'iso_2022_jp_2'      : 'cjkcodecs.iso_2022_jp_2',
@@ -131,6 +128,11 @@ aliases.update({
     'iso_2022_jp_3'      : 'cjkcodecs.iso_2022_jp_3',
     'iso2022_jp_3'       : 'cjkcodecs.iso_2022_jp_3',
     'iso2022jp_3'        : 'cjkcodecs.iso_2022_jp_3',
+
+    # iso_2022_jp_ext codec
+    'iso_2022_jp_ext'    : 'cjkcodecs.iso_2022_jp_ext',
+    'iso2022_jp_ext'     : 'cjkcodecs.iso_2022_jp_ext',
+    'iso2022jp_ext'      : 'cjkcodecs.iso_2022_jp_ext',
 
     # iso_2022_kr codec
     'iso_2022_kr'        : 'cjkcodecs.iso_2022_kr',

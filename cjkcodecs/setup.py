@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.10 2003/12/30 00:46:34 perky Exp $
+# $Id: setup.py,v 1.11 2003/12/30 05:47:12 perky Exp $
 #
 
 import os, shutil
@@ -42,8 +42,8 @@ LIBDIRS = []
 extensions = []
 encodings = {
 'ja_JP':    ['shift_jis', 'cp932', 'euc_jp', 'iso_2022_jp', 'iso_2022_jp_1',
-             'iso_2022_jp_2', 'iso_2022_jp_3', 'shift_jisx0213',
-             'euc_jisx0213'],
+             'iso_2022_jp_2', 'iso_2022_jp_3', 'iso_2022_jp_ext',
+             'shift_jisx0213', 'euc_jisx0213'],
 'ko_KR':    ['euc_kr', 'cp949', 'johab', 'iso_2022_kr'],
 'zh_CN':    ['gb2312', 'gbk', 'gb18030', 'hz'],
 'zh_TW':    ['big5', 'cp950'],
