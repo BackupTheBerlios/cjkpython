@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_interlude.h,v 1.5 2004/06/27 10:39:28 perky Exp $
+ * $Id: cjkc_interlude.h,v 1.6 2004/06/27 19:17:47 perky Exp $
  */
 
 #ifndef _CJKC_INTERLUDE_H_
@@ -203,7 +203,9 @@
 static DBCHAR find_pairencmap(ucs2_t , ucs2_t, struct pair_encodemap *, int);
 #endif
 #ifdef USING_IMPORTED_MAPS
-static int importmap(PyObject *, const char *, const struct unim_index **,
+#define IMPORT_MAP(locale, charset, encmap, decmap) \
+	importmap("_codecs_" #locale, "__map_" #charset, encmap, decmap)
+static int importmap(const char *, const char *, const struct unim_index **,
 		     const struct dbcs_index **);
 #endif
 

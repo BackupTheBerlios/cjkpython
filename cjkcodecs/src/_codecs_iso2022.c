@@ -26,29 +26,62 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.1 2004/06/27 10:39:28 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.2 2004/06/27 19:17:47 perky Exp $
  */
 
+#define USING_IMPORTED_MAPS
 #include "cjkc_prelude.h"
+#include "maps/alg_iso8859_1.h"
+#include "maps/alg_iso8859_7.h"
 #include "cjkc_interlude.h"
+
+/* STATE
+
+   state->c[0-3]
+
+	00000000
+	||^^^^^|
+	|+-----+----  G0-3 Character Set
+	+-----------  Is G0-3 double byte?
+
+   state->c[4]
+
+	00000000
+	      ||
+	      |+----  Locked-Shift?
+	      +-----  ESC Throughout
+*/
 
 #define ESC			0x1B
 #define SO			0x0E
 #define SI			0x0F
+#define LF			0x0A
+
+#define MAX_ESCSEQLEN		16
 
 #define CHARSET_ASCII		'B'
 #define CHARSET_ISO8859_1	'A'
 #define CHARSET_ISO8859_7	'F'
-#define CHARSET_KSX1001		'C'
-#define CHARSET_JISX0201_R	'J'
-#define CHARSET_JISX0201_K	'I'
-#define CHARSET_JISX0208	'B'
-#define CHARSET_JISX0208_O	'@'
-#define CHARSET_JISX0212	'D'
-#define CHARSET_JISX0213_1	'O'
-#define CHARSET_JISX0213_2	'P'
-#define CHARSET_GB2312		'A'
-#define CHARSET_GB2312_8565	'E'
+#define CHARSET_KSX1001		('C'|CHARSET_DBCS)
+#define CHARSET_JISX0201_R	('J'|CHARSET_DBCS)
+#define CHARSET_JISX0201_K	('I'|CHARSET_DBCS)
+#define CHARSET_JISX0208	('B'|CHARSET_DBCS)
+#define CHARSET_JISX0208_O	('@'|CHARSET_DBCS)
+#define CHARSET_JISX0212	('D'|CHARSET_DBCS)
+#define CHARSET_JISX0213_1	('O'|CHARSET_DBCS)
+#define CHARSET_JISX0213_2	('P'|CHARSET_DBCS)
+#define CHARSET_GB2312		('A'|CHARSET_DBCS)
+#define CHARSET_GB2312_8565	('E'|CHARSET_DBCS)
+
+#define CHARSET_DBCS		0x80
+#define ESCMARK(mark)		((mark) & 0x7f)
+
+#define IS_ESCEND(c)	(((c) >= 'A' && (c) <= 'Z') || (c) == '@')
+#define IS_ISO2022ESC(c2) \
+		((c2) == '(' || (c2) == ')' || (c2) == '$' || \
+		 (c2) == '.' || (c2) == '&')
+	/* this is not a complete list of ISO-2022 escape sequence headers.
+	 * but, it's enough to implement CJK instances of iso-2022. */
 
 #define MAP_UNMAPPABLE		0xFFFF
 #define MAP_MULTIPLE_AVAIL	0xFFFE /* for JIS X 0213 */
@@ -56,17 +89,17 @@
 #define F_SHIFTED		0x01
 #define F_ESCTHROUGHOUT		0x02
 
-#define STATE_SETG(dn, s, v)	((s)->c[dn]) = (v);
-#define STATE_GETG(dn, s)	((s)->c[dn])
+#define STATE_SETG(dn, v)	((state)->c[dn]) = (v);
+#define STATE_GETG(dn)		((state)->c[dn])
 
-#define STATE_G0		STATE_GETG(0, state)
-#define STATE_G1		STATE_GETG(1, state)
-#define STATE_G2		STATE_GETG(2, state)
-#define STATE_G3		STATE_GETG(3, state)
-#define STATE_SETG0(v)		STATE_SETG(0, state, v)
-#define STATE_SETG1(v)		STATE_SETG(1, state, v)
-#define STATE_SETG2(v)		STATE_SETG(2, state, v)
-#define STATE_SETG3(v)		STATE_SETG(3, state, v)
+#define STATE_G0		STATE_GETG(0)
+#define STATE_G1		STATE_GETG(1)
+#define STATE_G2		STATE_GETG(2)
+#define STATE_G3		STATE_GETG(3)
+#define STATE_SETG0(v)		STATE_SETG(0, v)
+#define STATE_SETG1(v)		STATE_SETG(1, v)
+#define STATE_SETG2(v)		STATE_SETG(2, v)
+#define STATE_SETG3(v)		STATE_SETG(3, v)
 
 #define STATE_SETFLAG(f)	((state)->c[4]) |= (f);
 #define STATE_GETFLAG(f)	((state)->c[4] & (f))
@@ -74,22 +107,22 @@
 #define STATE_CLEARFLAGS()	((state)->c[4]) = 0;
 
 #define ISO2022_CONFIG		((const struct iso2022_config *)config)
-#define CONFIG_ISSET(flag)	ISO2022_CONFIG |= (flag);
+#define CONFIG_ISSET(flag)	(ISO2022_CONFIG->flags & (flag))
 #define CONFIG_DESIGNATIONS	(ISO2022_CONFIG->designations)
 
 /* iso2022_config.flags */
-#define NO_SHIFT		(1<<0)
-#define USE_G2			(1<<1)
-#define USE_JISX0208_EXT	(1<<2)
+#define NO_SHIFT		0x01
+#define USE_G2			0x02
+#define USE_JISX0208_EXT	0x04
 
 /*-*- internal data structures -*-*/
 
 typedef int (*iso2022_init_func)(void);
-typedef ucs4_t (*iso2022_decode_func)(const char *data);
+typedef ucs4_t (*iso2022_decode_func)(const unsigned char *data);
 typedef DBCHAR (*iso2022_encode_func)(const ucs4_t *data, int length);
 
 struct iso2022_designation {
-	char mark;
+	unsigned char mark;
 	char plane;
 	char width;
 	iso2022_init_func initializer;
@@ -106,7 +139,10 @@ struct iso2022_config {
 
 CODEC_INIT(iso2022)
 {
-	printf("iso2022 codec init\n");
+	const struct iso2022_designation *desig = CONFIG_DESIGNATIONS;
+	for (desig = CONFIG_DESIGNATIONS; desig->mark; desig++)
+		if (desig->initializer() != 0)
+			return -1;
 	return 0;
 }
 
@@ -115,7 +151,6 @@ ENCODER_INIT(iso2022)
 	STATE_CLEARFLAGS()
 	STATE_SETG0(CHARSET_ASCII)
 	STATE_SETG1(CHARSET_ASCII)
-	STATE_SETG2(CHARSET_ASCII)
 	return 0;
 }
 
@@ -125,6 +160,11 @@ ENCODER_RESET(iso2022)
 		WRITE1(SI)
 		NEXT_OUT(1)
 		STATE_CLEARFLAG(F_SHIFTED)
+	}
+	if (STATE_G0 != CHARSET_ASCII) {
+		WRITE3(ESC, '(', 'B')
+		NEXT_OUT(3)
+		STATE_SETG0(CHARSET_ASCII)
 	}
 	return 0;
 }
@@ -158,8 +198,8 @@ ENCODER(iso2022)
 
 		for (dsg = CONFIG_DESIGNATIONS; dsg->mark; dsg++) {
 			encoded = dsg->encoder(&c, 1);
-			if (encoded == MAP_UNMAPPABLE)
-				continue;
+			if (encoded != MAP_UNMAPPABLE)
+				break;
 		}
 
 		if (!dsg->mark)
@@ -169,58 +209,63 @@ ENCODER(iso2022)
 		switch (dsg->plane) {
 		case 0: /* G0 */
 			if (STATE_GETFLAG(F_SHIFTED)) {
-				WRITE1(SO)
+				WRITE1(SI)
 				STATE_CLEARFLAG(F_SHIFTED)
 				NEXT_OUT(1)
 			}
 			if (STATE_G0 != dsg->mark) {
 				if (dsg->width == 1) {
-					WRITE3(ESC, '(', dsg->mark)
+					WRITE3(ESC, '(', ESCMARK(dsg->mark))
 					STATE_SETG0(dsg->mark)
 					NEXT_OUT(3)
 				}
 				else if (dsg->mark == CHARSET_JISX0208) {
-					WRITE3(ESC, '$', dsg->mark)
+					WRITE3(ESC, '$', ESCMARK(dsg->mark))
 					STATE_SETG0(dsg->mark)
 					NEXT_OUT(3)
 				}
 				else {
-					WRITE4(ESC, '$', '(', dsg->mark)
+					WRITE4(ESC, '$', '(',
+						ESCMARK(dsg->mark))
 					STATE_SETG0(dsg->mark)
 					NEXT_OUT(4)
 				}
 			}
 			break;
 		case 1: /* G1 */
-			if (!STATE_GETFLAG(F_SHIFTED)) {
-				WRITE1(SI)
-				STATE_SETFLAG(F_SHIFTED)
-				NEXT_OUT(1)
-			}
 			if (STATE_G1 != dsg->mark) {
 				if (dsg->width == 1) {
-					WRITE3(ESC, ')', dsg->mark)
+					WRITE3(ESC, ')', ESCMARK(dsg->mark))
 					STATE_SETG1(dsg->mark)
 					NEXT_OUT(3)
 				}
 				else {
-					WRITE4(ESC, '$', ')', dsg->mark)
+					WRITE4(ESC, '$', ')',
+						ESCMARK(dsg->mark))
 					STATE_SETG1(dsg->mark)
 					NEXT_OUT(4)
 				}
 			}
+			if (!STATE_GETFLAG(F_SHIFTED)) {
+				WRITE1(SO)
+				STATE_SETFLAG(F_SHIFTED)
+				NEXT_OUT(1)
+			}
 			break;
-		default: /* G2 and G3 is not supported: no encoding
-			  * in CJKCodecs are using them yet */
+		default: /* G2 and G3 is not supported: no encoding in
+			  * CJKCodecs are using them yet */
 			return MBERR_INTERNAL;
 		}
 
 		if (dsg->width == 1) {
 			WRITE1((unsigned char)encoded)
+			NEXT_OUT(1)
 		}
 		else {
 			WRITE2(encoded >> 8, encoded & 0xff)
+			NEXT_OUT(2)
 		}
+		NEXT_IN(insize)
 	}
 
 	return 0;
@@ -228,37 +273,284 @@ ENCODER(iso2022)
 
 DECODER_INIT(iso2022)
 {
+	STATE_CLEARFLAGS()
+	STATE_SETG0(CHARSET_ASCII)
+	STATE_SETG1(CHARSET_ASCII)
+	STATE_SETG2(CHARSET_ASCII)
 	return 0;
 }
 
 DECODER_RESET(iso2022)
 {
+	STATE_SETG0(CHARSET_ASCII)
+	STATE_CLEARFLAG(F_SHIFTED)
+	return 0;
+}
+
+static int
+iso2022processesc(const void *config, MultibyteCodec_State *state,
+		  const unsigned char **inbuf, size_t *inleft)
+{
+	unsigned char charset, designation;
+	size_t i, esclen;
+
+	for (i = 1;i < MAX_ESCSEQLEN;i++) {
+		if (i >= *inleft)
+			return MBERR_TOOFEW;
+		if (IS_ESCEND((*inbuf)[i])) {
+			esclen = i + 1;
+			break;
+		}
+		else if (CONFIG_ISSET(USE_JISX0208_EXT) && i+1 < *inleft &&
+			 (*inbuf)[i] == '&' && (*inbuf)[i+1] == '@')
+			i += 2;
+	}
+
+	if (i >= MAX_ESCSEQLEN)
+		return 1; /* unterminated escape sequence */
+
+	switch (esclen) {
+	case 3:
+		if (IN2 == '$') {
+			charset = IN3 | CHARSET_DBCS;
+			designation = 0;
+		}
+		else {
+			charset = IN3;
+			if (IN2 == '(') designation = 0;
+			else if (IN2 == ')') designation = 1;
+			else if (CONFIG_ISSET(USE_G2) && IN2 == '.')
+				designation = 2;
+			else return 3;
+		}
+		break;
+	case 4:
+		if (IN2 != '$')
+			return 4;
+
+		charset = IN4 | CHARSET_DBCS;
+		if (IN3 == '(') designation = 0;
+		else if (IN3 == ')') designation = 1;
+		else return 4;
+		break;
+	case 6: /* designation with prefix */
+		if (CONFIG_ISSET(USE_JISX0208_EXT) &&
+		    (*inbuf)[3] == ESC && (*inbuf)[4] == '$' &&
+		    (*inbuf)[5] == 'B') {
+			charset = 'B' | CHARSET_DBCS;
+			designation = 0;
+		}
+		else
+			return 6;
+		break;
+	default:
+		return esclen;
+	}
+
+	{/* raise error when the charset is not designated for this encoding */
+		const struct iso2022_designation *dsg;
+
+		for (dsg = CONFIG_DESIGNATIONS; dsg->mark; dsg++)
+			if (dsg->mark == charset)
+				break;
+		if (!dsg->mark)
+			return esclen;
+	}
+
+	STATE_SETG(designation, charset)
+	*inleft -= esclen;
+	(*inbuf) += esclen;
+	return 0;
+}
+
+static int
+iso2022processg2(const void *config, MultibyteCodec_State *state,
+		 const unsigned char **inbuf, size_t *inleft,
+		 Py_UNICODE **outbuf, size_t *outleft)
+{
+	/* not written to use encoder, decoder functions because only few
+	 * encodings use G2 designations in CJKCodecs */
+	if (STATE_G2 == CHARSET_ISO8859_1) {
+		ISO8859_1_DECODE(IN3 ^ 0x80, **outbuf)
+		else return 3;
+	}
+	else if (STATE_G2 == CHARSET_ISO8859_7) {
+		ISO8859_7_DECODE(IN3 ^ 0x80, **outbuf)
+		else return 3;
+	}
+	else if (STATE_G2 == CHARSET_ASCII) {
+		if (IN3 & 0x80) return 3;
+		else **outbuf = IN3;
+	}
+	else
+		return MBERR_INTERNAL;
+
+	(*inbuf) += 3;
+	*inleft -= 3;
+	(*outbuf) += 1;
+	*outbuf -= 1;
 	return 0;
 }
 
 DECODER(iso2022)
 {
+	const struct iso2022_designation *dsgcache = NULL;
+	
+	while (inleft > 0) {
+		unsigned char c = IN1;
+		int err;
+
+		if (STATE_GETFLAG(F_ESCTHROUGHOUT)) {
+			/* ESC throughout mode:
+			 * for non-iso2022 escape sequences */
+			WRITE1(c) /* assume as ISO-8859-1 */
+			NEXT(1, 1)
+			if (IS_ESCEND(c)) {
+				STATE_CLEARFLAG(F_ESCTHROUGHOUT)
+			}
+			continue;
+		}
+
+		switch (c) {
+		case ESC:
+			RESERVE_INBUF(2)
+			if (IS_ISO2022ESC(IN2)) {
+				err = iso2022processesc(config, state,
+							inbuf, &inleft);
+				if (err != 0)
+					return err;
+			}
+			else if (CONFIG_ISSET(USE_G2) && IN2 == 'N') {/* SS2 */
+				RESERVE_INBUF(3)
+				err = iso2022processg2(config, state,
+					inbuf, &inleft, outbuf, &outleft);
+				if (err != 0)
+					return err;
+			}
+			else {
+				WRITE1(ESC)
+				STATE_SETFLAG(F_ESCTHROUGHOUT)
+				NEXT(1, 1)
+			}
+			break;
+		case SI:
+			if (CONFIG_ISSET(NO_SHIFT))
+				goto bypass;
+			STATE_CLEARFLAG(F_SHIFTED)
+			NEXT_IN(1)
+			break;
+		case SO:
+			if (CONFIG_ISSET(NO_SHIFT))
+				goto bypass;
+			STATE_SETFLAG(F_SHIFTED)
+			NEXT_IN(1)
+			break;
+		case LF:
+			STATE_CLEARFLAG(F_SHIFTED)
+			WRITE1(LF)
+			NEXT(1, 1)
+			break;
+		default:
+			if (c < 0x20) /* C0 */
+				goto bypass;
+			else if (c >= 0x80)
+				return 1;
+			else {
+				const struct iso2022_designation *dsg;
+				unsigned char charset;
+				ucs4_t decoded;
+
+				if (STATE_GETFLAG(F_SHIFTED))
+					charset = STATE_G1;
+				else
+					charset = STATE_G0;
+
+				if (charset == CHARSET_ASCII) {
+bypass:					WRITE1(c)
+					NEXT(1, 1)
+					break;
+				}
+
+				if (dsgcache != NULL &&
+				    dsgcache->mark == charset)
+					dsg = dsgcache;
+				else {
+					for (dsg = CONFIG_DESIGNATIONS;
+					     dsg->mark != charset
+#ifdef Py_DEBUG
+						&& dsg->mark != '\0'
+#endif
+					     ;dsg++)
+						/* noop */;
+					assert(dsg->mark != '\0');
+					dsgcache = dsg;
+				}
+
+				RESERVE_INBUF(dsg->width)
+				decoded = dsg->decoder(*inbuf);
+				if (decoded == MAP_UNMAPPABLE)
+					return dsg->width;
+				WRITE1(decoded)
+				NEXT(dsg->width, 1)
+			}
+			break;
+		}
+	}
 	return 0;
 }
+
+/*-*- mapping table holders -*-*/
+
+#define ENCMAP(enc) static const encode_map *enc##_encmap = NULL;
+#define DECMAP(enc) static const decode_map *enc##_decmap = NULL;
+
+/* kr */
+ENCMAP(cp949)
+DECMAP(ksx1001)
+
+/* jp */
+ENCMAP(jisxcommon)
+DECMAP(jisx0208)
+DECMAP(jisx0212)
+
+/* cn */
+ENCMAP(gbcommon)
+DECMAP(gb2312)
 
 /*-*- mapping access functions -*-*/
 
 int
 ksx1001_init(void)
 {
+	static int ksx1001_initialized = 0;
+
+	if (!ksx1001_initialized && (
+			IMPORT_MAP(kr, cp949, &cp949_encmap, NULL) ||
+			IMPORT_MAP(kr, ksx1001, NULL, &ksx1001_decmap)))
+		return -1;
+	ksx1001_initialized = 1;
 	return 0;
 }
 
 ucs4_t
-ksx1001_decoder(const char *data)
+ksx1001_decoder(const unsigned char *data)
 {
-	return 0;
+	ucs4_t u;
+	TRYMAP_DEC(ksx1001, u, data[0], data[1])
+		return u;
+	else
+		return MAP_UNMAPPABLE;
 }
 
 DBCHAR
 ksx1001_encoder(const ucs4_t *data, int length)
 {
-	return 0;
+	DBCHAR coded;
+	assert(length == 1);
+	TRYMAP_ENC(cp949, coded, *data)
+		if (!(coded & 0x8000))
+			return coded;
+	return MAP_UNMAPPABLE;
 }
 
 /*-*- registry tables -*-*/

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_postlude.h,v 1.2 2004/06/19 07:04:30 perky Exp $
+ * $Id: cjkc_postlude.h,v 1.3 2004/06/27 19:17:47 perky Exp $
  */
 
 #ifndef _CJKC_POSTLUDE_H_
@@ -153,18 +153,22 @@ find_pairencmap(ucs2_t body, ucs2_t modifier,
 
 #ifdef USING_IMPORTED_MAPS
 static int
-importmap(PyObject *mod, const char *symbol,
+importmap(const char *modname, const char *symbol,
 	  const struct unim_index **encmap, const struct dbcs_index **decmap)
 {
-	PyObject *o;
+	PyObject *o, *mod;
+
+	mod = PyImport_ImportModule((char *)modname);
+	if (mod == NULL)
+		return -1;
 
 	o = PyObject_GetAttrString(mod, (char*)symbol);
 	if (o == NULL)
-		return -1;
+		goto errorexit;
 	else if (!PyCObject_Check(o)) {
 		PyErr_SetString(PyExc_ValueError,
 				"map data must be a CObject.");
-		return -1;
+		goto errorexit;
 	}
 	else {
 		struct dbcs_map *map;
@@ -176,7 +180,12 @@ importmap(PyObject *mod, const char *symbol,
 		Py_DECREF(o);
 	}
 
+	Py_DECREF(mod);
 	return 0;
+
+errorexit:
+	Py_DECREF(mod);
+	return -1;
 }
 #endif
 
