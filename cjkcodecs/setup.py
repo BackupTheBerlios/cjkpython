@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.8 2003/11/29 23:07:32 perky Exp $
+# $Id: setup.py,v 1.9 2003/11/29 23:44:54 perky Exp $
 #
 
 import os, shutil
@@ -35,8 +35,8 @@ import sys
 from distutils.core import setup, Extension
 from distutils.command.install import install
 
-SRCDIR = './src'
-TMPSRCDIR = './build/tmpsrc'
+SRCDIR = 'src'
+TMPSRCDIR = 'build/tmpsrc'
 
 LIBDIRS = []
 extensions = []
