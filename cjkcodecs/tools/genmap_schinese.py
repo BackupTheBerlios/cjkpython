@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_schinese.py,v 1.3 2004/06/17 18:31:21 perky Exp $
+# $Id: genmap_schinese.py,v 1.4 2004/06/19 06:11:46 perky Exp $
 #
 
 from genmap_support import *
@@ -176,4 +176,3 @@ print >> omap, "{0,0,%d}};" % (
     ranges[-1][2] + ranges[-1][1] - ranges[-1][0] + 1)
 
 print "\nDone!"
-# ex: ts=8 sts=4 et

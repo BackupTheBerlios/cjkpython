@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_korean.py,v 1.3 2004/06/17 18:31:21 perky Exp $
+# $Id: genmap_korean.py,v 1.4 2004/06/19 06:11:46 perky Exp $
 #
 
 from genmap_support import *
@@ -88,4 +88,3 @@ genmap_encode(filler, "cp949", cp949encmap)
 print_encmap(omap, filler, "cp949", cp949encmap)
 
 print "\nDone!"
-# ex: ts=8 sts=4 et

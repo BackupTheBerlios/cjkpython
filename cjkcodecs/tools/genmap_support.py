@@ -26,14 +26,14 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_support.py,v 1.3 2004/06/17 18:31:21 perky Exp $
+# $Id: genmap_support.py,v 1.4 2004/06/19 06:11:46 perky Exp $
 #
 
 import re
 
 COPYRIGHT_HEADER = """\
 /*
- * $Id: genmap_support.py,v 1.3 2004/06/17 18:31:21 perky Exp $
+ * $Id: genmap_support.py,v 1.4 2004/06/19 06:11:46 perky Exp $
  */
 """
 
@@ -197,5 +197,3 @@ def loadmap(fo, natcol=0, unicol=1, sbcs=0):
             decmap[(loc >> 8)][(loc & 0xff)] = uni
 
     return decmap
-
-# ex: ts=8 sts=4 et
