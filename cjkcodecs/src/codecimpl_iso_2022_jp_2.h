@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_iso_2022_jp_2.h,v 1.2 2004/06/18 18:15:24 perky Exp $
+ * $Id: codecimpl_iso_2022_jp_2.h,v 1.3 2004/06/18 18:49:03 perky Exp $
  */
 
 #define ISO2022_ENCODING iso_2022_jp_2
@@ -40,8 +40,49 @@
 
 #include "iso2022sect.h"
 
+static const encode_map *cp949_encmap = NULL, *gbcommon_encmap = NULL;
+static const decode_map *ksx1001_decmap = NULL, *gb2312_decmap = NULL;
+
+int
+import_maps_iso_2022_jp_2(void)
+{
+	PyObject *mod = NULL;
+
+	mod = PyImport_ImportModule("_codecs_kr");
+	if (mod == NULL)
+		goto errorexit;
+
+	if (importmap(mod, "__map_cp949", &cp949_encmap, NULL) ||
+	    importmap(mod, "__map_ksx1001", NULL, &ksx1001_decmap))
+		goto errorexit;
+
+	Py_DECREF(mod);
+
+	mod = PyImport_ImportModule("_codecs_cn");
+	if (mod == NULL)
+		goto errorexit;
+
+	if (importmap(mod, "__map_gbcommon", &gbcommon_encmap, NULL) ||
+	    importmap(mod, "__map_gb2312", NULL, &gb2312_decmap))
+		goto errorexit;
+
+	Py_DECREF(mod);
+	return 0;
+
+errorexit:
+	Py_XDECREF(mod);
+	cp949_encmap = gbcommon_encmap = NULL;
+	ksx1001_decmap = gb2312_decmap = NULL;
+	return -1;
+}
+
 ENCODER_INIT(iso_2022_jp_2)
 {
+	/* mapping tables for KS X 1001 and GB2312 needs to be imported from
+	 * foreign codec modules. */
+	if (cp949_encmap == NULL && import_maps_iso_2022_jp_2())
+		return MBERR_INTERNAL;
+
 	STATE_CLEARFLAGS(state)
 	STATE_SETG0(state, CHARSET_ASCII)
 	STATE_SETG1(state, CHARSET_ASCII)
@@ -170,6 +211,9 @@ jisx0208encode:				if (charset != CHARSET_JISX0208) {
 
 DECODER_INIT(iso_2022_jp_2)
 {
+	if (ksx1001_decmap == NULL && import_maps_iso_2022_jp_2())
+		return MBERR_INTERNAL;
+
 	STATE_CLEARFLAGS(state)
 	STATE_SETG0(state, CHARSET_ASCII)
 	STATE_SETG1(state, CHARSET_ASCII)

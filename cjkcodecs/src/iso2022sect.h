@@ -26,14 +26,14 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022sect.h,v 1.3 2004/06/18 18:13:30 perky Exp $
+ * $Id: iso2022sect.h,v 1.4 2004/06/18 18:49:03 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
  * rather than RFCs itself */
 
-#ifndef _ISO2022COMMON_H_ONCE_
-#define _ISO2022COMMON_H_ONCE_
+#ifndef _ISO2022SECT_H_ONCE_
+#define _ISO2022SECT_H_ONCE_
 
 #define ESC	0x1b
 #define SO	0x0e

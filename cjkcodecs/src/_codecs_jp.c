@@ -26,10 +26,11 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_jp.c,v 1.2 2004/06/18 18:13:30 perky Exp $
+ * $Id: _codecs_jp.c,v 1.3 2004/06/18 18:49:03 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
+#define USING_IMPORTED_MAPS
 #define EMPBASE 0x20000
 
 #include "cjkc_prelude.h"
@@ -40,6 +41,8 @@
 #include "maps/map_cp932ext.h"
 #include "maps/map_jisx0213_pairs.h"
 #include "maps/alg_jisx0201.h"
+#include "maps/alg_iso8859_1.h"
+#include "maps/alg_iso8859_7.h"
 
 #include "cjkc_interlude.h"
 #include "codecimpl_cp932.h"
@@ -49,6 +52,7 @@
 #include "codecimpl_shift_jisx0213.h"
 #include "codecimpl_iso_2022_jp.h"
 #include "codecimpl_iso_2022_jp_1.h"
+#include "codecimpl_iso_2022_jp_2.h"
 #include "codecimpl_iso_2022_jp_3.h"
 #include "codecimpl_iso_2022_jp_ext.h"
 
@@ -73,6 +77,7 @@ BEGIN_CODEC_LIST
   CODEC_STATELESS(euc_jisx0213)
   CODEC_STATEFUL(iso_2022_jp)
   CODEC_STATEFUL(iso_2022_jp_1)
+  CODEC_STATEFUL(iso_2022_jp_2)
   CODEC_STATEFUL(iso_2022_jp_3)
   CODEC_STATEFUL(iso_2022_jp_ext)
 END_CODEC_LIST
