@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.10 2004/06/28 15:26:21 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.11 2004/06/29 05:13:43 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -198,6 +198,7 @@ ENCODER(iso2022)
 		DECODE_SURROGATE(c)
 		insize = GET_INSIZE(c);
 
+		encoded = MAP_UNMAPPABLE;
 		for (dsg = CONFIG_DESIGNATIONS; dsg->mark; dsg++) {
 			int length = 1;
 			encoded = dsg->encoder(&c, &length);
