@@ -26,15 +26,13 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.9 2004/06/28 15:21:40 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.10 2004/06/28 15:26:21 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
 #define USING_BINARY_PAIR_SEARCH
 
 #include "cjkcodecs.h"
-#include "alg_iso8859_1.h"
-#include "alg_iso8859_7.h"
 #include "alg_jisx0201.h"
 #include "map_jisx0213_pairs.h"
 
@@ -386,6 +384,17 @@ iso2022processesc(const void *config, MultibyteCodec_State *state,
 	return 0;
 }
 
+#define ISO8859_7_DECODE(c, assi)					\
+	if ((c) < 0xa0) (assi) = (c);					\
+	else if ((c) < 0xc0 && (0x288f3bc9L & (1L << ((c)-0xa0))))	\
+		(assi) = (c);						\
+	else if ((c) >= 0xb4 && (c) <= 0xfe && ((c) >= 0xd4 ||		\
+		 (0xbffffd77L & (1L << ((c)-0xb4)))))			\
+		(assi) = 0x02d0 + (c);					\
+	else if ((c) == 0xa1) (assi) = 0x2018;				\
+	else if ((c) == 0xa2) (assi) = 0x2019;				\
+	else if ((c) == 0xaf) (assi) = 0x2015;
+
 static int
 iso2022processg2(const void *config, MultibyteCodec_State *state,
 		 const unsigned char **inbuf, size_t *inleft,
@@ -394,8 +403,10 @@ iso2022processg2(const void *config, MultibyteCodec_State *state,
 	/* not written to use encoder, decoder functions because only few
 	 * encodings use G2 designations in CJKCodecs */
 	if (STATE_G2 == CHARSET_ISO8859_1) {
-		ISO8859_1_DECODE(IN3 ^ 0x80, **outbuf)
-		else return 3;
+		if (IN3 < 0x80)
+			OUT1(IN3 + 0x80)
+		else
+			return 3;
 	}
 	else if (STATE_G2 == CHARSET_ISO8859_7) {
 		ISO8859_7_DECODE(IN3 ^ 0x80, **outbuf)
