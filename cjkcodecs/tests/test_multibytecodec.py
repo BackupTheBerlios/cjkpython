@@ -3,7 +3,7 @@
 # test_multibytecodec.py
 #   Unit test for multibytecodec itself
 #
-# $Id: test_multibytecodec.py,v 1.7 2004/06/07 13:36:45 perky Exp $
+# $Id: test_multibytecodec.py,v 1.8 2004/06/19 06:09:55 perky Exp $
 
 from test import test_support
 import test_multibytecodec_support
@@ -82,5 +82,3 @@ def test_main():
 
 if __name__ == "__main__":
     test_main()
-
-# ex: ts=8 sts=4 sw=4 et

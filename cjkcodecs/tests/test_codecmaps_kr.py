@@ -3,7 +3,7 @@
 # test_codecmaps_kr.py
 #   Codec mapping tests for ROK encodings
 #
-# $Id: test_codecmaps_kr.py,v 1.2 2004/01/17 12:47:19 perky Exp $
+# $Id: test_codecmaps_kr.py,v 1.3 2004/06/19 06:09:55 perky Exp $
 
 from test import test_support
 import test_multibytecodec_support
@@ -48,5 +48,3 @@ test_multibytecodec_support.register_skip_expected(TestCP949Map,
     TestEUCKRMap, TestJOHABMap)
 if __name__ == "__main__":
     test_main()
-
-# ex: ts=8 sts=4 sw=4 et

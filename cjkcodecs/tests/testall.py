@@ -3,7 +3,7 @@
 # testall.py
 #   Run all unittests.
 #
-# $Id: testall.py,v 1.2 2003/12/19 03:01:29 perky Exp $
+# $Id: testall.py,v 1.3 2004/06/19 06:09:55 perky Exp $
 
 import sys
 import os, unittest
@@ -32,5 +32,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# ex: ts=8 sts=4 sw=4 et

@@ -3,7 +3,7 @@
 # test_codecencodings_tw.py
 #   Codec encoding tests for ROC encodings.
 #
-# $Id: test_codecencodings_tw.py,v 1.1 2003/12/19 03:00:06 perky Exp $
+# $Id: test_codecencodings_tw.py,v 1.2 2004/06/19 06:09:55 perky Exp $
 
 from test import test_support
 import test_multibytecodec_support
@@ -28,5 +28,3 @@ def test_main():
 
 if __name__ == "__main__":
     test_main()
-
-# ex: ts=8 sts=4 sw=4 et

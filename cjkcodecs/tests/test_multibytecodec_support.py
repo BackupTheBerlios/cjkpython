@@ -3,7 +3,7 @@
 # test_multibytecodec_support.py
 #   Common Unittest Routines for CJK codecs
 #
-# $Id: test_multibytecodec_support.py,v 1.5 2004/01/17 12:47:19 perky Exp $
+# $Id: test_multibytecodec_support.py,v 1.6 2004/06/19 06:09:55 perky Exp $
 
 import sys, codecs, os.path
 import unittest
@@ -230,5 +230,3 @@ def register_skip_expected(*cases):
             break
     else:
         sys.modules[case.__module__].skip_expected = False
-
-# ex: ts=8 sts=4 sw=4 et
