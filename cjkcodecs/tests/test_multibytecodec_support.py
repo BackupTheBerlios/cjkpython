@@ -1,37 +1,13 @@
 #!/usr/bin/env python
 #
-# test_multibytecodec_support.py: Common Unittest Routines
+# test_multibytecodec_support.py
+#   Common Unittest Routines for CJK codecs
 #
-# Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
-# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-# IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
-#
-# $Id: test_multibytecodec_support.py,v 1.2 2003/11/27 18:55:34 perky Exp $
-#
+# $Id: test_multibytecodec_support.py,v 1.3 2003/12/19 02:39:09 perky Exp $
 
 import sys, codecs, os.path
 import unittest
+from test import test_support
 from StringIO import StringIO
 
 class TestBase:
@@ -180,6 +156,12 @@ class TestBase_Mapping(unittest.TestCase):
     pass_dectest = []
     supmaps = []
 
+    def __init__(self, *args, **kw):
+        unittest.TestCase.__init__(self, *args, **kw)
+        if not os.path.exists(self.mapfilename):
+            raise test_support.TestSkipped('%s not found, download from %s' %
+                    (self.mapfilename, self.mapfileurl))
+
     def test_mapping_file(self):
         unichrs = lambda s: u''.join(map(unichr, map(eval, s.split('+'))))
         urt_wa = {}
@@ -227,4 +209,4 @@ def load_teststring(encoding):
     utxt = open(os.path.join('sampletexts', encoding) + '.utf8').read()
     return (etxt, utxt)
 
-# ex: ts=8 sts=4 et
+# ex: ts=8 sts=4 sw=4 et
