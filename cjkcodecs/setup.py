@@ -2,7 +2,7 @@
 #
 # setup.py: CJK Codec Setup
 #
-# Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
+# Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.11 2003/12/30 05:47:12 perky Exp $
+# $Id: setup.py,v 1.12 2003/12/31 05:46:55 perky Exp $
 #
 
 import os, shutil

@@ -1,7 +1,7 @@
 /*
  * mapdata_zh_CN.c: Map Provider for Simplified Chinese Encodings
  *
- * Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
+ * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: mapdata_zh_CN.c,v 1.1 2003/09/24 17:47:01 perky Exp $
+ * $Id: mapdata_zh_CN.c,v 1.2 2003/12/31 05:46:55 perky Exp $
  */
 
 #include "Python.h"

@@ -1,7 +1,7 @@
 /*
  * _shift_jis.c: the SHIFT-JIS codec
  *
- * Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
+ * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _shift_jis.c,v 1.3 2003/12/30 02:42:07 perky Exp $
+ * $Id: _shift_jis.c,v 1.4 2003/12/31 05:46:55 perky Exp $
  */
 
 #include "codeccommon.h"

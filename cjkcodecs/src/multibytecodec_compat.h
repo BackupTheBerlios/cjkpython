@@ -1,7 +1,7 @@
 /*
  * multibytecodec_compat.h: Compatiblility Support
  *
- * Copyright (C) 2003 Hye-Shik Chang. All rights reserved.
+ * Copyright (C) 2003-2004 Hye-Shik Chang. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $Id: multibytecodec_compat.h,v 1.2 2003/12/30 01:35:01 perky Exp $
+ * $Id: multibytecodec_compat.h,v 1.3 2003/12/31 05:46:55 perky Exp $
  */
 
 /* We don't support 2.0 and older */

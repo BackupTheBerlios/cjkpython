@@ -2,7 +2,7 @@
 #
 # cp932.py: Python Unicode Codec for CP932
 #
-# Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
+# Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: cp932.py,v 1.1 2003/09/24 17:44:42 perky Exp $
+# $Id: cp932.py,v 1.2 2003/12/31 05:46:55 perky Exp $
 #
 
 from cjkcodecs._cp932 import codec

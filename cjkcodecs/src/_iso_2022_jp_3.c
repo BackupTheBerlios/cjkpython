@@ -1,7 +1,7 @@
 /*
  * _iso_2022_jp_3.c: the ISO-2022-JP-3 codec (JIS X 0213)
  *
- * Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
+ * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp_3.c,v 1.6 2003/12/31 02:44:57 perky Exp $
+ * $Id: _iso_2022_jp_3.c,v 1.7 2003/12/31 05:46:55 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH

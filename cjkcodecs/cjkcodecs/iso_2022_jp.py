@@ -2,7 +2,7 @@
 #
 # iso_2022_jp.py: Python Unicode Codec for ISO_2022_JP
 #
-# Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
+# Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: iso_2022_jp.py,v 1.1 2003/09/24 17:44:43 perky Exp $
+# $Id: iso_2022_jp.py,v 1.2 2003/12/31 05:46:55 perky Exp $
 #
 
 from cjkcodecs._iso_2022_jp import codec

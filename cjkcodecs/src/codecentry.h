@@ -1,7 +1,7 @@
 /*
  * codecentry.h: Common Codec Entry Routines
  *
- * Copyright (C) 2003 Hye-Shik Chang <perky@FreeBSD.org>.
+ * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecentry.h,v 1.3 2003/12/30 01:35:01 perky Exp $
+ * $Id: codecentry.h,v 1.4 2003/12/31 05:46:55 perky Exp $
  */
 
 #ifdef HAVE_ENCODER_INIT
