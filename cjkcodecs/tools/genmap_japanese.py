@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_japanese.py,v 1.7 2004/07/07 15:35:45 perky Exp $
+# $Id: genmap_japanese.py,v 1.8 2004/07/07 17:40:27 perky Exp $
 #
 
 from genmap_support import *
@@ -63,10 +63,10 @@ except IOError:
           "org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP932.TXT"
     raise SystemExit
 try:
-    jisx0213file = open('jisx0213-2000-std.txt')
+    jisx0213file = open('jisx0213-2004-std.txt')
 except IOError:
     print "=>> Please download mapping table from http://wakaba-web." \
-          "hp.infoseek.co.jp/table/jisx0213-2000-std.txt"
+          "hp.infoseek.co.jp/table/jisx0213-2004-std.txt"
     raise SystemExit
 
 def loadmap_jisx0213(fo):

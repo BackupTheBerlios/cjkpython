@@ -15,6 +15,8 @@ Changes with CJKCodecs 1.1
 	- iso-2022-cn (Simplified/Traditional Chinese)
 	- euc-tw (Traditional Chinese - Taiwan)
 	- big5hkscs (Traditional Chinese - Hong Kong)
+	- euc-jis-2004 (Japanese)
+	- shift_jis-2004 (Japanese)
 
   *) Added new compatibility alias:
 	cp932: windows-31j

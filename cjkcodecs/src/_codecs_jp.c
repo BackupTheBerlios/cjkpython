@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_jp.c,v 1.12 2004/07/07 14:59:26 perky Exp $
+ * $Id: _codecs_jp.c,v 1.13 2004/07/07 17:40:27 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
@@ -36,6 +36,7 @@
 #include "mappings_jp.h"
 #include "mappings_jisx0213_pair.h"
 #include "alg_jisx0201.h"
+#include "emu_jisx0213_2000.h"
 
 /*
  * CP932 codec
@@ -165,10 +166,10 @@ DECODER(cp932)
 
 
 /*
- * EUC-JISX0213 codec
+ * EUC-JIS-2004 codec
  */
 
-ENCODER(euc_jisx0213)
+ENCODER(euc_jis_2004)
 {
 	while (inleft > 0) {
 		ucs4_t c = IN1;
@@ -185,8 +186,8 @@ ENCODER(euc_jisx0213)
 		insize = GET_INSIZE(c);
 
 		if (c <= 0xFFFF) {
-			/* try 0213 first because it might have MULTIC */
-			TRYMAP_ENC(jisx0213_bmp, code, c) {
+			EMULATE_JISX0213_2000_ENCODE_BMP(code, c)
+			else TRYMAP_ENC(jisx0213_bmp, code, c) {
 				if (code == MULTIC) {
 					if (inleft < 2) {
 						if (flags & MBENC_FLUSH) {
@@ -234,7 +235,8 @@ ENCODER(euc_jisx0213)
 				return 1;
 		}
 		else if (c >> 16 == EMPBASE >> 16) {
-			TRYMAP_ENC(jisx0213_emp, code, c & 0xffff);
+			EMULATE_JISX0213_2000_ENCODE_EMP(code, c)
+			else TRYMAP_ENC(jisx0213_emp, code, c & 0xffff);
 			else return insize;
 		}
 		else
@@ -254,7 +256,7 @@ ENCODER(euc_jisx0213)
 	return 0;
 }
 
-DECODER(euc_jisx0213)
+DECODER(euc_jis_2004)
 {
 	while (inleft > 0) {
 		unsigned char c = IN1;
@@ -289,7 +291,8 @@ DECODER(euc_jisx0213)
 			c3 = IN3 ^ 0x80;
 
 			/* JIS X 0213 Plane 2 or JIS X 0212 (see NOTES) */
-			TRYMAP_DEC(jisx0213_2_bmp, **outbuf, c2, c3) ;
+			EMULATE_JISX0213_2000_DECODE_PLANE2(**outbuf, c2, c3)
+			else TRYMAP_DEC(jisx0213_2_bmp, **outbuf, c2, c3) ;
 			else TRYMAP_DEC(jisx0213_2_emp, code, c2, c3) {
 				WRITEUCS4(EMPBASE | code)
 				NEXT_IN(3)
@@ -307,7 +310,8 @@ DECODER(euc_jisx0213)
 			c2 = IN2 ^ 0x80;
 
 			/* JIS X 0213 Plane 1 */
-			if (c == 0x21 && c2 == 0x40) **outbuf = 0xff3c;
+			EMULATE_JISX0213_2000_DECODE_PLANE1(**outbuf, c, c2)
+			else if (c == 0x21 && c2 == 0x40) **outbuf = 0xff3c;
 			else if (c == 0x22 && c2 == 0x32) **outbuf = 0xff5e;
 			else TRYMAP_DEC(jisx0208, **outbuf, c, c2);
 			else TRYMAP_DEC(jisx0213_1_bmp, **outbuf, c, c2);
@@ -448,7 +452,7 @@ DECODER(euc_jp)
 
 
 /*
- * SHIFT-JIS codec
+ * SHIFT_JIS codec
  */
 
 ENCODER(shift_jis)
@@ -556,10 +560,10 @@ DECODER(shift_jis)
 
 
 /*
- * SHIFT-JISX0213 codec
+ * SHIFT_JIS-2004 codec
  */
 
-ENCODER(shift_jisx0213)
+ENCODER(shift_jis_2004)
 {
 	while (inleft > 0) {
 		ucs4_t c = IN1;
@@ -581,7 +585,8 @@ ENCODER(shift_jisx0213)
 
 		if (code == NOCHAR) {
 			if (c <= 0xffff) {
-				TRYMAP_ENC(jisx0213_bmp, code, c) {
+				EMULATE_JISX0213_2000_ENCODE_BMP(code, c)
+				else TRYMAP_ENC(jisx0213_bmp, code, c) {
 					if (code == MULTIC) {
 						if (inleft < 2) {
 						    if (flags & MBENC_FLUSH) {
@@ -621,7 +626,8 @@ ENCODER(shift_jisx0213)
 				else return 1;
 			}
 			else if (c >> 16 == EMPBASE >> 16) {
-				TRYMAP_ENC(jisx0213_emp, code, c & 0xffff);
+				EMULATE_JISX0213_2000_ENCODE_EMP(code, c)
+				else TRYMAP_ENC(jisx0213_emp, code, c&0xffff);
 				else return insize;
 			}
 			else
@@ -650,7 +656,7 @@ ENCODER(shift_jisx0213)
 	return 0;
 }
 
-DECODER(shift_jisx0213)
+DECODER(shift_jis_2004)
 {
 	while (inleft > 0) {
 		unsigned char c = IN1;
@@ -672,7 +678,9 @@ DECODER(shift_jisx0213)
 
 			if (c1 < 0x5e) { /* Plane 1 */
 				c1 += 0x21;
-				TRYMAP_DEC(jisx0208, **outbuf, c1, c2) {
+				EMULATE_JISX0213_2000_DECODE_PLANE1(**outbuf,
+						c1, c2)
+				else TRYMAP_DEC(jisx0208, **outbuf, c1, c2) {
 					NEXT_OUT(1)
 				}
 				else TRYMAP_DEC(jisx0213_1_bmp, **outbuf,
@@ -695,7 +703,10 @@ DECODER(shift_jisx0213)
 				else if (c1 >= 0x63 || c1 == 0x5f) c1 -= 0x37;
 				else c1 -= 0x3d;
 
-				TRYMAP_DEC(jisx0213_2_bmp, **outbuf, c1, c2) {
+				EMULATE_JISX0213_2000_DECODE_PLANE2(**outbuf,
+						c1, c2)
+				else TRYMAP_DEC(jisx0213_2_bmp, **outbuf,
+						c1, c2) {
 					NEXT_OUT(1)
 				}
 				else TRYMAP_DEC(jisx0213_2_emp, code, c1, c2) {
@@ -735,8 +746,10 @@ BEGIN_CODECS_LIST
   CODEC_STATELESS(shift_jis)
   CODEC_STATELESS(cp932)
   CODEC_STATELESS(euc_jp)
-  CODEC_STATELESS(shift_jisx0213)
-  CODEC_STATELESS(euc_jisx0213)
+  CODEC_STATELESS(shift_jis_2004)
+  CODEC_STATELESS(euc_jis_2004)
+  { "euc_jisx0213", (void *)2000, NULL, _STATELESS_METHODS(euc_jis_2004) },
+  { "shift_jisx0213", (void *)2000, NULL, _STATELESS_METHODS(shift_jis_2004) },
 END_CODECS_LIST
 
 I_AM_A_MODULE_FOR(jp)

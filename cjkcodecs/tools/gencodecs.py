@@ -25,17 +25,19 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: gencodecs.py,v 1.5 2004/07/06 17:00:18 perky Exp $
+# $Id: gencodecs.py,v 1.6 2004/07/07 17:40:27 perky Exp $
 #
 
 codecs = {
     'cn': ('gb2312', 'gbk', 'gb18030', 'hz'),
     'tw': ('big5', 'cp950', 'euc_tw'),
     'hk': ('big5hkscs',),
-    'jp': ('cp932', 'shift_jis', 'euc_jp', 'euc_jisx0213', 'shift_jisx0213'),
+    'jp': ('cp932', 'shift_jis', 'euc_jp', 'euc_jisx0213', 'shift_jisx0213',
+           'euc_jis_2004', 'shift_jis_2004'),
     'kr': ('cp949', 'euc_kr', 'johab'),
     'iso2022': ('iso2022_cn', 'iso2022_jp', 'iso2022_jp_1', 'iso2022_jp_2',
-                'iso2022_jp_3', 'iso2022_jp_ext', 'iso2022_kr'),
+                'iso2022_jp_2004', 'iso2022_jp_3', 'iso2022_jp_ext',
+                'iso2022_kr'),
     'unicode': ('utf_7', 'utf_8'),
 }
 TEMPLATE = 'xxcodec.py.in'
