@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.12 2004/07/06 17:00:18 perky Exp $
+# $Id: aliases.py,v 1.13 2004/07/07 16:24:16 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -62,21 +62,19 @@ aliases.update({
     'ms950'              : 'cjkcodecs.cp950',
 
     # euc_jisx0213 codec
-    'jisx0213'           : 'cjkcodecs.euc_jisx0213',
+    'jisx0213'           : 'cjkcodecs.euc_jis_2004',
+    'eucjis2004'         : 'cjkcodecs.euc_jis_2004',
+    'euc_jis_2004'       : 'cjkcodecs.euc_jis_2004',
+
+    # euc_jisx0213 codec
     'eucjisx0213'        : 'cjkcodecs.euc_jisx0213',
     'euc_jisx0213'       : 'cjkcodecs.euc_jisx0213',
-
-    # euc_jisx0213_strict codec
-    'euc_jisx0213_strict': 'cjkcodecs.euc_jisx0213_strict',
 
     # euc_jp codec
     'eucjp'              : 'cjkcodecs.euc_jp',
     'euc_jp'             : 'cjkcodecs.euc_jp',
     'ujis'               : 'cjkcodecs.euc_jp',
     'u_jis'              : 'cjkcodecs.euc_jp',
-
-    # euc_jp_strict codec
-    'euc_jp_strict'      : 'cjkcodecs.euc_jp_strict',
 
     # euc_kr codec
     'euckr'              : 'cjkcodecs.euc_kr',
@@ -141,6 +139,11 @@ aliases.update({
     'iso2022_jp_2'       : 'cjkcodecs.iso2022_jp_2',
     'iso2022jp_2'        : 'cjkcodecs.iso2022_jp_2',
 
+    # iso2022_jp_2004 codec
+    'iso_2022_jp_2004'   : 'cjkcodecs.iso2022_jp_2004',
+    'iso2022_jp_2004'    : 'cjkcodecs.iso2022_jp_2004',
+    'iso2022jp_2004'     : 'cjkcodecs.iso2022_jp_2004',
+
     # iso2022_jp_3 codec
     'iso_2022_jp_3'      : 'cjkcodecs.iso2022_jp_3',
     'iso2022_jp_3'       : 'cjkcodecs.iso2022_jp_3',
@@ -168,8 +171,11 @@ aliases.update({
     'sjis'               : 'cjkcodecs.shift_jis',
     's_jis'              : 'cjkcodecs.shift_jis',
 
-    # shift_jis_strict codec
-    'shift_jis_strict'   : 'cjkcodecs.shift_jis_strict',
+    # shift_jis_2004 codec
+    'shiftjis2004'       : 'cjkcodecs.shift_jis_2004',
+    'shift_jis_2004'     : 'cjkcodecs.shift_jis_2004',
+    'sjis_2004'          : 'cjkcodecs.shift_jis_2004',
+    's_jis_2004'         : 'cjkcodecs.shift_jis_2004',
 
     # shift_jisx0213 codec
     'shiftjisx0213'      : 'cjkcodecs.shift_jisx0213',
