@@ -26,13 +26,13 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_jp.c,v 1.7 2004/06/27 21:20:37 perky Exp $
+ * $Id: _codecs_jp.c,v 1.8 2004/06/27 21:37:47 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
 #define EMPBASE 0x20000
 
-#include "cjkc_prelude.h"
+#include "cjkcodecs.h"
 #include "map_jisx0208.h"
 #include "map_jisx0212.h"
 #include "map_jisx0213.h"
@@ -40,8 +40,6 @@
 #include "map_cp932ext.h"
 #include "map_jisx0213_pairs.h"
 #include "alg_jisx0201.h"
-
-#include "cjkc_interlude.h"
 
 /*
  * CP932 codec
@@ -743,7 +741,5 @@ BEGIN_CODEC_LIST
   CODEC_STATELESS(shift_jisx0213)
   CODEC_STATELESS(euc_jisx0213)
 END_CODEC_LIST
-
-#include "cjkc_postlude.h"
 
 I_AM_A_MODULE_FOR(jp)

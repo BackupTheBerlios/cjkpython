@@ -26,15 +26,14 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.6 2004/06/27 21:20:37 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.7 2004/06/27 21:37:47 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
-#include "cjkc_prelude.h"
+#include "cjkcodecs.h"
 #include "alg_iso8859_1.h"
 #include "alg_iso8859_7.h"
 #include "alg_jisx0201.h"
-#include "cjkc_interlude.h"
 
 /* STATE
 
@@ -790,7 +789,5 @@ BEGIN_CODEC_LIST
   ISO2022_CODEC(jp_2)
   ISO2022_CODEC(jp_ext)
 END_CODEC_LIST
-
-#include "cjkc_postlude.h"
 
 I_AM_A_MODULE_FOR(iso2022)

@@ -26,11 +26,10 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_unicode.c,v 1.3 2004/06/27 21:19:24 perky Exp $
+ * $Id: _codecs_unicode.c,v 1.4 2004/06/27 21:37:47 perky Exp $
  */
 
-#include "cjkc_prelude.h"
-#include "cjkc_interlude.h"
+#include "cjkcodecs.h"
 
 /*
  * UTF-7 codec
@@ -40,22 +39,22 @@
 #define SET_OPTIONAL    2
 #define SET_WHITESPACE  3
 
-#define D SET_DIRECT
-#define O SET_OPTIONAL
-#define W SET_WHITESPACE
+#define _D SET_DIRECT
+#define _O SET_OPTIONAL
+#define _W SET_WHITESPACE
 static const char utf7_sets[128] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, W, W, 0, 0, W, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	W, O, O, O, O, O, O, D, D, D, O, 0, D, D, D, 0,
-	D, D, D, D, D, D, D, D, D, D, D, O, O, O, O, D,
-	O, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D,
-	D, D, D, D, D, D, D, D, D, D, D, O, 0, O, O, O,
-	O, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D,
-	D, D, D, D, D, D, D, D, D, D, D, O, O, O, 0, 0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0, _W, _W,  0,  0, _W,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	_W, _O, _O, _O, _O, _O, _O, _D, _D, _D, _O,  0, _D, _D, _D,  0,
+	_D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _O, _O, _O, _O, _D,
+	_O, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D,
+	_D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _O,  0, _O, _O, _O,
+	_O, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D,
+	_D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _D, _O, _O, _O,  0,  0,
 };
-#undef W
-#undef O
-#undef D
+#undef _W
+#undef _O
+#undef _D
 
 #define B64(n)  ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" \
 		"0123456789+/"[(n) & 0x3f])
@@ -581,7 +580,5 @@ BEGIN_CODEC_LIST
   CODEC_STATEFUL(utf_7)
   CODEC_STATELESS(utf_8)
 END_CODEC_LIST
-
-#include "cjkc_postlude.h"
 
 I_AM_A_MODULE_FOR(unicode)

@@ -26,10 +26,10 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_cn.c,v 1.5 2004/06/27 21:20:37 perky Exp $
+ * $Id: _codecs_cn.c,v 1.6 2004/06/27 21:37:47 perky Exp $
  */
 
-#include "cjkc_prelude.h"
+#include "cjkcodecs.h"
 #include "map_gb2312.h"
 #include "map_gbkext.h"
 #include "map_gbcommon.h"
@@ -44,8 +44,6 @@
 	if ((code) == 0x2014) (assi) = 0xa1aa; \
 	else if ((code) == 0x2015) (assi) = 0xa844; \
 	else if ((code) == 0x00b7) (assi) = 0xa1a4;
-
-#include "cjkc_interlude.h"
 
 /*
  * GB2312 codec
@@ -460,7 +458,5 @@ BEGIN_CODEC_LIST
   CODEC_STATELESS(gb18030)
   CODEC_STATEFUL(hz)
 END_CODEC_LIST
-
-#include "cjkc_postlude.h"
 
 I_AM_A_MODULE_FOR(cn)

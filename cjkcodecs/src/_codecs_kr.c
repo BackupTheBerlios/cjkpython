@@ -26,15 +26,13 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_kr.c,v 1.5 2004/06/27 21:20:37 perky Exp $
+ * $Id: _codecs_kr.c,v 1.6 2004/06/27 21:37:47 perky Exp $
  */
 
-#include "cjkc_prelude.h"
+#include "cjkcodecs.h"
 #include "map_ksx1001.h"
 #include "map_cp949.h"
 #include "map_cp949ext.h"
-
-#include "cjkc_interlude.h"
 
 /*
  * EUC-KR codec
@@ -380,7 +378,5 @@ BEGIN_CODEC_LIST
   CODEC_STATELESS(cp949)
   CODEC_STATELESS(johab)
 END_CODEC_LIST
-
-#include "cjkc_postlude.h"
 
 I_AM_A_MODULE_FOR(kr)
