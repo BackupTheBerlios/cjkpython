@@ -26,10 +26,11 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_tchinese.py,v 1.5 2004/06/20 18:42:09 perky Exp $
+# $Id: genmap_tchinese.py,v 1.6 2004/06/28 16:50:37 perky Exp $
 #
 
 import sys
+import re
 from genmap_support import *
 
 BIG5_C1     = (0xa1, 0xfe)
@@ -38,6 +39,8 @@ BIG5_C2     = (0x40, 0xfe)
 # that for forward compatiblilty. "Hey! we have the euro-big5!" :)
 CP950_C1    = BIG5_C1
 CP950_C2    = BIG5_C2
+BIG5HKSCS_C1= (0x88, 0xfe)
+BIG5HKSCS_C2= (0x40, 0xfe)
 CNS11643_C1 = (0x21, 0x7e)
 CNS11643_C2 = (0x21, 0x7e)
 
@@ -52,6 +55,12 @@ try:
 except IOError:
     print "=>> Please download mapping table from http://www.unicode." \
           "org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP950.TXT"
+    raise SystemExit
+try:
+    big5hkscsmap = open('big5-iso.txt')
+except IOError:
+    print "=>> Please download mapping table from http://www.info.gov." \
+          "hk/digital21/eng/hkscs/download/big5-iso.txt"
     raise SystemExit
 
 try:
@@ -88,9 +97,40 @@ class CNS11643MapReader(UCMReader):
             encmap[i >> 8][i & 0xff] = (plane, code)
         return decmaps, encmap_bmp, encmap_nonbmp
 
+def bh2s(code):
+    return ((code >> 8) - 0x88) * (0xfe - 0x40 + 1) + ((code & 0xff) - 0x40)
+
+def loadhkscsmap(fo):
+    print "Loading from", fo
+    fo.seek(0, 0)
+    decmap = {}
+    encmap_bmp, encmap_nonbmp = {}, {}
+    isbmpmap = {}
+    lineparse = re.compile('^([0-9A-F]{4})\s*([0-9A-F]{4})\s*([0-9A-F]{4})\s*'
+                           '(2?[0-9A-F]{4})$')
+    for line in fo:
+        data = lineparse.findall(line)
+        if not data:
+            continue
+        hkscs, u1993, ubmp, u2001 = [int(x, 16) for x in data[0]]
+        decmap.setdefault(hkscs >> 8, {})
+        if u2001 > 0xffff:
+            encmap = encmap_nonbmp
+            isbmpmap[bh2s(hkscs)] = 1
+            u2001 &= 0xffff
+        else:
+            encmap = encmap_bmp
+        decmap[hkscs >> 8][hkscs & 0xff] = u2001
+        encmap.setdefault(u2001 >> 8, {})
+        encmap[u2001 >> 8][u2001 & 0xff] = hkscs
+
+    return decmap, encmap_bmp, encmap_nonbmp, isbmpmap
+
 print "Loading Mapping File..."
 cp950decmap = loadmap(cp950map)
 big5decmap = loadmap(big5map)
+hkscsdecmap, hkscsencmap_bmp, hkscsencmap_nonbmp, isbmpmap = \
+    loadhkscsmap(big5hkscsmap)
 cns11643decmaps, cns11643encmap_bmp, cns11643encmap_nonbmp = \
     CNS11643MapReader(cns11643map).readmap()
 
@@ -162,6 +202,40 @@ print "Generating CP950 extension encode map..."
 filler = BufferedFiller()
 genmap_encode(filler, "cp950ext", cp950encmap)
 print_encmap(omap, filler, "cp950ext", cp950encmap)
+
+omap = open('map_big5hkscs.h', 'w')
+printcopyright(omap)
+
+print "Generating BIG5HKSCS decode map..."
+filler = BufferedFiller()
+genmap_decode(filler, "big5hkscs", BIG5HKSCS_C1, BIG5HKSCS_C2, hkscsdecmap)
+print_decmap(omap, filler, "big5hkscs", hkscsdecmap)
+
+print "Generating BIG5HKSCS decode map Unicode plane hints..."
+filler = BufferedFiller()
+def fillhints(hintfrom, hintto):
+    print >> omap, "static const unsigned char big5hkscs_phint_%d[] = {" \
+                    % (hintfrom)
+    for msbcode in range(hintfrom, hintto+1, 8):
+        v = 0
+        for c in range(msbcode, msbcode+8):
+            v = (v << 1) | isbmpmap.get(c, 0)
+        filler.write('%d,' % v)
+    filler.printout(omap)
+    print >> omap, "};\n"
+fillhints(bh2s(0x8840), bh2s(0xa0fe))
+fillhints(bh2s(0xc6a1), bh2s(0xc8fe))
+fillhints(bh2s(0xf9d6), bh2s(0xfefe))
+
+print "Generating BIG5HKSCS encode map (BMP)..."
+filler = BufferedFiller()
+genmap_encode(filler, "big5hkscs_bmp", hkscsencmap_bmp)
+print_encmap(omap, filler, "big5hkscs_bmp", hkscsencmap_bmp)
+
+print "Generating BIG5HKSCS encode map (non-BMP)..."
+filler = BufferedFiller()
+genmap_encode(filler, "big5hkscs_nonbmp", hkscsencmap_nonbmp)
+print_encmap(omap, filler, "big5hkscs_nonbmp", hkscsencmap_nonbmp)
 
 omap = open('map_cns11643.h', 'w')
 printcopyright(omap)
