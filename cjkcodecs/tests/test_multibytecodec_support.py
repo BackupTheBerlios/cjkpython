@@ -3,7 +3,7 @@
 # test_multibytecodec_support.py
 #   Common Unittest Routines for CJK codecs
 #
-# $Id: test_multibytecodec_support.py,v 1.4 2004/01/06 02:26:28 perky Exp $
+# $Id: test_multibytecodec_support.py,v 1.5 2004/01/17 12:47:19 perky Exp $
 
 import sys, codecs, os.path
 import unittest
@@ -217,5 +217,18 @@ def load_teststring(encoding):
     else:
         from test import cjkencodings_test
         return cjkencodings_test.teststring[encoding]
+
+def register_skip_expected(*cases):
+    for case in cases: # len(cases) must be 1 at least.
+        for path in [os.path.curdir, os.path.pardir]:
+            fn = os.path.join(path, case.mapfilename)
+            if os.path.exists(fn):
+                case.mapfilename = fn
+                break
+        else:
+            sys.modules[case.__module__].skip_expected = True
+            break
+    else:
+        sys.modules[case.__module__].skip_expected = False
 
 # ex: ts=8 sts=4 sw=4 et

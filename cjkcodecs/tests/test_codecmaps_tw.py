@@ -3,7 +3,7 @@
 # test_codecmaps_tw.py
 #   Codec mapping tests for ROC encodings
 #
-# $Id: test_codecmaps_tw.py,v 1.1 2003/12/19 02:39:09 perky Exp $
+# $Id: test_codecmaps_tw.py,v 1.2 2004/01/17 12:47:19 perky Exp $
 
 from test import test_support
 import test_multibytecodec_support
@@ -33,6 +33,7 @@ def test_main():
     suite.addTest(unittest.makeSuite(TestCP950Map))
     test_support.run_suite(suite)
 
+test_multibytecodec_support.register_skip_expected(TestBIG5Map, TestCP950Map)
 if __name__ == "__main__":
     test_main()
 
