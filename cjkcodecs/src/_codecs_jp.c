@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_jp.c,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: _codecs_jp.c,v 1.2 2004/06/18 18:13:30 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
@@ -47,6 +47,10 @@
 #include "codecimpl_euc_jp.h"
 #include "codecimpl_shift_jis.h"
 #include "codecimpl_shift_jisx0213.h"
+#include "codecimpl_iso_2022_jp.h"
+#include "codecimpl_iso_2022_jp_1.h"
+#include "codecimpl_iso_2022_jp_3.h"
+#include "codecimpl_iso_2022_jp_ext.h"
 
 BEGIN_MAPPING_LIST
   MAPPING_DECONLY(jisx0208)
@@ -67,6 +71,10 @@ BEGIN_CODEC_LIST
   CODEC_STATELESS(euc_jp)
   CODEC_STATELESS(shift_jisx0213)
   CODEC_STATELESS(euc_jisx0213)
+  CODEC_STATEFUL(iso_2022_jp)
+  CODEC_STATEFUL(iso_2022_jp_1)
+  CODEC_STATEFUL(iso_2022_jp_3)
+  CODEC_STATEFUL(iso_2022_jp_ext)
 END_CODEC_LIST
 
 #include "cjkc_postlude.h"

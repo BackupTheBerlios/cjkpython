@@ -26,9 +26,10 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_iso_2022_kr.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_iso_2022_kr.h,v 1.2 2004/06/18 18:13:30 perky Exp $
  */
 
+#define ISO2022_ENCODING iso_2022_kr
 #define ISO2022_DESIGNATIONS \
         CHARSET_ASCII, CHARSET_KSX1001
 
@@ -116,7 +117,7 @@ DECODER_RESET(iso_2022_kr)
 
 DECODER(iso_2022_kr)
 {
-ISO2022_LOOP_BEGIN
+BEGIN_ISO2022_LOOP
 	unsigned char charset, c2;
 
 	ISO2022_GETCHARSET(charset, c)
@@ -139,7 +140,7 @@ ISO2022_LOOP_BEGIN
 		OUT1(c);
 		NEXT(1, 1)
 	}
-ISO2022_LOOP_END
+END_ISO2022_LOOP
 
 	return 0;
 }

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022sect.h,v 1.2 2004/06/17 18:49:33 perky Exp $
+ * $Id: iso2022sect.h,v 1.3 2004/06/18 18:13:30 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
@@ -122,6 +122,7 @@
 #ifdef _ISO2022_TOGGLED_ON_
 /* this section undefines all iso-2022 related macros and functions */
 #undef _ISO2022_TOGGLED_ON_
+#undef ISO2022_ENCODING
 #undef ISO2022_DESIGNATIONS
 #undef ISO2022_USE_G2_DESIGNATION
 #undef ISO2022_USE_JISX0208EXT
@@ -130,10 +131,13 @@
 #undef SS2_ROUTINE
 #undef ISO2022_BASECASES
 #undef ISO2022_ESCTHROUGHOUT
-#undef ISO2022_LOOP_BEGIN
-#undef ISO2022_LOOP_END
+#undef BEGIN_ISO2022_LOOP
+#undef END_ISO2022_LOOP
+#undef iso2022processesc
 #else /* !_ISO2022_TOGGLED_ON_ */
 #define _ISO2022_TOGGLED_ON_
+#define iso2022processesc ISO2022_ENCODING /* not so cute. but.. */
+
 #ifdef ISO2022_USE_G2_DESIGNATION
 /* hardcoded for iso-2022-jp-2 for now. we'll need to generalize it
    when we have more G2 designating encodings */
@@ -206,7 +210,7 @@
 		continue;						\
 	}
 
-#define ISO2022_LOOP_BEGIN						\
+#define BEGIN_ISO2022_LOOP						\
 	while (inleft > 0) {						\
 		unsigned char c = IN1;					\
 		ISO2022_ESCTHROUGHOUT(c)				\
@@ -221,7 +225,7 @@
 			else if (c >= 0x80)				\
 				return 1;				\
 			else {
-#define ISO2022_LOOP_END						\
+#define END_ISO2022_LOOP						\
 			}						\
 		}							\
 	}
