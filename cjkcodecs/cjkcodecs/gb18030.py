@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: gb18030.py,v 1.7 2004/06/27 19:28:55 perky Exp $
+# $Id: gb18030.py,v 1.8 2004/06/28 18:16:03 perky Exp $
 #
 
 from cjkcodecs import _codecs_cn

@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_tchinese.py,v 1.6 2004/06/28 16:50:37 perky Exp $
+# $Id: genmap_tchinese.py,v 1.7 2004/06/28 18:16:03 perky Exp $
 #
 
 import sys
@@ -219,7 +219,7 @@ def fillhints(hintfrom, hintto):
     for msbcode in range(hintfrom, hintto+1, 8):
         v = 0
         for c in range(msbcode, msbcode+8):
-            v = (v << 1) | isbmpmap.get(c, 0)
+            v |= isbmpmap.get(c, 0) << (c - msbcode)
         filler.write('%d,' % v)
     filler.printout(omap)
     print >> omap, "};\n"

@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.17 2004/06/27 10:39:28 perky Exp $
+# $Id: setup.py,v 1.18 2004/06/28 18:16:03 perky Exp $
 #
 
 import os
@@ -39,7 +39,7 @@ SRCDIR = 'src'
 LIBDIRS = []
 extensions = []
 macros = []
-locales = ['kr', 'jp', 'cn', 'tw', 'iso2022', 'unicode']
+locales = ['kr', 'jp', 'cn', 'tw', 'hk', 'iso2022', 'unicode']
 
 for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
     args = arg.split('=', 1)
@@ -51,6 +51,7 @@ for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
         locales.remove('cn')
     elif args[0] == '--disable-traditional-chinese':
         locales.remove('tw')
+        locales.remove('hk')
     elif args[0] == '--disable-iso2022':
         locales.remove('iso2022')
     elif args[0] == '--disable-utf':

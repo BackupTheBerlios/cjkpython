@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkcodecs.h,v 1.2 2004/06/27 21:41:15 perky Exp $
+ * $Id: cjkcodecs.h,v 1.3 2004/06/28 18:16:03 perky Exp $
  */
 
 #ifndef _CJKCODECS_H_
@@ -242,6 +242,11 @@ static const struct dbcs_map mapping_list[];
 },
 #define CODEC_STATELESS(enc) {		\
 	#enc, NULL, NULL,		\
+	_STATELESS_METHODS(enc)		\
+},
+#define CODEC_STATELESS_WINIT(enc) {	\
+	#enc, NULL,			\
+	enc##_codec_init,		\
 	_STATELESS_METHODS(enc)		\
 },
 #define END_CODECS_LIST {"", NULL,} };

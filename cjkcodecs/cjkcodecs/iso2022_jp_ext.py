@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: iso2022_jp_ext.py,v 1.1 2004/06/27 19:28:55 perky Exp $
+# $Id: iso2022_jp_ext.py,v 1.2 2004/06/28 18:16:03 perky Exp $
 #
 
 from cjkcodecs import _codecs_iso2022

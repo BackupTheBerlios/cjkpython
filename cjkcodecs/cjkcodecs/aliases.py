@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.10 2004/06/27 20:47:24 perky Exp $
+# $Id: aliases.py,v 1.11 2004/06/28 18:16:03 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -36,6 +36,11 @@ aliases.update({
     'big5'               : 'cjkcodecs.big5',
     'big5_tw'            : 'cjkcodecs.big5',
     'csbig5'             : 'cjkcodecs.big5',
+
+    # big5hkscs codec
+    'big5_hkscs'         : 'cjkcodecs.big5hkscs',
+    'big5hkscs'          : 'cjkcodecs.big5hkscs',
+    'hkscs'              : 'cjkcodecs.big5hkscs',
 
     # cp932 codec
     '932'                : 'cjkcodecs.cp932',

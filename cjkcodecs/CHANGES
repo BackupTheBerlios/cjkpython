@@ -8,11 +8,13 @@ Changes with CJKCodecs 1.1
   *) ISO-2022 codecs are completely rewritten as compact unified
      implementation plus few per-variant configuration tables.
 
-  *) Added new encoding:
-       euc-tw
+  *) Added support for new encodings:
+	- iso-2022-cn (Simplified/Traditional Chinese)
+	- euc-tw (Traditional Chinese - Taiwan)
+	- big5hkscs (Traditional Chinese - Hong Kong)
 
   *) Added new compatibility alias:
-       cp932: windows-31j
+	cp932: windows-31j
 
 
 Changes with CJKCodecs 1.0.3
