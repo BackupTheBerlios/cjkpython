@@ -6,6 +6,9 @@ Changes with CJKCodecs 1.0.3
   *) Fixed ISO-2022 decoder's behavior that didn't understand JIS X
      0208:1978. [IKEDA Soji]
 
+  *) ISO-2022-JP{,-1,-3} codec now raises decode error for SI and SO which
+     is obsolete in Japanese environments. [IKEDA Soji]
+
 
 Changes with CJKCodecs 1.0.2
 

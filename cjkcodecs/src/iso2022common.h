@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022common.h,v 1.3 2003/12/30 01:56:52 perky Exp $
+ * $Id: iso2022common.h,v 1.4 2003/12/30 02:26:47 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
@@ -136,6 +136,23 @@
 #define SS2_ROUTINE
 #endif
 
+#ifndef ISO2022_NO_SHIFT
+#define SHIFT_CASES                                                 \
+    case SI:                                                        \
+        STATE_CLEARFLAG(state, F_SHIFTED)                           \
+        NEXT_IN(1)                                                  \
+        break;                                                      \
+    case SO:                                                        \
+        STATE_SETFLAG(state, F_SHIFTED)                             \
+        NEXT_IN(1)                                                  \
+        break;
+#else
+#define SHIFT_CASES                                                 \
+    case SI:                                                        \
+    case SO:                                                        \
+        return 1;
+#endif
+
 #define ISO2022_BASECASES(c1)                                       \
     case ESC:                                                       \
         RESERVE_INBUF(2)                                            \
@@ -150,14 +167,7 @@
             NEXT(1, 1)                                              \
         }                                                           \
         break;                                                      \
-    case SI:                                                        \
-        STATE_CLEARFLAG(state, F_SHIFTED)                           \
-        NEXT_IN(1)                                                  \
-        break;                                                      \
-    case SO:                                                        \
-        STATE_SETFLAG(state, F_SHIFTED)                             \
-        NEXT_IN(1)                                                  \
-        break;                                                      \
+    SHIFT_CASES                                                     \
     case '\n':                                                      \
         STATE_CLEARFLAG(state, F_SHIFTED)                           \
         WRITE1('\n')                                                \

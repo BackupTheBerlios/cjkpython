@@ -26,12 +26,14 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp_3.c,v 1.2 2003/12/30 01:35:01 perky Exp $
+ * $Id: _iso_2022_jp_3.c,v 1.3 2003/12/30 02:26:47 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
 #define ISO2022_DESIGNATIONS    \
         CHARSET_ASCII, CHARSET_JISX0208, CHARSET_JISX0213_1, CHARSET_JISX0213_2
+#define ISO2022_NO_SHIFT
+
 #include "codeccommon.h"
 #include "iso2022common.h"
 #include "maps/map_jisx0213_pairs.h"
