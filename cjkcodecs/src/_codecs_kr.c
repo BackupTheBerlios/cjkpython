@@ -26,13 +26,13 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_kr.c,v 1.4 2004/06/27 21:19:24 perky Exp $
+ * $Id: _codecs_kr.c,v 1.5 2004/06/27 21:20:37 perky Exp $
  */
 
 #include "cjkc_prelude.h"
-#include "maps/map_ksx1001.h"
-#include "maps/map_cp949.h"
-#include "maps/map_cp949ext.h"
+#include "map_ksx1001.h"
+#include "map_cp949.h"
+#include "map_cp949ext.h"
 
 #include "cjkc_interlude.h"
 

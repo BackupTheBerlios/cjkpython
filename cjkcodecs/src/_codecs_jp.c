@@ -26,20 +26,20 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_jp.c,v 1.6 2004/06/27 21:19:24 perky Exp $
+ * $Id: _codecs_jp.c,v 1.7 2004/06/27 21:20:37 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
 #define EMPBASE 0x20000
 
 #include "cjkc_prelude.h"
-#include "maps/map_jisx0208.h"
-#include "maps/map_jisx0212.h"
-#include "maps/map_jisx0213.h"
-#include "maps/map_jisxcommon.h"
-#include "maps/map_cp932ext.h"
-#include "maps/map_jisx0213_pairs.h"
-#include "maps/alg_jisx0201.h"
+#include "map_jisx0208.h"
+#include "map_jisx0212.h"
+#include "map_jisx0213.h"
+#include "map_jisxcommon.h"
+#include "map_cp932ext.h"
+#include "map_jisx0213_pairs.h"
+#include "alg_jisx0201.h"
 
 #include "cjkc_interlude.h"
 
