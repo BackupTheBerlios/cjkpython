@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _euc_jp.c,v 1.3 2003/12/30 02:42:07 perky Exp $
+ * $Id: _euc_jp.c,v 1.4 2003/12/30 03:00:40 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -132,10 +132,9 @@ DECODER(euc_jp)
                 **outbuf = 0xff3c;
             else
 #endif
-            TRYMAP_DEC(jisx0208, **outbuf, c ^ 0x80, c2 ^ 0x80) {
-                NEXT(2, 1)
-            } else
-                return 2;
+            TRYMAP_DEC(jisx0208, **outbuf, c ^ 0x80, c2 ^ 0x80) ;
+            else return 2;
+            NEXT(2, 1)
         }
     }
 
