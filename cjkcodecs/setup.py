@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.3 2003/11/27 15:09:50 perky Exp $
+# $Id: setup.py,v 1.4 2003/11/27 15:15:46 perky Exp $
 #
 
 import sys
@@ -88,7 +88,7 @@ for loc in locales:
     for enc in encodings[loc]:
         extensions.append(Extension('cjkcodecs._'+enc, ['src/_%s.c'%enc],
             library_dirs=LIBDIRS))
-        if enc in strictencodings:
+        if 'sdist' not in sys.argv and enc in strictencodings:
             shutil.copy('src/_%s.c' % enc, 'src/_%s_strict.c' % enc)
             extensions.append(Extension('cjkcodecs._'+enc+'_strict',
                 ['src/_%s_strict.c' % enc], library_dirs=LIBDIRS,
