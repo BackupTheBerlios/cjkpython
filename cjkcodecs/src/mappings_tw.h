@@ -1,5 +1,5 @@
 /*
- * $Id: mappings_tw.h,v 1.1 2004/07/07 14:59:27 perky Exp $
+ * $Id: mappings_tw.h,v 1.2 2004/07/07 15:07:23 perky Exp $
  */
 
 static const ucs2_t __big5_decmap[16702] = {
@@ -2635,4 +2635,3 @@ static const struct unim_index cp950ext_encmap[256] = {
 0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{__cp950ext_encmap+342,81,104},{
 __cp950ext_encmap+366,15,229},
 };
-
