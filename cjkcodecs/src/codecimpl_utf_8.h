@@ -26,14 +26,14 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_utf_8.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_utf_8.h,v 1.2 2004/06/19 16:20:50 perky Exp $
  */
 
 ENCODER(utf_8)
 {
 	while (inleft > 0) {
 		ucs4_t c = **inbuf;
-		int outsize, insize = 1;
+		size_t outsize, insize = 1;
 
 		if (c < 0x80) outsize = 1;
 		else if (c < 0x800) outsize = 2;

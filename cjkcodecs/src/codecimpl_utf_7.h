@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_utf_7.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: codecimpl_utf_7.h,v 1.2 2004/06/19 16:20:49 perky Exp $
  */
 
 #define SET_DIRECT      1
@@ -133,10 +133,12 @@ ENCODER(utf_7)
 					if (ESTATE_GETSTAGE(state) != 0) {
 						oc1 = B64(ESTATE_GETPENDING(
 								state));
-						WRITE3(oc1, '-', c1)
+						WRITE3(oc1, '-',
+						       (unsigned char)c1)
 						NEXT_OUT(3)
 					} else {
-						WRITE2('-', c1)
+						WRITE2('-',
+						       (unsigned char)c1)
 						NEXT_OUT(2)
 					}
 					ESTATE_CLEARSHIFTED(state)
@@ -180,7 +182,7 @@ ENCODER(utf_7)
 			}
 			else {
 				if (c1 < 128 && UTF7_DENCODABLE_STRICT(c1)) {
-					WRITE1(c1)
+					WRITE1((unsigned char)c1)
 					NEXT_OUT(1)
 				}
 				else if (c1 == '+') {
