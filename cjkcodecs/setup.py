@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.7 2003/11/27 19:11:02 perky Exp $
+# $Id: setup.py,v 1.8 2003/11/29 23:07:32 perky Exp $
 #
 
 import os, shutil
@@ -51,7 +51,7 @@ encodings = {
 }
 locales = encodings.keys()
 strictencodings = (
-'shift_jis', 'euc_jp', 'euc_jisx0213',
+'shift_jis', 'euc_jp',
 )
 
 for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
