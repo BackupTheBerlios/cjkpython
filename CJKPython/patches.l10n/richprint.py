@@ -283,7 +283,7 @@ def _safe_repr(object, context, maxlevels, level):
         write = sio.write
         for char in sobject:
             write(qget(char, char))
-        return ("%s%s%s" % (closure, sio.getvalue(), closure)), True, False
+        return ("u%s%s%s" % (closure, sio.getvalue(), closure)), True, False
 
     if typ is dict:
         if not object:
