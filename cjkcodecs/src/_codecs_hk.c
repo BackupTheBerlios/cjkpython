@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_hk.c,v 1.1 2004/06/28 18:16:03 perky Exp $
+ * $Id: _codecs_hk.c,v 1.2 2004/06/29 13:55:37 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -71,8 +71,8 @@ ENCODER(big5hkscs)
 		REQUIRE_OUTBUF(2)
 
 		if (c < 0x10000) {
-			TRYMAP_ENC(big5, code, c);
-			else TRYMAP_ENC(big5hkscs_bmp, code, c);
+			TRYMAP_ENC(big5hkscs_bmp, code, c);
+			else TRYMAP_ENC(big5, code, c);
 			else return 1;
 		}
 		else if (c < 0x20000)
@@ -109,10 +109,15 @@ DECODER(big5hkscs)
 		}
 
 		REQUIRE_INBUF(2)
+
+		if (0xc6 <= c && c <= 0xc8 && (c >= 0xc7 || IN2 >= 0xa1))
+			goto hkscsdec;
+
 		TRYMAP_DEC(big5, **outbuf, c, IN2) {
 			NEXT(2, 1)
 		}
-		else TRYMAP_DEC(big5hkscs, decoded, c, IN2) {
+		else
+hkscsdec:	TRYMAP_DEC(big5hkscs, decoded, c, IN2) {
 			int s = BH2S(c, IN2);
 			const unsigned char *hintbase;
 
