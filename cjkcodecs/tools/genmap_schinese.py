@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_schinese.py,v 1.5 2004/07/07 15:35:45 perky Exp $
+# $Id: genmap_schinese.py,v 1.6 2004/07/10 17:38:56 perky Exp $
 #
 
 from genmap_support import *
@@ -52,8 +52,8 @@ GB18030EXTP5_C2 = (0x50, 0xfe)
 try:
     gb2312map = open('GB2312.TXT')
 except IOError:
-    print "=>> Please download mapping table from http://www.unicode." \
-          "org/Public/MAPPINGS/OBSOLETE/EASTASIA/GB/GB2312.TXT"
+    print "=>> Please download mapping table from http://people.freebsd." \
+          "org/~perky/i18n/GB2312.TXT"
     raise SystemExit
 try:
     cp936map = open('CP936.TXT')
