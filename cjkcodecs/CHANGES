@@ -1,3 +1,9 @@
+Changed with CJKCodecs 1.0.1
+
+  *) Fixed a bug that decoders' returning u'' not (u'', 0) when decoding
+     empty string. [Tae-Wook Kang]
+
+
 Changes with CJKCodecs 1.0
 
   *) UTF-16 codecs are removed from distribution.

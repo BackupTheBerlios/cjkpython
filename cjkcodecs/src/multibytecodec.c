@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.1 2003/09/24 17:44:54 perky Exp $
+ * $Id: multibytecodec.c,v 1.2 2003/09/24 18:04:36 perky Exp $
  */
 
 #include "Python.h"
@@ -575,7 +575,7 @@ MultibyteCodec_Decode(MultibyteCodecObject *self,
     if (datalen == 0) {
         if (errorcb > ERROR_MAX)
             {Py_DECREF(errorcb);}
-        return PyUnicode_FromUnicode(NULL, 0);
+        return make_tuple(PyUnicode_FromUnicode(NULL, 0), 0);
     }
 
     buf.outobj = buf.excobj = NULL;
