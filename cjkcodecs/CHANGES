@@ -9,6 +9,9 @@ Changes with CJKCodecs 1.0.3
   *) ISO-2022-JP{,-1,-3} codec now raises decode error for SI and SO which
      is obsolete in Japanese environments. [IKEDA Soji]
 
+  *) Removed PUA(Private Use Area) support from EUC-JP and SHIFT-JIS codec
+     which is usually undesired by Japanese users. [IKEDA Soji]
+
 
 Changes with CJKCodecs 1.0.2
 

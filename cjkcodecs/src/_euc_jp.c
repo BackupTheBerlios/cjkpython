@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _euc_jp.c,v 1.2 2003/11/27 19:01:29 perky Exp $
+ * $Id: _euc_jp.c,v 1.3 2003/12/30 02:42:07 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -54,18 +54,6 @@ ENCODER(euc_jp)
             /* JIS X 0201 half-width katakana */
             WRITE2(0x8e, c - 0xfec0)
             NEXT(1, 2)
-            continue;
-        } else if (c >= 0xe000 && c < 0xe3ac) {
-            /* User-defined area 1 */
-            WRITE2((Py_UNICODE)(c - 0xe000) / 94 + 0xf5,
-                    (Py_UNICODE)(c - 0xe000) % 94 + 0xa1)
-            NEXT(1, 2)
-            continue;
-        } else if (c >= 0xe3ac && c < 0xe758) {
-            /* User-defined area 2 */
-            WRITE3(0x8f, (Py_UNICODE)(c - 0xe3ac) / 94 + 0xf5,
-                         (Py_UNICODE)(c - 0xe3ac) % 94 + 0xa1)
-            NEXT(1, 3)
             continue;
         }
 #ifndef STRICT_BUILD
@@ -128,38 +116,26 @@ DECODER(euc_jp)
             RESERVE_INBUF(3)
             c2 = IN2;
             c3 = IN3;
-            if (c2 < 0xf5) {
-                /* JIS X 0212 */
-                TRYMAP_DEC(jisx0212, **outbuf, c2 ^ 0x80, c3 ^ 0x80);
-                else return 3;
-            } else {
-                /* User-defined area 2 */
-                if (c2 == 0xff || c3 < 0xa1 || c3 == 0xff)
-                    return 3;
-                OUT1(0xe3ac + 94 * (c2 - 0xf5) + (c3 - 0xa1))
-            }
-            NEXT(3, 1)
+            /* JIS X 0212 */
+            TRYMAP_DEC(jisx0212, **outbuf, c2 ^ 0x80, c3 ^ 0x80) {
+                NEXT(3, 1)
+            } else
+                return 3;
         } else {
             unsigned char    c2;
 
             RESERVE_INBUF(2)
             c2 = IN2;
-            if (c < 0xf5) {
-                /* JIS X 0208 */
+            /* JIS X 0208 */
 #ifndef STRICT_BUILD
-                if (c == 0xa1 && c2 == 0xc0) /* FULL-WIDTH REVERSE SOLIDUS */
-                    **outbuf = 0xff3c;
-                else
+            if (c == 0xa1 && c2 == 0xc0) /* FULL-WIDTH REVERSE SOLIDUS */
+                **outbuf = 0xff3c;
+            else
 #endif
-                TRYMAP_DEC(jisx0208, **outbuf, c ^ 0x80, c2 ^ 0x80);
-                else return 2;
-            } else {
-                /* User-defined area 1 */
-                if (c2 < 0xa1 || c2 == 0xff)
-                    return 2;
-                OUT1(0xe000 + 94 * (c - 0xf5) + (c2 - 0xa1))
-            }
-            NEXT(2, 1)
+            TRYMAP_DEC(jisx0208, **outbuf, c ^ 0x80, c2 ^ 0x80) {
+                NEXT(2, 1)
+            } else
+                return 2;
         }
     }
 

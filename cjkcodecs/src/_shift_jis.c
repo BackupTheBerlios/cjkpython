@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _shift_jis.c,v 1.2 2003/11/27 16:42:20 perky Exp $
+ * $Id: _shift_jis.c,v 1.3 2003/12/30 02:42:07 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -65,15 +65,6 @@ ENCODER(shift_jis)
 
         if (code == NOCHAR) {
             TRYMAP_ENC(jisxcommon, code, c);
-            else if (c >= 0xe000 && c < 0xe758) {
-                /* user-defined area */
-                c1 = (Py_UNICODE)(c - 0xe000) / 188;
-                c2 = (Py_UNICODE)(c - 0xe000) % 188;
-                OUT1(c1 + 0xf0)
-                OUT2(c2 < 0x3f ? c2 + 0x40 : c2 + 0x41)
-                NEXT(1, 2)
-                continue;
-            }
 #ifndef STRICT_BUILD
             else if (c == 0xff3c)
                 code = 0x2140; /* FULL-WIDTH REVERSE SOLIDUS */
@@ -132,18 +123,6 @@ DECODER(shift_jis)
             }
 #endif
             TRYMAP_DEC(jisx0208, **outbuf, c1, c2) {
-                NEXT(2, 1)
-                continue;
-            } else
-                return 2;
-        } else if (c >= 0xf0 && c <= 0xf9) {
-            unsigned char    c2;
-
-            RESERVE_INBUF(2)
-            c2 = IN2;
-            if ((c2 >= 0x40 && c2 <= 0x7e) || (c2 >= 0x80 && c2 <= 0xfc)) {
-                OUT1(0xe000 + 188 * (c - 0xf0) +
-                       (c2 < 0x80 ? c2 - 0x40 : c2 - 0x41))
                 NEXT(2, 1)
                 continue;
             } else
