@@ -1,5 +1,5 @@
 /*
- * $Id: map_jisxcommon.h,v 1.3 2004/06/17 18:31:21 perky Exp $
+ * $Id: map_jisxcommon.h,v 1.1 2004/06/27 21:19:24 perky Exp $
  */
 
 static const DBCHAR __jisxcommon_encmap[22016] = {

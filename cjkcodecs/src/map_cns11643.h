@@ -1,5 +1,5 @@
 /*
- * $Id: map_cns11643.h,v 1.1 2004/06/20 18:42:09 perky Exp $
+ * $Id: map_cns11643.h,v 1.1 2004/06/27 21:19:24 perky Exp $
  */
 
 static const ucs2_t __cns11643_1_decmap[5885] = {

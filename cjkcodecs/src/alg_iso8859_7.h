@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: alg_iso8859_7.h,v 1.3 2004/06/19 06:00:32 perky Exp $
+ * $Id: alg_iso8859_7.h,v 1.1 2004/06/27 21:19:24 perky Exp $
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: map_jisx0213.h,v 1.3 2004/06/17 18:31:20 perky Exp $
+ * $Id: map_jisx0213.h,v 1.1 2004/06/27 21:19:24 perky Exp $
  */
 
 static const ucs2_t __jisx0213_1_bmp_decmap[2187] = {

@@ -1,5 +1,5 @@
 /*
- * impl_gb2312.h: the GB2312 codec implementation
+ * alg_iso8859_1.c: Encoder/Decoder macro for ISO8859-1
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,56 +26,11 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: impl_gb2312.h,v 1.1 2004/06/27 20:59:34 perky Exp $
+ * $Id: alg_iso8859_1.h,v 1.1 2004/06/27 21:19:24 perky Exp $
  */
 
-ENCODER(gb2312)
-{
-	while (inleft > 0) {
-		Py_UNICODE c = IN1;
-		DBCHAR code;
+#define ISO8859_1_ENCODE(c, assi) \
+	if ((c) <= 0xff) (assi) = (c);
 
-		if (c < 0x80) {
-			WRITE1((unsigned char)c)
-			NEXT(1, 1)
-			continue;
-		}
-		UCS4INVALID(c)
-
-		REQUIRE_OUTBUF(2)
-		TRYMAP_ENC(gbcommon, code, c);
-		else return 1;
-
-		if (code & 0x8000) /* MSB set: GBK */
-			return 1;
-
-		OUT1((code >> 8) | 0x80)
-		OUT2((code & 0xFF) | 0x80)
-		NEXT(1, 2)
-	}
-
-	return 0;
-}
-
-DECODER(gb2312)
-{
-	while (inleft > 0) {
-		unsigned char c = **inbuf;
-
-		REQUIRE_OUTBUF(1)
-
-		if (c < 0x80) {
-			OUT1(c)
-			NEXT(1, 1)
-			continue;
-		}
-
-		REQUIRE_INBUF(2)
-		TRYMAP_DEC(gb2312, **outbuf, c ^ 0x80, IN2 ^ 0x80) {
-			NEXT(2, 1)
-		}
-		else return 2;
-	}
-
-	return 0;
-}
+#define ISO8859_1_DECODE(c, assi) \
+	if (1/*(c) <= 0xff*/) (assi) = (c);

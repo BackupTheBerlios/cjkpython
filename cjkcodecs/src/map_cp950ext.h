@@ -1,5 +1,5 @@
 /*
- * $Id: map_cp950ext.h,v 1.2 2004/06/17 18:31:20 perky Exp $
+ * $Id: map_cp950ext.h,v 1.1 2004/06/27 21:19:24 perky Exp $
  */
 
 static const ucs2_t __cp950ext_decmap[224] = {

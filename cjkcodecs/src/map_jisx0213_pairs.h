@@ -1,5 +1,5 @@
 /*
- * $Id: map_jisx0213_pairs.h,v 1.4 2004/06/17 18:31:21 perky Exp $
+ * $Id: map_jisx0213_pairs.h,v 1.1 2004/06/27 21:19:24 perky Exp $
  */
 
 static const ucs4_t __jisx0213_pair_decmap[49] = {

@@ -1,4 +1,4 @@
-/* $Id: alg_jisx0201.h,v 1.2 2003/11/27 16:42:20 perky Exp $ */
+/* $Id: alg_jisx0201.h,v 1.1 2004/06/27 21:19:24 perky Exp $ */
 
 #define JISX0201_R_ENCODE(c, assi)              \
     if ((c) < 0x80 && (c) != 0x5c && (c) != 0x7e) \

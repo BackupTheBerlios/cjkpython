@@ -1,5 +1,5 @@
 /*
- * $Id: map_ksx1001.h,v 1.2 2004/06/17 18:31:21 perky Exp $
+ * $Id: map_ksx1001.h,v 1.1 2004/06/27 21:19:24 perky Exp $
  */
 
 static const ucs2_t __ksx1001_decmap[8264] = {
