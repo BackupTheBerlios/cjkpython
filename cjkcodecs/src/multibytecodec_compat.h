@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $Id: multibytecodec_compat.h,v 1.3 2003/12/31 05:46:55 perky Exp $
+ * $Id: multibytecodec_compat.h,v 1.4 2004/06/17 18:49:33 perky Exp $
  */
 
 /* We don't support 2.0 and older */
@@ -41,38 +41,34 @@
 
 /* PEP293 Codec Error Callbacks are only for Python 2.3 and over */
 #if PY_VERSION_HEX < 0x02030000
-# define NO_ERROR_CALLBACKS      1
+# define NO_ERROR_CALLBACKS		1
 #endif
 
 /* Python 2.1 doesn't have sth */
 #if PY_VERSION_HEX < 0x02020000
-# define Py_USING_UNICODE           1
-# define Py_UNICODE_SIZE            2
-# define METH_NOARGS                METH_VARARGS
-# define NO_METH_O                  1
-# define OLD_STYLE_TYPE             1
-# define OLD_GETATTR_DEF(prefix)                                \
-    static PyObject *                                           \
-    prefix##_getattr(PyObject *self, char *name)                \
-    {                                                           \
-        return Py_FindMethod(prefix##_methods, self, name);     \
-    }
-# define GETATTR_FUNC(prefix)       prefix##_getattr
-# define GETATTRO_FUNC(prefix)      0
+# define Py_USING_UNICODE		1
+# define Py_UNICODE_SIZE		2
+# define METH_NOARGS			METH_VARARGS
+# define NO_METH_O			1
+# define OLD_STYLE_TYPE			1
+# define OLD_GETATTR_DEF(prefix)					\
+	static PyObject *						\
+	prefix##_getattr(PyObject *self, char *name)			\
+	{								\
+		return Py_FindMethod(prefix##_methods, self, name);	\
+	}
+# define GETATTR_FUNC(prefix)		prefix##_getattr
+# define GETATTRO_FUNC(prefix)		0
 #else
 # define OLD_GETATTR_DEF(prefix)
-# define GETATTR_FUNC(prefix)       0
+# define GETATTR_FUNC(prefix)		0
 # ifdef __MINGW32__
 __inline static PyObject* __dummy_getattro(PyObject* self, PyObject* args)
 {
-   return PyObject_GenericGetAttr(self, args);
+	return PyObject_GenericGetAttr(self, args);
 }
-#  define GETATTRO_FUNC(prefix)     __dummy_getattro
+#  define GETATTRO_FUNC(prefix)		__dummy_getattro
 # else
-#  define GETATTRO_FUNC(prefix)     PyObject_GenericGetAttr
+#  define GETATTRO_FUNC(prefix)		PyObject_GenericGetAttr
 # endif
 #endif
-
-/*
- * ex: ts=8 sts=4 et
- */
