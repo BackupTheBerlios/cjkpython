@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: shift_jisx0213.py,v 1.6 2004/06/20 18:42:09 perky Exp $
+# $Id: shift_jisx0213.py,v 1.7 2004/06/27 19:28:55 perky Exp $
 #
 
 from cjkcodecs import _codecs_jp

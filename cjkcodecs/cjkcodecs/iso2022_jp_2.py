@@ -1,6 +1,6 @@
 # ACHTUNG: This file is generated automatically. Please do not edit.
 #
-# iso_2022_jp_ext.py: Python Unicode Codec for ISO_2022_JP_EXT
+# iso2022_jp_2.py: Python Unicode Codec for ISO2022_JP_2
 #
 # Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
 # All rights reserved.
@@ -27,13 +27,13 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: iso_2022_jp_ext.py,v 1.6 2004/06/20 18:42:09 perky Exp $
+# $Id: iso2022_jp_2.py,v 1.1 2004/06/27 19:28:55 perky Exp $
 #
 
-from cjkcodecs import _codecs_jp
+from cjkcodecs import _codecs_iso2022
 import codecs
 
-codec = _codecs_jp.getcodec('iso_2022_jp_ext')
+codec = _codecs_iso2022.getcodec('iso2022_jp_2')
 
 class Codec(codecs.Codec):
     encode = codec.encode
