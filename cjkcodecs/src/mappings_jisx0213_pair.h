@@ -1,5 +1,5 @@
 /*
- * $Id: mappings_jisx0213_pair.h,v 1.1 2004/07/07 14:59:27 perky Exp $
+ * $Id: mappings_jisx0213_pair.h,v 1.2 2004/07/07 15:28:02 perky Exp $
  */
 
 #define JISX0213_ENCPAIRS 46
