@@ -3,7 +3,7 @@
 ;
 ; Created by Hye-Shik Chang <perky@i18n.org>
 ;
-; $Id: cjkpython.nsi,v 1.2 2003/09/24 17:46:50 perky Exp $
+; $Id: cjkpython.nsi,v 1.3 2003/09/24 18:17:43 perky Exp $
 ;
 
 !include "MUI.nsh"
@@ -15,7 +15,7 @@
 !define PYTHON_VERSION_MAJOR "2.3"
 !define PYTHON_VERSION_SHORT "23"
 !define PYTHON_VERSION_MINOR ".1"
-!define PYTHON_VERSION_FULL "2.3.1-RC"
+!define PYTHON_VERSION_FULL "2.3.1"
 !define CJK_REVISION ""
 !define PYTHON_VERSION "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}"
 
@@ -247,8 +247,8 @@ Section $(SecPythonCore) PythonCore
   WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "DisplayIcon" "$INSTDIR\py.ico,-0"
   WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "DisplayVersion" "${MUI_VERSION}"
   WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "Publisher" "Hye-Shik Chang"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "HelpLink" "http://www.python.org"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "URLInfoAbout" "http://openlook.org/wiki/CJKPython"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "HelpLink" "http://cjkpython.berlios.de/#CJKPython"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "URLInfoAbout" "http://cjkpython.berlios.de/#CJKPython"
 
   CreateDirectory "${SMPATH}"
   SetOutPath "$INSTDIR"
