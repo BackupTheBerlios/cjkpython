@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_iso_2022_jp_ext.h,v 1.1 2004/06/18 18:13:30 perky Exp $
+ * $Id: codecimpl_iso_2022_jp_ext.h,v 1.2 2004/06/18 18:15:24 perky Exp $
  */
 
 #define ISO2022_ENCODING iso_2022_jp_ext
@@ -116,8 +116,8 @@ jisx0208encode:				if (charset != CHARSET_JISX0208) {
 						STATE_SETG0(state,
 							    CHARSET_JISX0208)
 						NEXT_OUT(3)
-				    	}
-		    			WRITE2(code >> 8, code & 0xff)
+					}
+					WRITE2(code >> 8, code & 0xff)
 				}
 				NEXT(1, 2)
 			}
