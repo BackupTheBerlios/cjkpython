@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_big5.h,v 1.2 2004/06/27 19:24:13 perky Exp $
+ * $Id: codecimpl_big5.h,v 1.3 2004/06/27 20:57:33 perky Exp $
  */
 
 ENCODER(big5)
@@ -48,8 +48,8 @@ ENCODER(big5)
 		TRYMAP_ENC(big5, code, c);
 		else return 1;
 
-		(*outbuf)[0] = code >> 8;
-		(*outbuf)[1] = code & 0xFF;
+		OUT1(code >> 8)
+		OUT2(code & 0xFF)
 		NEXT(1, 2)
 	}
 
