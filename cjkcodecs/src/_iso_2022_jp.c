@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp.c,v 1.3 2003/12/30 02:26:47 perky Exp $
+ * $Id: _iso_2022_jp.c,v 1.4 2003/12/30 04:04:47 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
@@ -155,14 +155,16 @@ DECODER(iso_2022_jp)
   ISO2022_LOOP_BEGIN
     unsigned char    charset, c2;
 
-    ISO2022_GETCHARSET(charset, c, c2)
+    ISO2022_GETCHARSET(charset, c)
 
     if (charset & CHARSET_DOUBLEBYTE) {
         /* all double byte character sets are in JIS X 0208 here.
          * this means that we don't distinguish :1978 from :1983. */
         RESERVE_INBUF(2)
         RESERVE_OUTBUF(1)
-        c2 &= IN2;
+        c2 = IN2;
+        if (c2 >= 0x80)
+            return 1;
         if (c == 0x21 && c2 == 0x40) { /* FULL-WIDTH REVERSE SOLIDUS */
             **outbuf = 0xff3c;
             NEXT(2, 1)

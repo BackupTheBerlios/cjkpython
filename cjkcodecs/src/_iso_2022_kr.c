@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_kr.c,v 1.1 2003/09/24 17:44:49 perky Exp $
+ * $Id: _iso_2022_kr.c,v 1.2 2003/12/30 04:04:47 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
@@ -124,13 +124,15 @@ DECODER(iso_2022_kr)
   ISO2022_LOOP_BEGIN
     unsigned char    charset, c2;
 
-    ISO2022_GETCHARSET(charset, c, c2)
+    ISO2022_GETCHARSET(charset, c)
 
     if (charset & CHARSET_DOUBLEBYTE) {
         /* all double byte character sets are in KS X 1001 here */
         RESERVE_INBUF(2)
         RESERVE_OUTBUF(1)
-        c2 &= IN2;
+        c2 = IN2;
+        if (c2 >= 0x80)
+            return 1;
         TRYMAP_DEC(ksx1001, **outbuf, c, c2) {
             NEXT(2, 1)
         } else

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp_3.c,v 1.3 2003/12/30 02:26:47 perky Exp $
+ * $Id: _iso_2022_jp_3.c,v 1.4 2003/12/30 04:04:47 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
@@ -178,12 +178,14 @@ DECODER(iso_2022_jp_3)
     unsigned char    charset, c2;
     ucs4_t           code;
 
-    ISO2022_GETCHARSET(charset, c, c2)
+    ISO2022_GETCHARSET(charset, c)
 
     if (charset & CHARSET_DOUBLEBYTE) {
         RESERVE_INBUF(2)
         RESERVE_OUTBUF(1)
-        c2 &= IN2;
+        c2 = IN2;
+        if (c2 >= 0x80)
+            return 1;
         if (charset == CHARSET_JISX0213_1) {
             if (c == 0x21 && c2 == 0x40) **outbuf = 0xff3c;
             else TRYMAP_DEC(jisx0208, **outbuf, c, c2);

@@ -12,6 +12,8 @@ Changes with CJKCodecs 1.0.3
   *) Removed PUA(Private Use Area) support from EUC-JP and SHIFT-JIS codec
      which is usually undesired by Japanese users. [IKEDA Soji]
 
+  *) ISO-2022 codecs now raise decode error for bytes set MSB. [IKEDA Soji]
+
 
 Changes with CJKCodecs 1.0.2
 

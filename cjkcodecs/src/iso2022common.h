@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022common.h,v 1.4 2003/12/30 02:26:47 perky Exp $
+ * $Id: iso2022common.h,v 1.5 2003/12/30 04:04:47 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
@@ -104,14 +104,13 @@
 #define STATE_CLEARFLAG(s, f)   ((s)->c[4]) &= ~(f);
 #define STATE_CLEARFLAGS(s)     ((s)->c[4]) = 0;
 
-#define ISO2022_GETCHARSET(charset, c1, c2mask)                     \
-    if (STATE_GETFLAG(state, F_SHIFTED) || (c) >= 0x80) { /* G1 */  \
+#define ISO2022_GETCHARSET(charset, c1)                             \
+    if ((c) >= 0x80)                                                \
+        return 1;                                                   \
+    if (STATE_GETFLAG(state, F_SHIFTED)) /* G1 */                   \
         (charset) = STATE_GETG1(state);                             \
-        (c) &= 0x7f; (c2mask) = 0x7f;                               \
-    } else { /* G1 */                                               \
+    else /* G1 */                                                   \
         (charset) = STATE_GETG0(state);                             \
-        (c2mask) = 0xff;                                            \
-    }
 
 #ifdef ISO2022_USE_G2_DESIGNATION
 /* hardcoded for iso-2022-jp-2 for now. we'll need to generalize it
