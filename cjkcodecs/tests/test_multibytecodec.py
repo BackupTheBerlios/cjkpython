@@ -3,7 +3,7 @@
 # test_multibytecodec.py
 #   Unit test for multibytecodec itself
 #
-# $Id: test_multibytecodec.py,v 1.4 2003/12/19 02:39:09 perky Exp $
+# $Id: test_multibytecodec.py,v 1.5 2004/01/06 02:26:28 perky Exp $
 
 from test import test_support
 import test_multibytecodec_support
@@ -30,31 +30,33 @@ class Test_StreamWriter(unittest.TestCase):
             self.assertEqual(s.getvalue(),
                     '123\x907\x959\x907\x959\x907\x959\x827\xcf5\x810\x851')
 
-        def test_utf_8(self):
-            s= StringIO.StringIO()
-            c = codecs.lookup('cjkcodecs.utf-8')[3](s)
-            c.write(u'123')
-            self.assertEqual(s.getvalue(), '123')
-            c.write(u'\U00012345')
-            self.assertEqual(s.getvalue(), '123\xf0\x92\x8d\x85')
-            c.write(u'\U00012345'[0])
-            self.assertEqual(s.getvalue(), '123\xf0\x92\x8d\x85')
-            c.write(u'\U00012345'[1] + u'\U00012345' + u'\uac00\u00ac')
-            self.assertEqual(s.getvalue(),
-                '123\xf0\x92\x8d\x85\xf0\x92\x8d\x85\xf0\x92\x8d\x85'
-                '\xea\xb0\x80\xc2\xac')
-            c.write(u'\U00012345'[0])
-            self.assertEqual(s.getvalue(),
-                '123\xf0\x92\x8d\x85\xf0\x92\x8d\x85\xf0\x92\x8d\x85'
-                '\xea\xb0\x80\xc2\xac')
-            c.reset()
-            self.assertEqual(s.getvalue(),
-                '123\xf0\x92\x8d\x85\xf0\x92\x8d\x85\xf0\x92\x8d\x85'
-                '\xea\xb0\x80\xc2\xac\xed\xa0\x88')
-            c.write(u'\U00012345'[1])
-            self.assertEqual(s.getvalue(),
-                '123\xf0\x92\x8d\x85\xf0\x92\x8d\x85\xf0\x92\x8d\x85'
-                '\xea\xb0\x80\xc2\xac\xed\xa0\x88\xed\xbd\x85')
+        # standard utf-8 codecs has broken StreamReader
+        if test_multibytecodec_support.__cjkcodecs__:
+            def test_utf_8(self):
+                s= StringIO.StringIO()
+                c = codecs.lookup('cjkcodecs.utf-8')[3](s)
+                c.write(u'123')
+                self.assertEqual(s.getvalue(), '123')
+                c.write(u'\U00012345')
+                self.assertEqual(s.getvalue(), '123\xf0\x92\x8d\x85')
+                c.write(u'\U00012345'[0])
+                self.assertEqual(s.getvalue(), '123\xf0\x92\x8d\x85')
+                c.write(u'\U00012345'[1] + u'\U00012345' + u'\uac00\u00ac')
+                self.assertEqual(s.getvalue(),
+                    '123\xf0\x92\x8d\x85\xf0\x92\x8d\x85\xf0\x92\x8d\x85'
+                    '\xea\xb0\x80\xc2\xac')
+                c.write(u'\U00012345'[0])
+                self.assertEqual(s.getvalue(),
+                    '123\xf0\x92\x8d\x85\xf0\x92\x8d\x85\xf0\x92\x8d\x85'
+                    '\xea\xb0\x80\xc2\xac')
+                c.reset()
+                self.assertEqual(s.getvalue(),
+                    '123\xf0\x92\x8d\x85\xf0\x92\x8d\x85\xf0\x92\x8d\x85'
+                    '\xea\xb0\x80\xc2\xac\xed\xa0\x88')
+                c.write(u'\U00012345'[1])
+                self.assertEqual(s.getvalue(),
+                    '123\xf0\x92\x8d\x85\xf0\x92\x8d\x85\xf0\x92\x8d\x85'
+                    '\xea\xb0\x80\xc2\xac\xed\xa0\x88\xed\xbd\x85')
 
     else: # UCS4
         pass

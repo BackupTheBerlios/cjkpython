@@ -3,12 +3,14 @@
 # test_multibytecodec_support.py
 #   Common Unittest Routines for CJK codecs
 #
-# $Id: test_multibytecodec_support.py,v 1.3 2003/12/19 02:39:09 perky Exp $
+# $Id: test_multibytecodec_support.py,v 1.4 2004/01/06 02:26:28 perky Exp $
 
 import sys, codecs, os.path
 import unittest
 from test import test_support
 from StringIO import StringIO
+
+__cjkcodecs__ = 1 # define this as 0 for python
 
 class TestBase:
     encoding        = ''   # codec name
@@ -111,10 +113,13 @@ class TestBase:
                 self.assertEqual(ostream.getvalue(), self.tstring[1])
 
     def test_streamwriter(self):
-        # don't use standard utf-8 streamreader here.
-        # it's broken for sr.readline(smallnumber)
+        if __cjkcodecs__:
+            readfuncs = ('read', 'readline', 'readlines')
+        else:
+            # standard utf8 codec has broken readline and readlines.
+            readfuncs = ('read',)
         UTF8Reader = codecs.getreader('cjkcodecs.utf-8')
-        for name in ["read", "readline", "readlines"]:
+        for name in readfuncs:
             for sizehint in [None] + range(1, 33) + \
                             [64, 128, 256, 512, 1024]:
                 istream = UTF8Reader(StringIO(self.tstring[1]))
@@ -205,8 +210,12 @@ class TestBase_Mapping(unittest.TestCase):
             self.assertEqual(unicode(csetch, self.encoding), unich)
 
 def load_teststring(encoding):
-    etxt = open(os.path.join('sampletexts', encoding) + '.txt').read()
-    utxt = open(os.path.join('sampletexts', encoding) + '.utf8').read()
-    return (etxt, utxt)
+    if __cjkcodecs__:
+        etxt = open(os.path.join('sampletexts', encoding) + '.txt').read()
+        utxt = open(os.path.join('sampletexts', encoding) + '.utf8').read()
+        return (etxt, utxt)
+    else:
+        from test import cjkencodings_test
+        return cjkencodings_test.teststring[encoding]
 
 # ex: ts=8 sts=4 sw=4 et
