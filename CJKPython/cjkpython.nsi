@@ -3,8 +3,14 @@
 ;
 ; Created by Hye-Shik Chang <perky@i18n.org>
 ;
-; $Id: cjkpython.nsi,v 1.3 2003/09/24 18:17:43 perky Exp $
+; $Id: cjkpython.nsi,v 1.4 2004/02/13 13:50:13 perky Exp $
 ;
+
+;Icons and graphics
+!define MUI_SPECIALBITMAP "installer-cjk.bmp"
+!define MUI_ICON "contrib\yi-box_install.ico"
+!define MUI_UNICON "contrib\yi-box_uninstall.ico"
+!define MUI_CHECKBITMAP "contrib\yi-box_check.bmp"
 
 !include "MUI.nsh"
 !include "contrib\UpgradeDLL.nsh"
@@ -14,13 +20,13 @@
 
 !define PYTHON_VERSION_MAJOR "2.3"
 !define PYTHON_VERSION_SHORT "23"
-!define PYTHON_VERSION_MINOR ".1"
-!define PYTHON_VERSION_FULL "2.3.1"
+!define PYTHON_VERSION_MINOR ".3"
+!define PYTHON_VERSION_FULL "2.3.3"
 !define CJK_REVISION ""
 !define PYTHON_VERSION "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}"
 
-!define MUI_PRODUCT "CJKPython"
-!define MUI_VERSION "${PYTHON_VERSION_FULL}${CJK_REVISION}"
+!define PRODUCT_NAME "CJKPython"
+!define VERSION_NAME "${PYTHON_VERSION_FULL}${CJK_REVISION}"
 
 !define REGISTRY_ROOT HKLM
 !define REGISTRY_PATH "Software\Python\PythonCore\${PYTHON_VERSION_MAJOR}"
@@ -33,6 +39,7 @@ XPStyle on
 ;Configuration
 
   ;General
+  Name "${PRODUCT_NAME} ${VERSION_NAME}"
   OutFile "CJKPython${PYTHON_VERSION_FULL}${CJK_REVISION}.exe"
 
   ;Folder selection page
@@ -42,13 +49,10 @@ XPStyle on
   InstallDirRegKey "${REGISTRY_ROOT}" "${REGISTRY_PATH}\InstallPath" ""
 
   ;Show its version
-  BrandingText "${MUI_PRODUCT} ${MUI_VERSION}"
+  BrandingText "${PRODUCT_NAME} ${VERSION_NAME}"
 
 ;--------------------------------
 ;Sub Package Directories
-
-  !define CJKCODECS_PATH "dist\cjkcodecs-1.0"
-  !define CJKCODECS_LIBDIR "${CJKCODECS_PATH}\build\lib.win32-${PYTHON_VERSION_MAJOR}\cjkcodecs"
 
   !define CTYPES_PATH "dist\ctypes-0.6.2"
   !define CTYPES_LIBDIR "${CTYPES_PATH}\build\lib.win32-${PYTHON_VERSION_MAJOR}"
@@ -64,7 +68,7 @@ XPStyle on
 ;Modern UI Configuration
 
   !insertmacro MUI_PAGE_WELCOME
-  !insertmacro MUI_PAGE_LICENSE
+  !insertmacro MUI_PAGE_LICENSE "License.txt"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
@@ -75,12 +79,6 @@ XPStyle on
 
   !define MUI_COMPONENTSPAGE_SMALLDESC
   !define MUI_ABORTWARNING
-
-  ;Icons and graphics
-  !define MUI_SPECIALBITMAP "installer-cjk.bmp"
-  !define MUI_ICON "contrib\yi-box_install.ico"
-  !define MUI_UNICON "contrib\yi-box_uninstall.ico"
-  !define MUI_CHECKBITMAP "contrib\yi-box_check.bmp"
 
   
 ;--------------------------------
@@ -241,14 +239,14 @@ Section $(SecPythonCore) PythonCore
   WriteRegStr ${REGISTRY_ROOT} "SOFTWARE\CLASSES\.pyo" "Content Type" "text/plain"
 
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "DisplayName" "${MUI_PRODUCT} ${MUI_VERSION}"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "UninstallString" "$INSTDIR\Uninstall.exe"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "InstallLocation" "$INSTDIR"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "DisplayIcon" "$INSTDIR\py.ico,-0"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "DisplayVersion" "${MUI_VERSION}"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "Publisher" "Hye-Shik Chang"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "HelpLink" "http://cjkpython.berlios.de/#CJKPython"
-  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}" "URLInfoAbout" "http://cjkpython.berlios.de/#CJKPython"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}" "DisplayName" "${PRODUCT_NAME} ${VERSION_NAME}"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}" "InstallLocation" "$INSTDIR"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}" "DisplayIcon" "$INSTDIR\py.ico,-0"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}" "DisplayVersion" "${VERSION_NAME}"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}" "Publisher" "Hye-Shik Chang"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}" "HelpLink" "http://cjkpython.berlios.de/#CJKPython"
+  WriteRegStr ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}" "URLInfoAbout" "http://cjkpython.berlios.de/#CJKPython"
 
   CreateDirectory "${SMPATH}"
   SetOutPath "$INSTDIR"
@@ -498,126 +496,6 @@ Section $(SecPythonTclTkGUI) PythonTclTkGUI
 SectionEnd
 
 
-SubSection $(SubSectionCJKCodecs) CJKCodecs
-
-Section $(SecSimplifiedChineseCodecs) SimplifiedChineseCodecs
-
-  SectionIn 1 2 3 4
-
-  SetOutPath "$INSTDIR\DLLs"
-  File "${CJKCODECS_LIBDIR}\mapdata_zh_CN.pyd"
-  File "${CJKCODECS_LIBDIR}\multibytecodec.pyd" ;installing duplicated
-
-  SetOutPath "$INSTDIR\DLLs\cjkcodecs"
-  File "${CJKCODECS_LIBDIR}\_gb2312.pyd"
-  File "${CJKCODECS_LIBDIR}\_gbk.pyd"
-  File "${CJKCODECS_LIBDIR}\_gb18030.pyd"
-  File "${CJKCODECS_LIBDIR}\_hz.pyd"
-
-  SetOutPath "$INSTDIR\Lib\encodings"
-  File "${CJKCODECS_LIBDIR}\gb18030.py"
-  File "${CJKCODECS_LIBDIR}\gb2312.py"
-  File "${CJKCODECS_LIBDIR}\gbk.py"
-  File "${CJKCODECS_LIBDIR}\hz.py"
-
-SectionEnd
-
-Section $(SecTraditionalChineseCodecs) TraditionalChineseCodecs
-
-  SectionIn 1 2 3 4
-
-  SetOutPath "$INSTDIR\DLLs"
-  File "${CJKCODECS_LIBDIR}\mapdata_zh_TW.pyd"
-  File "${CJKCODECS_LIBDIR}\multibytecodec.pyd" ;installing duplicated
-
-  SetOutPath "$INSTDIR\DLLs\cjkcodecs"
-  File "${CJKCODECS_LIBDIR}\__init__.py" ;installing duplicated
-  File "${CJKCODECS_LIBDIR}\_big5.pyd"
-  File "${CJKCODECS_LIBDIR}\_cp950.pyd"
-
-  SetOutPath "$INSTDIR\Lib\encodings"
-  File "${CJKCODECS_LIBDIR}\big5.py"
-  File "${CJKCODECS_LIBDIR}\cp950.py"
-
-SectionEnd
-
-Section $(SecJapaneseCodecs) JapaneseCodecs
-
-  SectionIn 1 2 3 4
-
-  SetOutPath "$INSTDIR\DLLs"
-  File "${CJKCODECS_LIBDIR}\mapdata_ja_JP.pyd"
-  File "${CJKCODECS_LIBDIR}\multibytecodec.pyd" ;installing duplicated
-
-  SetOutPath "$INSTDIR\DLLs\cjkcodecs"
-  File "${CJKCODECS_LIBDIR}\__init__.py" ;installing duplicated
-  File "${CJKCODECS_LIBDIR}\_shift_jis.pyd"
-  File "${CJKCODECS_LIBDIR}\_cp932.pyd"
-  File "${CJKCODECS_LIBDIR}\_euc_jp.pyd"
-  File "${CJKCODECS_LIBDIR}\_iso_2022_jp.pyd"
-  File "${CJKCODECS_LIBDIR}\_iso_2022_jp_1.pyd"
-  File "${CJKCODECS_LIBDIR}\_iso_2022_jp_2.pyd"
-  File "${CJKCODECS_LIBDIR}\_iso_2022_jp_3.pyd"
-  File "${CJKCODECS_LIBDIR}\_shift_jisx0213.pyd"
-  File "${CJKCODECS_LIBDIR}\_euc_jisx0213.pyd"
-
-  SetOutPath "$INSTDIR\Lib\encodings"
-  File "${CJKCODECS_LIBDIR}\cp932.py"
-  File "${CJKCODECS_LIBDIR}\euc_jisx0213.py"
-  File "${CJKCODECS_LIBDIR}\euc_jp.py"
-  File "${CJKCODECS_LIBDIR}\iso_2022_jp.py"
-  File "${CJKCODECS_LIBDIR}\iso_2022_jp_1.py"
-  File "${CJKCODECS_LIBDIR}\iso_2022_jp_2.py"
-  File "${CJKCODECS_LIBDIR}\iso_2022_jp_3.py"
-  File "${CJKCODECS_LIBDIR}\shift_jis.py"
-  File "${CJKCODECS_LIBDIR}\shift_jisx0213.py"
-
-SectionEnd
-
-Section $(SecKoreanCodecs) KoreanCodecs
-
-  SectionIn 1 2 3 4
-
-  SetOutPath "$INSTDIR\DLLs"
-  File "${CJKCODECS_LIBDIR}\mapdata_ko_KR.pyd"
-  File "${CJKCODECS_LIBDIR}\multibytecodec.pyd" ;installing duplicated
-
-  SetOutPath "$INSTDIR\DLLs\cjkcodecs"
-  File "${CJKCODECS_LIBDIR}\__init__.py" ;installing duplicated
-  File "${CJKCODECS_LIBDIR}\_euc_kr.pyd"
-  File "${CJKCODECS_LIBDIR}\_cp949.pyd"
-  File "${CJKCODECS_LIBDIR}\_johab.pyd"
-  File "${CJKCODECS_LIBDIR}\_iso_2022_kr.pyd"
-
-  SetOutPath "$INSTDIR\Lib\encodings"
-  File "${CJKCODECS_LIBDIR}\cp949.py"
-  File "${CJKCODECS_LIBDIR}\euc_kr.py"
-  File "${CJKCODECS_LIBDIR}\iso_2022_kr.py"
-  File "${CJKCODECS_LIBDIR}\johab.py"
-
-SectionEnd
-
-Section $(SecUTFCodecs) UTFCodecs
-
-  SectionIn 1 2 3 4
-
-  SetOutPath "$INSTDIR\DLLs"
-  File "${CJKCODECS_LIBDIR}\multibytecodec.pyd" ;installing duplicated
-
-  SetOutPath "$INSTDIR\DLLs\cjkcodecs"
-  File "${CJKCODECS_LIBDIR}\__init__.py" ;installing duplicated
-  File "${CJKCODECS_LIBDIR}\_utf_7.pyd"
-  File "${CJKCODECS_LIBDIR}\_utf_8.pyd"
-
-  SetOutPath "$INSTDIR\Lib\encodings"
-  File /oname=utf_7_cjk.py "${CJKCODECS_LIBDIR}\utf_7.py"
-  File /oname=utf_8_cjk.py "${CJKCODECS_LIBDIR}\utf_8.py"
-
-SectionEnd
-
-SubSectionEnd
-
-
 SubSection $(SubSectionLocalizationPatches) LocalizationPatches
 
 Section $(SecLegacyLocaleSupportByDefault) LegacyLocaleSupportByDefault
@@ -721,7 +599,7 @@ SectionEnd
 ;--------------------------------
 ;Descriptions
 
-!insertmacro MUI_FUNCTIONS_DESCRIPTION_BEGIN
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${PythonCore} $(DESC_PythonCore)
   !insertmacro MUI_DESCRIPTION_TEXT ${PythonSJISPatch} $(DESC_PythonSJISPatch)
   !insertmacro MUI_DESCRIPTION_TEXT ${PythonCAPI} $(DESC_PythonCAPI)
@@ -729,20 +607,14 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${PythonTclTkGUI} $(DESC_PythonTclTkGUI)
   !insertmacro MUI_DESCRIPTION_TEXT ${PythonUtilityScripts} $(DESC_PythonUtilityScripts)
   !insertmacro MUI_DESCRIPTION_TEXT ${PythonTestSuite} $(DESC_PythonTestSuite)
-  !insertmacro MUI_DESCRIPTION_TEXT ${SimplifiedChineseCodecs} $(DESC_SimplifiedChineseCodecs)
-  !insertmacro MUI_DESCRIPTION_TEXT ${TraditionalChineseCodecs} $(DESC_TraditionalChineseCodecs)
-  !insertmacro MUI_DESCRIPTION_TEXT ${JapaneseCodecs} $(DESC_JapaneseCodecs)
-  !insertmacro MUI_DESCRIPTION_TEXT ${KoreanCodecs} $(DESC_KoreanCodecs)
   !insertmacro MUI_DESCRIPTION_TEXT ${HangulModule} $(DESC_HangulModule)
   !insertmacro MUI_DESCRIPTION_TEXT ${PyKfModule} $(DESC_PyKfModule)
-  !insertmacro MUI_DESCRIPTION_TEXT ${UTFCodecs} $(DESC_UTFCodecs)
   !insertmacro MUI_DESCRIPTION_TEXT ${CtypesModule} $(DESC_CtypesModule)
   !insertmacro MUI_DESCRIPTION_TEXT ${CompileByteCodes} $(DESC_CompileByteCodes)
 
   !insertmacro MUI_DESCRIPTION_TEXT ${Python} $(DESC_Python)
-  !insertmacro MUI_DESCRIPTION_TEXT ${CJKCodecs} $(DESC_CJKCodecs)
   !insertmacro MUI_DESCRIPTION_TEXT ${ThirdPartyModules} $(DESC_ThirdPartyModules)
-!insertmacro MUI_FUNCTIONS_DESCRIPTION_END
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
  
 
 ;Uninstaller Section
@@ -1008,6 +880,7 @@ Section "Uninstall"
   Delete "$INSTDIR\Lib\encodings\aliases.py*"
   Delete "$INSTDIR\Lib\encodings\ascii.py*"
   Delete "$INSTDIR\Lib\encodings\base64_codec.py*"
+  Delete "$INSTDIR\Lib\encodings\big5.py*"
   Delete "$INSTDIR\Lib\encodings\charmap.py*"
   Delete "$INSTDIR\Lib\encodings\cp037.py*"
   Delete "$INSTDIR\Lib\encodings\cp1006.py*"
@@ -1042,8 +915,24 @@ Section "Uninstall"
   Delete "$INSTDIR\Lib\encodings\cp869.py*"
   Delete "$INSTDIR\Lib\encodings\cp874.py*"
   Delete "$INSTDIR\Lib\encodings\cp875.py*"
+  Delete "$INSTDIR\Lib\encodings\cp932.py*"
+  Delete "$INSTDIR\Lib\encodings\cp949.py*"
+  Delete "$INSTDIR\Lib\encodings\cp950.py*"
+  Delete "$INSTDIR\Lib\encodings\euc_jisx0213.py*"
+  Delete "$INSTDIR\Lib\encodings\euc_jp.py*"
+  Delete "$INSTDIR\Lib\encodings\euc_kr.py*"
+  Delete "$INSTDIR\Lib\encodings\gb18030.py*"
+  Delete "$INSTDIR\Lib\encodings\gb2312.py*"
+  Delete "$INSTDIR\Lib\encodings\gbk.py*"
   Delete "$INSTDIR\Lib\encodings\hex_codec.py*"
+  Delete "$INSTDIR\Lib\encodings\hz.py*"
   Delete "$INSTDIR\Lib\encodings\idna.py*"
+  Delete "$INSTDIR\Lib\encodings\iso2022_jp.py*"
+  Delete "$INSTDIR\Lib\encodings\iso2022_jp_1.py*"
+  Delete "$INSTDIR\Lib\encodings\iso2022_jp_2.py*"
+  Delete "$INSTDIR\Lib\encodings\iso2022_jp_3.py*"
+  Delete "$INSTDIR\Lib\encodings\iso2022_jp_ext.py*"
+  Delete "$INSTDIR\Lib\encodings\iso2022_kr.py*"
   Delete "$INSTDIR\Lib\encodings\iso8859_1.py*"
   Delete "$INSTDIR\Lib\encodings\iso8859_10.py*"
   Delete "$INSTDIR\Lib\encodings\iso8859_13.py*"
@@ -1057,6 +946,7 @@ Section "Uninstall"
   Delete "$INSTDIR\Lib\encodings\iso8859_7.py*"
   Delete "$INSTDIR\Lib\encodings\iso8859_8.py*"
   Delete "$INSTDIR\Lib\encodings\iso8859_9.py*"
+  Delete "$INSTDIR\Lib\encodings\johab.py*"
   Delete "$INSTDIR\Lib\encodings\koi8_r.py*"
   Delete "$INSTDIR\Lib\encodings\koi8_u.py*"
   Delete "$INSTDIR\Lib\encodings\latin_1.py*"
@@ -1072,6 +962,8 @@ Section "Uninstall"
   Delete "$INSTDIR\Lib\encodings\quopri_codec.py*"
   Delete "$INSTDIR\Lib\encodings\raw_unicode_escape.py*"
   Delete "$INSTDIR\Lib\encodings\rot_13.py*"
+  Delete "$INSTDIR\Lib\encodings\shift_jis.py*"
+  Delete "$INSTDIR\Lib\encodings\shift_jisx0213.py*"
   Delete "$INSTDIR\Lib\encodings\string_escape.py*"
   Delete "$INSTDIR\Lib\encodings\undefined.py*"
   Delete "$INSTDIR\Lib\encodings\unicode_escape.py*"
@@ -2430,60 +2322,6 @@ Section "Uninstall"
   RMDir "$INSTDIR\Tools\bgen"
   RMDir "$INSTDIR\Tools"
 
-
-  ;------------------------------------------------
-  ;CJKCodecs files
-  Delete "$INSTDIR\DLLs\cjkcodecs\__init__.py*"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_big5.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_cp932.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_cp949.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_cp950.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_euc_jisx0213.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_euc_jp.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_euc_kr.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_gb18030.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_gb2312.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_gbk.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_hz.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_iso_2022_jp.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_iso_2022_jp_1.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_iso_2022_jp_2.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_iso_2022_jp_3.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_iso_2022_kr.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_johab.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_shift_jis.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_shift_jisx0213.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_utf_7.pyd"
-  Delete "$INSTDIR\DLLs\cjkcodecs\_utf_8.pyd"
-  Delete "$INSTDIR\DLLs\mapdata_ja_JP.pyd"
-  Delete "$INSTDIR\DLLs\mapdata_ko_KR.pyd"
-  Delete "$INSTDIR\DLLs\mapdata_zh_CN.pyd"
-  Delete "$INSTDIR\DLLs\mapdata_zh_TW.pyd"
-  Delete "$INSTDIR\DLLs\multibytecodec.pyd"
-  Delete "$INSTDIR\Lib\encodings\big5.py*"
-  Delete "$INSTDIR\Lib\encodings\cp932.py*"
-  Delete "$INSTDIR\Lib\encodings\cp949.py*"
-  Delete "$INSTDIR\Lib\encodings\cp950.py*"
-  Delete "$INSTDIR\Lib\encodings\euc_jisx0213.py*"
-  Delete "$INSTDIR\Lib\encodings\euc_jp.py*"
-  Delete "$INSTDIR\Lib\encodings\euc_kr.py*"
-  Delete "$INSTDIR\Lib\encodings\gb18030.py*"
-  Delete "$INSTDIR\Lib\encodings\gb2312.py*"
-  Delete "$INSTDIR\Lib\encodings\gbk.py*"
-  Delete "$INSTDIR\Lib\encodings\hz.py*"
-  Delete "$INSTDIR\Lib\encodings\iso_2022_jp.py*"
-  Delete "$INSTDIR\Lib\encodings\iso_2022_jp_1.py*"
-  Delete "$INSTDIR\Lib\encodings\iso_2022_jp_2.py*"
-  Delete "$INSTDIR\Lib\encodings\iso_2022_jp_3.py*"
-  Delete "$INSTDIR\Lib\encodings\iso_2022_kr.py*"
-  Delete "$INSTDIR\Lib\encodings\johab.py*"
-  Delete "$INSTDIR\Lib\encodings\shift_jis.py*"
-  Delete "$INSTDIR\Lib\encodings\shift_jisx0213.py*"
-  Delete "$INSTDIR\Lib\encodings\utf_7_cjk.py*"
-  Delete "$INSTDIR\Lib\encodings\utf_8_cjk.py*"
-  RMDir "$INSTDIR\Lib\encodings"
-  RMDir "$INSTDIR\DLLs\cjkcodecs"
-
   ;-----------------------------------------------------
   ;ctypes module files
   Delete "$INSTDIR\DLLs\_ctypes.pyd"
@@ -2520,7 +2358,7 @@ Section "Uninstall"
 
   ;----------------------------------------
   ;Uninstall Information
-  DeleteRegKey ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${MUI_PRODUCT}-${MUI_VERSION}"
+  DeleteRegKey ${REGISTRY_ROOT} "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}-${VERSION_NAME}"
 
   ;-----------------------------------------
   ;IDLE shell association
@@ -2556,8 +2394,5 @@ Section "Uninstall"
   DeleteRegKey ${REGISTRY_ROOT} "${REGISTRY_PATH}\Modules"
   DeleteRegKey ${REGISTRY_ROOT} "${REGISTRY_PATH}\PythonPath"
   DeleteRegKey ${REGISTRY_ROOT} "${REGISTRY_PATH}"
-
-  ;Display the Finish header
-  !insertmacro MUI_UNFINISHHEADER
 
 SectionEnd

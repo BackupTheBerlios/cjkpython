@@ -1,0 +1,1093 @@
+diff -crN Python-2.3/Lib/fnmatch.py Python-2.3JP/Lib/fnmatch.py
+*** Python-2.3/Lib/fnmatch.py	Mon Jul 14 01:06:26 2003
+--- Python-2.3JP/Lib/fnmatch.py	Sat Aug  2 23:23:52 2003
+***************
+*** 41,47 ****
+      """Return the subset of the list NAMES that match PAT"""
+      import os,posixpath
+      result=[]
+!     pat=os.path.normcase(pat)
+      if not pat in _cache:
+          res = translate(pat)
+          _cache[pat] = re.compile(res)
+--- 41,47 ----
+      """Return the subset of the list NAMES that match PAT"""
+      import os,posixpath
+      result=[]
+!     pat=unicode(os.path.normcase(pat), "mbcs")
+      if not pat in _cache:
+          res = translate(pat)
+          _cache[pat] = re.compile(res)
+***************
+*** 53,59 ****
+                  result.append(name)
+      else:
+          for name in names:
+!             if match(os.path.normcase(name)):
+                  result.append(name)
+      return result
+  
+--- 53,59 ----
+                  result.append(name)
+      else:
+          for name in names:
+!             if match(unicode(os.path.normcase(name), "mbcs")):
+                  result.append(name)
+      return result
+  
+***************
+*** 64,69 ****
+--- 64,70 ----
+      its arguments.
+      """
+  
++     pat = unicode(pat, "mbcs")
+      if not pat in _cache:
+          res = translate(pat)
+          _cache[pat] = re.compile(res)
+***************
+*** 74,80 ****
+  
+      There is no way to quote meta-characters.
+      """
+! 
+      i, n = 0, len(pat)
+      res = ''
+      while i < n:
+--- 75,81 ----
+  
+      There is no way to quote meta-characters.
+      """
+!     
+      i, n = 0, len(pat)
+      res = ''
+      while i < n:
+diff -crN Python-2.3/Lib/ntsjispath.py Python-2.3JP/Lib/ntsjispath.py
+*** Python-2.3/Lib/ntsjispath.py	Thu Jan  1 09:00:00 1970
+--- Python-2.3JP/Lib/ntsjispath.py	Sun Aug  3 10:02:24 2003
+***************
+*** 0 ****
+--- 1,614 ----
++ # Module 'ntsjispath' -- common operations on WinNT/Win95 pathnames
++ """Common pathname manipulations, WindowsNT/95 version.
++ 
++ Instead of importing this module directly, import os and refer to this
++ module as os.path.
++ """
++ 
++ import os
++ import stat
++ import sys
++ 
++ import ntpath
++ from ntpath import *
++ 
++ __all__ = ["normcase","isabs","join","splitdrive","split","splitext",
++            "basename","dirname","commonprefix","getsize","getmtime",
++            "getatime","getctime", "islink","exists","isdir","isfile","ismount",
++            "walk","expanduser","expandvars","normpath","abspath","splitunc",
++            "curdir","pardir","sep","pathsep","defpath","altsep","extsep",
++            "realpath","supports_unicode_filenames"]
++ 
++ ## strings representing various path-related bits and pieces
++ #curdir = '.'
++ #pardir = '..'
++ #extsep = '.'
++ #sep = '\\'
++ #pathsep = ';'
++ #altsep = '/'
++ #defpath = '.;C:\\bin'
++ #if 'ce' in sys.builtin_module_names:
++ #    defpath = '\\Windows'
++ #elif 'os2' in sys.builtin_module_names:
++ #    # OS/2 w/ VACPP
++ #    altsep = '/'
++ 
++ # Normalize the case of a pathname and map slashes to backslashes.
++ # Other normalizations (such as optimizing '../' away) are not done
++ # (this is done by normpath).
++ 
++ #def normcase(s):
++ #    """Normalize case of pathname.
++ #
++ #    Makes all characters lowercase and all slashes into backslashes."""
++ #    return s.replace("/", "\\").lower()
++ 
++ 
++ # Return whether a path is absolute.
++ # Trivial in Posix, harder on the Mac or MS-DOS.
++ # For DOS it is absolute if it starts with a slash or backslash (current
++ # volume), or if a pathname after the volume letter and colon / UNC resource
++ # starts with a slash or backslash.
++ 
++ #def isabs(s):
++ #    """Test whether a path is absolute"""
++ #    s = splitdrive(s)[1]
++ #    return s != '' and s[:1] in '/\\'
++ 
++ 
++ # Join two (or more) paths.
++ 
++ def u_join(a, *p):
++     """Join two or more pathname components, inserting "\\" as needed"""
++     path = a
++     for b in p:
++         b_wins = 0  # set to 1 iff b makes path irrelevant
++         if path == u"":
++             b_wins = 1
++ 
++         elif isabs(b):
++             # This probably wipes out path so far.  However, it's more
++             # complicated if path begins with a drive letter:
++             #     1. join('c:', '/a') == 'c:/a'
++             #     2. join('c:/', '/a') == 'c:/a'
++             # But
++             #     3. join('c:/a', '/b') == '/b'
++             #     4. join('c:', 'd:/') = 'd:/'
++             #     5. join('c:/', 'd:/') = 'd:/'
++             if path[1:2] != u":" or b[1:2] == u":":
++                 # Path doesn't start with a drive letter, or cases 4 and 5.
++                 b_wins = 1
++ 
++             # Else path has a drive letter, and b doesn't but is absolute.
++             elif len(path) > 3 or (len(path) == 3 and
++                                    path[-1] not in u"/\\"):
++                 # case 3
++                 b_wins = 1
++ 
++         if b_wins:
++             path = b
++         else:
++             # Join, and ensure there's a separator.
++             assert len(path) > 0
++             if path[-1] in u"/\\":
++                 if b and b[0] in u"/\\":
++                     path += b[1:]
++                 else:
++                     path += b
++             elif path[-1] == u":":
++                 path += b
++             elif b:
++                 if b[0] in u"/\\":
++                     path += b
++                 else:
++                     path += u"\\" + b
++             else:
++                 # path is not empty and does not end with a backslash,
++                 # but b is empty; since, e.g., split('a/') produces
++                 # ('a', ''), it's best if join() adds a backslash in
++                 # this case.
++                 path += u'\\'
++ 
++     return path
++ 
++ def join(a, *p):
++     """Join two or more pathname components, inserting "\\" as needed"""
++     
++     u_ret = False
++     if isinstance(a, unicode):
++         u_ret = True
++     else:
++         a = unicode(a, "mbcs")
++     
++     args = []
++     for pathname in p:
++         if isinstance(pathname, unicode):
++             u_ret = 1
++         else:
++             pathname = unicode(pathname, "mbcs")
++         args.append(pathname)
++         
++     ret = u_join(a, *args)
++     if u_ret:
++         return ret
++     else:
++         return ret.encode("mbcs")
++     
++ 
++ # Split a path in a drive specification (a drive letter followed by a
++ # colon) and the path specification.
++ # It is always true that drivespec + pathspec == p
++ #def splitdrive(p):
++ #    """Split a pathname into drive and path specifiers. Returns a 2-tuple
++ #"(drive,path)";  either part may be empty"""
++ #    if p[1:2] == ':':
++ #        return p[0:2], p[2:]
++ #    return '', p
++ 
++ 
++ # Parse UNC paths
++ def u_splitunc(p):
++     """Split a pathname into UNC mount point and relative path specifiers.
++ 
++     Return a 2-tuple (unc, rest); either part may be empty.
++     If unc is not empty, it has the form '//host/mount' (or similar
++     using backslashes).  unc+rest is always the input path.
++     Paths containing drive letters never have an UNC part.
++     """
++     if p[1:2] == u':':
++         return u'', p # Drive letter present
++     firstTwo = p[0:2]
++     if firstTwo == u'//' or firstTwo == u'\\\\':
++         # is a UNC path:
++         # vvvvvvvvvvvvvvvvvvvv equivalent to drive letter
++         # \\machine\mountpoint\directories...
++         #           directory ^^^^^^^^^^^^^^^
++         normp = normcase(p)
++         index = normp.find(u'\\', 2)
++         if index == -1:
++             ##raise RuntimeError, 'illegal UNC path: "' + p + '"'
++             return (u"", p)
++         index = normp.find(u'\\', index + 1)
++         if index == -1:
++             index = len(p)
++         return p[:index], p[index:]
++     return u'', p
++ 
++ 
++ def splitunc(p):
++     """Split a pathname into UNC mount point and relative path specifiers.
++ 
++     Return a 2-tuple (unc, rest); either part may be empty.
++     If unc is not empty, it has the form '//host/mount' (or similar
++     using backslashes).  unc+rest is always the input path.
++     Paths containing drive letters never have an UNC part.
++     """
++ 
++     if isinstance(p, unicode):
++         return u_splitunc(p)
++     else:
++         drv, path = u_splitunc(unicode(p, "mbcs"))
++         return drv.encode("mbcs"), path.encode("mbcs")
++ 
++ 
++ # Split a path in head (everything up to the last '/') and tail (the
++ # rest).  After the trailing '/' is stripped, the invariant
++ # join(head, tail) == p holds.
++ # The resulting head won't end in '/' unless it is the root.
++ 
++ def u_split(p):
++     """Split a pathname.
++ 
++     Return tuple (head, tail) where tail is everything after the final slash.
++     Either part may be empty."""
++ 
++     d, p = splitdrive(p)
++     # set i to index beyond p's last slash
++     i = len(p)
++     while i and p[i-1] not in u'/\\':
++         i = i - 1
++     head, tail = p[:i], p[i:]  # now tail has no slashes
++     # remove trailing slashes from head, unless it's all slashes
++     head2 = head
++     while head2 and head2[-1] in u'/\\':
++         head2 = head2[:-1]
++     head = head2 or head
++     return d + head, tail
++ 
++ def split(p):
++     """Split a pathname.
++ 
++     Return tuple (head, tail) where tail is everything after the final slash.
++     Either part may be empty."""
++ 
++     if isinstance(p, unicode):
++         return u_split(p)
++     else:
++         head, tail = u_split(unicode(p, "mbcs"))
++         return head.encode("mbcs"), tail.encode("mbcs")
++ 
++ 
++ # Split a path in root and extension.
++ # The extension is everything starting at the last dot in the last
++ # pathname component; the root is everything before that.
++ # It is always true that root + ext == p.
++ 
++ def u_splitext(p):
++     """Split the extension from a pathname.
++ 
++     Extension is everything from the last dot to the end.
++     Return (root, ext), either part may be empty."""
++ 
++     i = p.rfind(u'.')
++     if i<=max(p.rfind(u'/'), p.rfind(u'\\')):
++         return p, u''
++     else:
++         return p[:i], p[i:]
++ 
++ 
++ def splitext(p):
++     """Split the extension from a pathname.
++ 
++     Extension is everything from the last dot to the end.
++     Return (root, ext), either part may be empty."""
++ 
++     if isinstance(p, unicode):
++         return u_splitext(p)
++     else:
++         head, tail = u_splitext(unicode(p, "mbcs"))
++         return head.encode("mbcs"), tail.encode("mbcs")
++ 
++ 
++ # Return the tail (basename) part of a path.
++ 
++ def basename(p):
++     """Returns the final component of a pathname"""
++     return split(p)[1]
++ 
++ 
++ # Return the head (dirname) part of a path.
++ 
++ def dirname(p):
++     """Returns the directory component of a pathname"""
++     return split(p)[0]
++ 
++ 
++ # Return the longest prefix of all list elements.
++ 
++ def u_commonprefix(m):
++     "Given a list of pathnames, returns the longest common leading component"
++     if not m: return ''
++     prefix = m[0]
++     for item in m:
++         for i in range(len(prefix)):
++             if prefix[:i+1] != item[:i+1]:
++                 prefix = prefix[:i]
++                 if i == 0: return ''
++                 break
++     return prefix
++ 
++ def commonprefix(m):
++     "Given a list of pathnames, returns the longest common leading component"
++ 
++     args = []
++     u_ret = False
++     for p in m:
++         if isinstance(p, unicode):
++             u_ret = True
++         else:
++             p = unicode(p, "mbcs")
++         args.append(p)
++     
++     ret = u_commonprefix(args)
++     if u_ret:
++         return ret
++     else:
++         return ret.encode("mbcs")
++ 
++ # Get size, mtime, atime of files.
++ 
++ #def getsize(filename):
++ #    """Return the size of a file, reported by os.stat()"""
++ #    return os.stat(filename).st_size
++ 
++ #def getmtime(filename):
++ #    """Return the last modification time of a file, reported by os.stat()"""
++ #    return os.stat(filename).st_mtime
++ #
++ #def getatime(filename):
++ #    """Return the last access time of a file, reported by os.stat()"""
++ #    return os.stat(filename).st_atime
++ #
++ #def getctime(filename):
++ #    """Return the creation time of a file, reported by os.stat()."""
++ #    return os.stat(filename).st_ctime
++ 
++ # Is a path a symbolic link?
++ # This will always return false on systems where posix.lstat doesn't exist.
++ 
++ #def islink(path):
++ #    """Test for symbolic link.  On WindowsNT/95 always returns false"""
++ #    return False
++ 
++ 
++ # Does a path exist?
++ # This is false for dangling symbolic links.
++ 
++ #def exists(path):
++ #    """Test whether a path exists"""
++ #    try:
++ #        st = os.stat(path)
++ #    except os.error:
++ #        return False
++ #    return True
++ 
++ 
++ # Is a path a dos directory?
++ # This follows symbolic links, so both islink() and isdir() can be true
++ # for the same path.
++ 
++ #def isdir(path):
++ #    """Test whether a path is a directory"""
++ #    try:
++ #        st = os.stat(path)
++ #    except os.error:
++ #        return False
++ #    return stat.S_ISDIR(st.st_mode)
++ 
++ 
++ # Is a path a regular file?
++ # This follows symbolic links, so both islink() and isdir() can be true
++ # for the same path.
++ 
++ #def isfile(path):
++ #    """Test whether a path is a regular file"""
++ #    try:
++ #        st = os.stat(path)
++ #    except os.error:
++ #        return False
++ #    return stat.S_ISREG(st.st_mode)
++ 
++ 
++ # Is a path a mount point?  Either a root (with or without drive letter)
++ # or an UNC path with at most a / or \ after the mount point.
++ 
++ def u_ismount(path):
++     """Test whether a path is a mount point (defined as root of drive)"""
++     unc, rest = splitunc(path)
++     if unc:
++         return rest in (u"", u"/", u"\\")
++     p = splitdrive(path)[1]
++     return len(p) == 1 and p[0] in u'/\\'
++ 
++ def ismount(path):
++     """Test whether a path is a mount point (defined as root of drive)"""
++ 
++     if isinstance(path, unicode):
++         return u_ismount(path)
++     else:
++         return u_ismount(unicode(path, "mbcs"))
++ 
++ # Directory tree walk.
++ # For each directory under top (including top itself, but excluding
++ # '.' and '..'), func(arg, dirname, filenames) is called, where
++ # dirname is the name of the directory and filenames is the list
++ # files files (and subdirectories etc.) in the directory.
++ # The func may modify the filenames list, to implement a filter,
++ # or to impose a different order of visiting.
++ 
++ def walk(top, func, arg):
++     """Directory tree walk with callback function.
++ 
++     For each directory in the directory tree rooted at top (including top
++     itself, but excluding '.' and '..'), call func(arg, dirname, fnames).
++     dirname is the name of the directory, and fnames a list of the names of
++     the files and subdirectories in dirname (excluding '.' and '..').  func
++     may modify the fnames list in-place (e.g. via del or slice assignment),
++     and walk will only recurse into the subdirectories whose names remain in
++     fnames; this can be used to implement a filter, or to impose a specific
++     order of visiting.  No semantics are defined for, or required of, arg,
++     beyond that arg is always passed to func.  It can be used, e.g., to pass
++     a filename pattern, or a mutable object designed to accumulate
++     statistics.  Passing None for arg is common."""
++ 
++     try:
++         names = os.listdir(top)
++     except os.error:
++         return
++     func(arg, top, names)
++     exceptions = ('.', '..')
++     for name in names:
++         if name not in exceptions:
++             name = join(top, name)
++             if isdir(name):
++                 walk(name, func, arg)
++ 
++ 
++ # Expand paths beginning with '~' or '~user'.
++ # '~' means $HOME; '~user' means that user's home directory.
++ # If the path doesn't begin with '~', or if the user or $HOME is unknown,
++ # the path is returned unchanged (leaving error reporting to whatever
++ # function is called with the expanded path as argument).
++ # See also module 'glob' for expansion of *, ? and [...] in pathnames.
++ # (A function should also be defined to do full *sh-style environment
++ # variable expansion.)
++ 
++ def u_expanduser(path):
++     """Expand ~ and ~user constructs.
++ 
++     If user or $HOME is unknown, do nothing."""
++     if path[:1] != u'~':
++         return path
++     i, n = 1, len(path)
++     while i < n and path[i] not in u'/\\':
++         i = i + 1
++     if i == 1:
++         if 'HOME' in os.environ:
++             userhome = unicode(os.environ['HOME'], "mbcs")
++         elif not 'HOMEPATH' in os.environ:
++             return path
++         else:
++             try:
++                 drive = unicode(os.environ['HOMEDRIVE'], "mbcs")
++             except KeyError:
++                 drive = u''
++             userhome = u_join(drive, unicode(os.environ['HOMEPATH'], "mbcs"))
++     else:
++         return path
++     return userhome + path[i:]
++ 
++ def expanduser(path):
++     """Expand ~ and ~user constructs.
++ 
++     If user or $HOME is unknown, do nothing."""
++ 
++     if isinstance(path, unicode):
++         return u_expanduser(path)
++     else:
++         ret = u_expanduser(unicode(path, "mbcs"))
++         return ret.encode("mbcs")
++ 
++ 
++ # Expand paths containing shell variable substitutions.
++ # The following rules apply:
++ #       - no expansion within single quotes
++ #       - no escape character, except for '$$' which is translated into '$'
++ #       - ${varname} is accepted.
++ #       - varnames can be made out of letters, digits and the character '_'
++ # XXX With COMMAND.COM you can use any characters in a variable name,
++ # XXX except '^|<>='.
++ 
++ def u_expandvars(path):
++     """Expand shell variables of form $var and ${var}.
++ 
++     Unknown variables are left unchanged."""
++     if u'$' not in path:
++         return path
++     import string
++     varchars = unicode(string.ascii_letters + string.digits + '_-')
++     res = u''
++     index = 0
++     pathlen = len(path)
++     while index < pathlen:
++         c = path[index]
++         if c == u'\'':   # no expansion within single quotes
++             path = path[index + 1:]
++             pathlen = len(path)
++             try:
++                 index = path.index(u'\'')
++                 res = res + u'\'' + path[:index + 1]
++             except ValueError:
++                 res = res + path
++                 index = pathlen - 1
++         elif c == u'$':  # variable or '$$'
++             if path[index + 1:index + 2] == u'$':
++                 res = res + c
++                 index = index + 1
++             elif path[index + 1:index + 2] == u'{':
++                 path = path[index+2:]
++                 pathlen = len(path)
++                 try:
++                     index = path.index(u'}')
++                     var = path[:index]
++                     if var in os.environ:
++                         res = res + unicode(os.environ[var], "mbcs")
++                 except ValueError:
++                     res = res + path
++                     index = pathlen - 1
++             else:
++                 var = u''
++                 index = index + 1
++                 c = path[index:index + 1]
++                 while c != u'' and c in varchars:
++                     var = var + c
++                     index = index + 1
++                     c = path[index:index + 1]
++                 if var in os.environ:
++                     res = res + os.environ[var]
++                 if c != u'':
++                     res = res + c
++         else:
++             res = res + c
++         index = index + 1
++     return res
++ 
++ def expandvars(path):
++     """Expand shell variables of form $var and ${var}.
++ 
++     Unknown variables are left unchanged."""
++ 
++     if isinstance(path, unicode):
++         return u_expandvars(path)
++     else:
++         ret = u_expandvars(unicode(path, "mbcs"))
++         return ret.encode("mbcs")
++ 
++ # Normalize a path, e.g. A//B, A/./B and A/foo/../B all become A\B.
++ # Previously, this function also truncated pathnames to 8+3 format,
++ # but as this module is called "ntpath", that's obviously wrong!
++ 
++ def u_normpath(path):
++     """Normalize path, eliminating double slashes, etc."""
++     path = path.replace(u"/", u"\\")
++     prefix, path = splitdrive(path)
++     while path[:1] == u"\\":
++         prefix = prefix + u"\\"
++         path = path[1:]
++     comps = path.split(u"\\")
++     i = 0
++     while i < len(comps):
++         if comps[i] in (u'.', u''):
++             del comps[i]
++         elif comps[i] == u'..':
++             if i > 0 and comps[i-1] != u'..':
++                 del comps[i-1:i+1]
++                 i -= 1
++             elif i == 0 and prefix.endswith(u"\\"):
++                 del comps[i]
++             else:
++                 i += 1
++         else:
++             i += 1
++     # If the path is now empty, substitute '.'
++     if not prefix and not comps:
++         comps.append(u'.')
++     return prefix + u"\\".join(comps)
++ 
++ def normpath(path):
++     """Normalize path, eliminating double slashes, etc."""
++ 
++     if isinstance(path, unicode):
++         return u_normpath(path)
++     else:
++         ret = u_normpath(unicode(path, "mbcs"))
++         return ret.encode("mbcs")
++ 
++ 
++ # Return an absolute path.
++ def abspath(path):
++     """Return the absolute version of a path"""
++     try:
++         from nt import _getfullpathname
++     except ImportError: # Not running on Windows - mock up something sensible.
++         global abspath
++         def _abspath(path):
++             if not isabs(path):
++                 path = join(os.getcwd(), path)
++             return normpath(path)
++         abspath = _abspath
++         return _abspath(path)
++ 
++     if path: # Empty path must return current working directory.
++         try:
++             path = _getfullpathname(path)
++         except WindowsError:
++             pass # Bad path - return unchanged.
++     else:
++         path = os.getcwd()
++     return normpath(path)
++ 
++ ## realpath is a no-op on systems without islink support
++ #realpath = abspath
++ ## Win9x family and earlier have no Unicode filename support.
++ #supports_unicode_filenames = (hasattr(sys, "getwindowsversion") and
++ #                              sys.getwindowsversion()[3] >= 2)
+diff -crN Python-2.3/Lib/os.py Python-2.3JP/Lib/os.py
+*** Python-2.3/Lib/os.py	Wed Jul  2 11:49:33 2003
+--- Python-2.3JP/Lib/os.py	Sat Aug  2 22:00:18 2003
+***************
+*** 58,64 ****
+          from nt import _exit
+      except ImportError:
+          pass
+!     import ntpath as path
+  
+      import nt
+      __all__.extend(_get_exports_list(nt))
+--- 58,64 ----
+          from nt import _exit
+      except ImportError:
+          pass
+!     import ntsjispath as path
+  
+      import nt
+      __all__.extend(_get_exports_list(nt))
+diff -crN Python-2.3/Lib/site.py Python-2.3JP/Lib/site.py
+*** Python-2.3/Lib/site.py	Sat Jul 19 02:45:33 2003
+--- Python-2.3JP/Lib/site.py	Sat Aug  2 09:32:57 2003
+***************
+*** 316,322 ****
+  # default is 'ascii', but if you're willing to experiment, you can
+  # change this.
+  
+! encoding = "ascii" # Default value set by _PyUnicode_Init()
+  
+  if 0:
+      # Enable to support locale aware default string encodings.
+--- 316,322 ----
+  # default is 'ascii', but if you're willing to experiment, you can
+  # change this.
+  
+! encoding = "mbcs" # Default value set by _PyUnicode_Init()
+  
+  if 0:
+      # Enable to support locale aware default string encodings.
+diff -crN Python-2.3/Modules/posixmodule.c Python-2.3JP/Modules/posixmodule.c
+*** Python-2.3/Modules/posixmodule.c	Wed Jun 11 09:18:09 2003
+--- Python-2.3JP/Modules/posixmodule.c	Sat Aug  2 09:44:52 2003
+***************
+*** 16,21 ****
+--- 16,25 ----
+  #include "Python.h"
+  #include "structseq.h"
+  
++ #ifdef SJIS
++ #include <mbctype.h>
++ #endif
++ 
+  #if defined(__VMS)
+  #    include <unixio.h>
+  #endif /* defined(__VMS) */
+***************
+*** 986,991 ****
+--- 990,998 ----
+  	*/
+  	if (pathlen > 0 &&
+  	    (path[pathlen-1]== '\\' || path[pathlen-1] == '/')) {
++ #ifdef SJIS
++           if (!_ismbstrail(path, path + pathlen-1)) {
++ #endif
+  	    	/* It does end with a slash -- exempt the root drive cases. */
+  	    	/* XXX UNC root drives should also be exempted? */
+  	    	if (pathlen == 1 || (pathlen == 3 && path[1] == ':'))
+***************
+*** 995,1000 ****
+--- 1002,1010 ----
+  			strncpy(pathcopy, path, pathlen);
+  			pathcopy[pathlen-1] = '\0';
+  			path = pathcopy;
++ #ifdef SJIS
++ 	    }
++ #endif	    
+  		}
+  	}
+  #endif /* MS_WINDOWS */
+***************
+*** 1419,1424 ****
+--- 1429,1439 ----
+  		return NULL;
+  	if (len > 0) {
+  		char ch = namebuf[len-1];
++ #ifdef SJIS
++ 		if (_ismbstrail(namebuf, namebuf + len-1))
++ 			namebuf[len++] = '/';
++ 		else
++ #endif
+  		if (ch != SEP && ch != ALTSEP && ch != ':')
+  			namebuf[len++] = '/';
+  	}
+diff -crN Python-2.3/Modules/pyexpat.c Python-2.3JP/Modules/pyexpat.c
+*** Python-2.3/Modules/pyexpat.c	Tue Jul 22 02:22:43 2003
+--- Python-2.3JP/Modules/pyexpat.c	Sun Aug  3 11:39:13 2003
+***************
+*** 1266,1271 ****
+--- 1266,1297 ----
+      template_buffer[256] = 0;
+  }
+  
++ #ifdef JAPANESE
++ 
++ int convert(void *data, const char *s) {
++ 	PyUnicodeObject *_u_string;
++ 	Py_UNICODE *u;
++ 	Py_UNICODE ret;
++ 
++ 	_u_string = (PyUnicodeObject *)PyUnicode_Decode(
++ 		  s, 2, data, NULL );
++ 
++ 	if (_u_string) {
++ 		u = PyUnicode_AS_UNICODE(_u_string);
++ 		if (u) {
++ 			ret = *u;
++ 			Py_DECREF(_u_string);
++ 			return ret;
++ 		}
++ 	}
++ 	return 0;
++ }
++ 
++ void release(void *data) {
++ }
++ 
++ #endif
++ 
+  static int
+  PyUnknownEncodingHandler(void *encodingHandlerData,
+                           const XML_Char *name,
+***************
+*** 1275,1280 ****
+--- 1301,1360 ----
+      int result = 0;
+      int i;
+  
++ #ifdef JAPANESE
++       int sjis=0;
++ #ifdef MS_WIN32
++ #define strcasecmp stricmp
++ #endif
++ 
++ 	Py_UNICODE *unicode;
++ 	char c[2];
++ 
++ 	memset(c, 0, sizeof(c));
++ 
++ 	if (strcasecmp(name, "shift_jis") == 0) {
++ 		info->data = "japanese.shift_jis";
++ 		sjis = 1;
++ 	}
++ 	else if (strcasecmp(name, "windows-31j") == 0) {
++ 		info->data = "japanese.windows_31j";
++ 		sjis = 1;
++ 	}
++ 	else if (strcasecmp(name, "euc-jp") == 0) {
++ 		info->data = "japanese.euc-jp";
++ 	}
++ 	if (info->data != NULL) {
++ 		for (i = 0; i <= 0xff; i++) {
++ 			if ((i < 0x80) || (sjis && (0xa1 <= i) && (i <= 0xDF))) {
++ 				c[0] = i;
++ 				_u_string = (PyUnicodeObject *)PyUnicode_Decode(
++ 					c, 1, info->data, NULL );
++ 
++ 				if (_u_string) {
++ 					unicode = PyUnicode_AS_UNICODE(_u_string);
++ 					if (unicode)
++ 						info->map[i] = *unicode;
++ 					else
++ 						info->map[i] = -1;
++ 					Py_DECREF(_u_string );
++ 				}
++ 				else {
++ 					  info->map[i] = i;
++ 				}
++ 			}
++ 			else {
++ 				  info->map[i] = -2;
++ 			}
++ 		}
++ 
++ 		info->convert = convert;
++ 		info->release= release;
++ 
++ 		return 1;
++ 	}
++ 	else {
++ #endif
++ 
+      /* Yes, supports only 8bit encodings */
+      _u_string = (PyUnicodeObject *)
+          PyUnicode_Decode(template_buffer, 256, name, "replace");
+***************
+*** 1296,1303 ****
+      result = 1;
+      Py_DECREF(_u_string);
+      return result;
+  }
+- 
+  #endif
+  
+  static PyObject *
+--- 1376,1385 ----
+      result = 1;
+      Py_DECREF(_u_string);
+      return result;
++ #ifdef JAPANESE
++ 	}
++ #endif
+  }
+  #endif
+  
+  static PyObject *
+diff -crN Python-2.3/Objects/stringobject.c Python-2.3JP/Objects/stringobject.c
+*** Python-2.3/Objects/stringobject.c	Wed Jun 18 23:17:01 2003
+--- Python-2.3JP/Objects/stringobject.c	Sat Aug  2 09:32:57 2003
+***************
+*** 4,9 ****
+--- 4,13 ----
+  
+  #include <ctype.h>
+  
++ #ifdef SJIS
++ #include <mbctype.h>
++ #endif  /* SJIS */
++ 
+  #ifdef COUNT_ALLOCS
+  int null_strings, one_strings;
+  #endif
+***************
+*** 540,545 ****
+--- 544,558 ----
+  	p = buf = PyString_AsString(v);
+  	end = s + len;
+  	while (s < end) {
++ #ifdef SJIS
++ 		if (!recode_encoding && (_ismbblead(*s) && s + 1 < end && 
++ 			_ismbbtrail(*(s + 1)))) {
++ 			*p++ = *s++;
++ 			*p++ = *s++;
++ 			continue;
++ 		}
++ #endif  /* SJIS */
++ 
+  		if (*s != '\\') {
+  		  non_esc:
+  #ifdef Py_USING_UNICODE
+***************
+*** 782,787 ****
+--- 795,810 ----
+  	fputc(quote, fp);
+  	for (i = 0; i < op->ob_size; i++) {
+  		c = op->ob_sval[i];
++ #ifdef SJIS
++ 		if ((i != op->ob_size - 1) && _ismbblead(c) && _ismbbtrail(op->ob_sval[i+1])) {
++ 			fprintf(fp, "%c%c", c, op->ob_sval[i+1]);
++ 			i++;
++ 		}
++ 		else if (_ismbbkana(c)) {
++ 			fprintf(fp, "%c", c);
++ 		}
++ 		else
++ #endif
+  		if (c == quote || c == '\\')
+  			fprintf(fp, "\\%c", c);
+                  else if (c == '\t')
+***************
+*** 833,838 ****
+--- 856,872 ----
+  			   and a closing quote. */
+  			assert(newsize - (p - PyString_AS_STRING(v)) >= 5);
+  			c = op->ob_sval[i];
++ #ifdef SJIS
++ 			if ((i != op->ob_size - 1) && _ismbblead(c) && _ismbbtrail(op->ob_sval[i+1])) {
++ 				*p++ = c;
++ 				*p++ = op->ob_sval[i+1];
++ 				i++;
++ 			}
++ 			else if (_ismbbkana(c)) {
++ 				*p++ = c;
++ 			}
++ 			else
++ #endif
+  			if (c == quote || c == '\\')
+  				*p++ = '\\', *p++ = c;
+  			else if (c == '\t')
+diff -crN Python-2.3/Parser/tokenizer.c Python-2.3JP/Parser/tokenizer.c
+*** Python-2.3/Parser/tokenizer.c	Tue Feb 18 03:31:57 2003
+--- Python-2.3JP/Parser/tokenizer.c	Sat Aug  2 09:32:57 2003
+***************
+*** 7,12 ****
+--- 7,16 ----
+  #include <ctype.h>
+  #include <assert.h>
+  
++ #ifdef SJIS
++ #include <mbctype.h>
++ #endif
++ 
+  #include "tokenizer.h"
+  #include "errcode.h"
+  
+***************
+*** 681,686 ****
+--- 685,733 ----
+  		}
+  		if (tok->prompt != NULL) {
+  			char *new = PyOS_Readline(stdin, stdout, tok->prompt);
++ /*			
++ #ifdef SJIS
++ 			if (!tok->encoding) {
++ 				tok->encoding = PyMem_NEW(char, 5);
++ 				if (!tok->encoding) {
++ 					PyMem_FREE(new);
++ 					tok->done = E_NOMEM;
++ 					return EOF;
++ 				}
++ 				strcpy(tok->encoding, "mbcs");
++ 			}
++ 
++ 			if (new) {
++ 				// Convert line to utf-8
++ 
++ 				PyObject *unicode, *utf8;
++ 				char *utf8_str;
++ 
++ 				unicode = PyUnicode_Decode(new, strlen(new), "mbcs", NULL);
++ 				if (!unicode) {
++ 					tok->done = E_NOMEM;
++ 					return EOF;
++ 				}
++ 				utf8 = PyUnicode_AsUTF8String(unicode);
++ 				Py_DECREF(unicode);
++ 				if (!utf8) {
++ 					tok->done = E_NOMEM;
++ 					return EOF;
++ 				}
++ 				utf8_str = PyString_AsString(utf8);
++ 				
++ 				PyMem_RESIZE(new, char, strlen(utf8_str)+1);
++ 				if (!new) {
++ 					Py_DECREF(utf8);
++ 					tok->done = E_NOMEM;
++ 					return EOF;
++ 				}
++ 				strcpy(new, utf8_str);
++ 				Py_DECREF(utf8);
++ 			}
++ #endif
++ */
++ 
+  			if (tok->nextprompt != NULL)
+  				tok->prompt = tok->nextprompt;
+  			if (new == NULL)
+***************
+*** 1309,1314 ****
+--- 1356,1370 ----
+  		int tripcount = 0;
+  		for (;;) {
+  			c = tok_nextc(tok);
++ #ifdef SJIS
++ 			if (!tok->encoding && _ismbblead(c)) {
++  				tripcount = 0;
++  				c = tok_nextc(tok);
++ 				if (_ismbbtrail(c)) {
++ 					continue;
++ 				}
++  			}
++ #endif  /* SJIS */
+  			if (c == '\n') {
+  				if (!triple) {
+  					tok->done = E_EOLS;
+diff -crN Python-2.3/Python/compile.c Python-2.3JP/Python/compile.c
+*** Python-2.3/Python/compile.c	Wed Jul 16 05:23:26 2003
+--- Python-2.3JP/Python/compile.c	Sat Aug  2 09:32:57 2003
+***************
+*** 21,26 ****
+--- 21,31 ----
+  
+  #include <ctype.h>
+  
++ #ifdef SJIS
++ #include <mbctype.h>
++ #include <mbstring.h>
++ #endif  /* SJIS */
++ 
+  /* Three symbols from graminit.h are also defined in Python.h, with
+     Py_ prefixes to their names.  Python.h can't include graminit.h
+     (which defines too many confusing symbols), but we can check here
+***************
+*** 1390,1395 ****
+--- 1395,1408 ----
+  			p = buf = PyString_AsString(u);
+  			end = s + len;
+  			while (s < end) {
++ #ifdef SJIS
++ 				if (!encoding && (_ismbblead(*s) && s + 1 < end && 
++ 					_ismbbtrail(*(s + 1)))) {
++ 					*p++ = *s++;
++ 					*p++ = *s++;
++ 					continue;
++ 				}
++ #endif
+  				if (*s == '\\') {
+  					*p++ = *s++;
+  					if (*s & 0x80) {
