@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _shift_jis.c,v 1.4 2003/12/31 05:46:55 perky Exp $
+ * $Id: _shift_jis.c,v 1.5 2004/03/10 07:44:09 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -56,7 +56,7 @@ ENCODER(shift_jis)
         if (code < 0x80 || (code >= 0xa1 && code <= 0xdf)) {
             RESERVE_OUTBUF(1)
 
-            OUT1(code)
+            OUT1((unsigned char)code)
             NEXT(1, 1)
             continue;
         }

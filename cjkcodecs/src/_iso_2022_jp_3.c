@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp_3.c,v 1.7 2003/12/31 05:46:55 perky Exp $
+ * $Id: _iso_2022_jp_3.c,v 1.8 2004/03/10 07:44:09 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
@@ -104,18 +104,18 @@ ENCODER(iso_2022_jp_3)
             if (code == MULTIC) {
                 if (inleft < 2) {
                     if (flags & MBENC_FLUSH) {
-                        code = find_pairencmap(c, 0, jisx0213_pairencmap,
-                                            JISX0213_ENCPAIRS);
+                        code = find_pairencmap((ucs2_t)c, 0,
+                                    jisx0213_pairencmap, JISX0213_ENCPAIRS);
                         if (code == DBCINV)
                             return 1;
                     } else
                         return MBERR_TOOFEW;
                 } else {
-                    code = find_pairencmap(c, IN2,
+                    code = find_pairencmap((ucs2_t)c, IN2,
                                 jisx0213_pairencmap, JISX0213_ENCPAIRS);
                     if (code == DBCINV) {
-                        code = find_pairencmap(c, 0, jisx0213_pairencmap,
-                                            JISX0213_ENCPAIRS);
+                        code = find_pairencmap((ucs2_t)c, 0,
+                                    jisx0213_pairencmap, JISX0213_ENCPAIRS);
                         if (code == DBCINV)
                             return 1;
                     } else

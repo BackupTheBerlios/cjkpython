@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _gb2312.c,v 1.2 2003/12/31 05:46:55 perky Exp $
+ * $Id: _gb2312.c,v 1.3 2004/03/10 07:44:09 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -41,7 +41,7 @@ ENCODER(gb2312)
         DBCHAR      code;
 
         if (c < 0x80) {
-            WRITE1(c)
+            WRITE1((unsigned char)c)
             NEXT(1, 1)
             continue;
         }

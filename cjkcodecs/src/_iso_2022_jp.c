@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp.c,v 1.7 2003/12/31 05:46:55 perky Exp $
+ * $Id: _iso_2022_jp.c,v 1.8 2004/03/10 07:44:09 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
@@ -73,7 +73,7 @@ ENCODER(iso_2022_jp)
         if (c < 0x80) {
             switch (STATE_GETG0(state)) {
             case CHARSET_ASCII:
-                WRITE1(c)
+                WRITE1((unsigned char)c)
                 NEXT(1, 1)
                 break;
             case CHARSET_JISX0201_R:
@@ -85,7 +85,7 @@ ENCODER(iso_2022_jp)
                     STATE_SETG0(state, CHARSET_ASCII)
                     code = c;
                 }
-                WRITE1(code)
+                WRITE1((unsigned char)code)
                 NEXT(1, 1)
                 break;
             }
@@ -101,7 +101,7 @@ ENCODER(iso_2022_jp)
                 code = DBCINV;
                 JISX0201_R_ENCODE(c, code)
                 if (code != DBCINV) {
-                    WRITE1(code)
+                    WRITE1((unsigned char)code)
                     NEXT(1, 1)
                     continue;
                 }
@@ -125,7 +125,7 @@ jisx0208encode: if (charset != CHARSET_JISX0208) {
                 else
                     return 1;
                 /* if (charset == CHARSET_JISX0201_R) : already checked */
-                WRITE4(ESC, '(', 'J', code)
+                WRITE4(ESC, '(', 'J', (unsigned char)code)
                 STATE_SETG0(state, CHARSET_JISX0201_R)
                 NEXT(1, 4)
             }

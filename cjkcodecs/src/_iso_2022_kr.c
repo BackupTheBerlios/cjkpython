@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_kr.c,v 1.3 2003/12/31 05:46:55 perky Exp $
+ * $Id: _iso_2022_kr.c,v 1.4 2004/03/10 07:44:09 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
@@ -67,11 +67,11 @@ ENCODER(iso_2022_kr)
 
         if (c < 0x80) {
             if (STATE_GETFLAG(state, F_SHIFTED)) {
-                WRITE2(SI, c)
+                WRITE2(SI, (unsigned char)c)
                 STATE_CLEARFLAG(state, F_SHIFTED)
                 NEXT(1, 2)
             } else {
-                WRITE1(c)
+                WRITE1((unsigned char)c)
                 NEXT(1, 1)
             }
             if (c == '\n')

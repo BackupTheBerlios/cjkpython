@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022common.h,v 1.8 2003/12/31 05:46:55 perky Exp $
+ * $Id: iso2022common.h,v 1.9 2004/03/10 07:44:09 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
@@ -207,7 +207,7 @@ iso2022processesc(MultibyteCodec_State *state,
                   const unsigned char **inbuf, size_t *inleft)
 {
     unsigned char charset, designation;
-    int  i, esclen;
+    size_t  i, esclen;
 
     for (i = 1;i < MAX_ESCSEQLEN;i++) {
         if (i >= *inleft)

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _cp932.c,v 1.2 2003/12/31 05:46:55 perky Exp $
+ * $Id: _cp932.c,v 1.3 2004/03/10 07:44:09 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -44,7 +44,7 @@ ENCODER(cp932)
         unsigned char    c1, c2;
 
         if (c <= 0x80) {
-            WRITE1(c)
+            WRITE1((unsigned char)c)
             NEXT(1, 1)
             continue;
         } else if (c >= 0xff61 && c <= 0xff9f) {

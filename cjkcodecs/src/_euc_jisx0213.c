@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _euc_jisx0213.c,v 1.2 2003/12/31 05:46:55 perky Exp $
+ * $Id: _euc_jisx0213.c,v 1.3 2004/03/10 07:44:09 perky Exp $
  */
 
 #define USING_BINARY_PAIR_SEARCH
@@ -67,18 +67,18 @@ ENCODER(euc_jisx0213)
                 if (code == MULTIC) {
                     if (inleft < 2) {
                         if (flags & MBENC_FLUSH) {
-                            code = find_pairencmap(c, 0, jisx0213_pairencmap,
-                                                JISX0213_ENCPAIRS);
+                            code = find_pairencmap((ucs2_t)c, 0,
+                                     jisx0213_pairencmap, JISX0213_ENCPAIRS);
                             if (code == DBCINV)
                                 return 1;
                         } else
                             return MBERR_TOOFEW;
                     } else {
-                        code = find_pairencmap(c, (*inbuf)[1],
-                                    jisx0213_pairencmap, JISX0213_ENCPAIRS);
+                        code = find_pairencmap((ucs2_t)c, (*inbuf)[1],
+                                     jisx0213_pairencmap, JISX0213_ENCPAIRS);
                         if (code == DBCINV) {
-                            code = find_pairencmap(c, 0, jisx0213_pairencmap,
-                                                JISX0213_ENCPAIRS);
+                            code = find_pairencmap((ucs2_t)c, 0,
+                                     jisx0213_pairencmap, JISX0213_ENCPAIRS);
                             if (code == DBCINV)
                                 return 1;
                         } else

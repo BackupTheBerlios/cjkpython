@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _johab.c,v 1.3 2003/12/31 05:46:55 perky Exp $
+ * $Id: _johab.c,v 1.4 2004/03/10 07:44:09 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -68,7 +68,7 @@ ENCODER(johab)
         DBCHAR      code;
 
         if (c < 0x80) {
-            WRITE1(c)
+            WRITE1((unsigned char)c)
             NEXT(1, 1)
             continue;
         }
