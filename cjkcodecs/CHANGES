@@ -5,7 +5,7 @@ Changes with CJKCodecs 1.1
   *) C codec modules are merged into a few per-locale modules with
      its dependent mapping table holder modules.
 
-  *) ISO-2022 codecs are completely rewritten in compact unified
+  *) ISO-2022 codecs are completely rewritten as compact unified
      implementation plus few per-variant configuration tables.
 
   *) Added new encoding:
