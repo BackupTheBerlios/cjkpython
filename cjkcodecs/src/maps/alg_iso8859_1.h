@@ -26,15 +26,11 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: alg_iso8859_1.h,v 1.3 2003/12/31 05:46:55 perky Exp $
+ * $Id: alg_iso8859_1.h,v 1.4 2004/06/19 06:00:32 perky Exp $
  */
 
-#define ISO8859_1_ENCODE(c, assi)                               \
-    if ((c) <= 0xff) (assi) = (c);
+#define ISO8859_1_ENCODE(c, assi) \
+	if ((c) <= 0xff) (assi) = (c);
 
-#define ISO8859_1_DECODE(c, assi)                               \
-    if (1/*(c) <= 0xff*/) (assi) = (c);
-
-/*
- * ex: ts=8 sts=4 et
- */
+#define ISO8859_1_DECODE(c, assi) \
+	if (1/*(c) <= 0xff*/) (assi) = (c);
