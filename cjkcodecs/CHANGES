@@ -1,4 +1,4 @@
-Changes with CJKCodecs 1.0.4
+Changes with CJKCodecs 1.1
 
   *) StreamWriter.write now can write non-unicode objects.
 
