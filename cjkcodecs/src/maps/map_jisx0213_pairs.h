@@ -1,8 +1,8 @@
 /*
- * $Id: map_jisx0213_pairs.h,v 1.2 2003/11/27 13:29:01 perky Exp $
+ * $Id: map_jisx0213_pairs.h,v 1.3 2004/06/16 06:04:18 perky Exp $
  */
 
-static const ucs4_t __jisx0213_pairdecmap[49] = {
+static const ucs4_t __jisx0213_pair_decmap[49] = {
   0x304b309a, 0x304d309a, 0x304f309a, 0x3051309a,
   0x3053309a, 0x30ab309a, 0x30ad309a, 0x30af309a,
   0x30b1309a, 0x30b3309a, 0x30bb309a, 0x30c4309a,
@@ -18,7 +18,7 @@ static const ucs4_t __jisx0213_pairdecmap[49] = {
   0x02e502e9,
 };
 
-static const struct widedbcs_index jisx0213_pairdecmap[256] = {
+static const struct widedbcs_index jisx0213_pair_decmap[256] = {
 /* 0x00 */ {0, 0, 0},
 /* 0x01 */ {0, 0, 0},
 /* 0x02 */ {0, 0, 0},
@@ -55,14 +55,14 @@ static const struct widedbcs_index jisx0213_pairdecmap[256] = {
 /* 0x21 */ {0, 0, 0},
 /* 0x22 */ {0, 0, 0},
 /* 0x23 */ {0, 0, 0},
-/* 0x24 */ {__jisx0213_pairdecmap+0, 0x77, 0x7b},
-/* 0x25 */ {__jisx0213_pairdecmap+5, 0x77, 0x7e},
-/* 0x26 */ {__jisx0213_pairdecmap+13, 0x78, 0x78},
+/* 0x24 */ {__jisx0213_pair_decmap+0, 0x77, 0x7b},
+/* 0x25 */ {__jisx0213_pair_decmap+5, 0x77, 0x7e},
+/* 0x26 */ {__jisx0213_pair_decmap+13, 0x78, 0x78},
 /* 0x27 */ {0, 0, 0},
 /* 0x28 */ {0, 0, 0},
 /* 0x29 */ {0, 0, 0},
 /* 0x2A */ {0, 0, 0},
-/* 0x2B */ {__jisx0213_pairdecmap+14, 0x44, 0x66},
+/* 0x2B */ {__jisx0213_pair_decmap+14, 0x44, 0x66},
 /* 0x2C */ {0, 0, 0},
 /* 0x2D */ {0, 0, 0},
 /* 0x2E */ {0, 0, 0},
@@ -278,7 +278,7 @@ static const struct widedbcs_index jisx0213_pairdecmap[256] = {
 };
 
 #define JISX0213_ENCPAIRS   46
-static struct pair_encodemap jisx0213_pairencmap[JISX0213_ENCPAIRS] = {
+struct pair_encodemap jisx0213_pairencmap[JISX0213_ENCPAIRS] = {
     { 0x00e60000, 0x295c },
     { 0x00e60300, 0x2b44 },
     { 0x02540000, 0x2b38 },

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecentry.h,v 1.6 2004/06/07 13:36:45 perky Exp $
+ * $Id: codecentry.h,v 1.7 2004/06/16 06:04:18 perky Exp $
  */
 
 #ifdef HAVE_ENCODER_INIT
@@ -89,14 +89,14 @@
     if (mod == NULL) goto errorexit;                        \
     if (
 #define IMPORTMAP_ENCDEC(charset)                           \
-    importmap(mod, "__map_" #charset, &charset##encmap,     \
-        &charset##decmap) ||
+    importmap(mod, "__map_" #charset, &charset##_encmap,    \
+        &charset##_decmap) ||
 #define IMPORTMAP_ENC(charset)                              \
-    importmap(mod, "__map_" #charset, &charset##encmap,     \
+    importmap(mod, "__map_" #charset, &charset##_encmap,    \
         NULL) ||
 #define IMPORTMAP_DEC(charset)                              \
     importmap(mod, "__map_" #charset, NULL,                 \
-        &charset##decmap) ||
+        &charset##_decmap) ||
 #define MAPCLOSE()                                          \
     0) goto errorexit;                                      \
     Py_DECREF(mod);

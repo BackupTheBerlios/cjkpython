@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codeccommon.h,v 1.5 2004/06/16 05:56:43 perky Exp $
+ * $Id: codeccommon.h,v 1.6 2004/06/16 06:04:18 perky Exp $
  */
 
 #include "Python.h"
@@ -40,9 +40,9 @@
 #endif
 
 #define ENCMAP(encoding)                                    \
-    static const encode_map *encoding##encmap;
+    static const encode_map *encoding##_encmap;
 #define DECMAP(encoding)                                    \
-    static const decode_map *encoding##decmap;
+    static const decode_map *encoding##_decmap;
 
 #define ENCODER_INIT(encoding)                              \
     static int encoding##_encode_init(                      \
@@ -140,13 +140,13 @@
         (val)<= (m)->top && ((assi) = (m)->map[(val) -      \
             (m)->bottom]) != NOCHAR)
 #define TRYMAP_ENC(charset, assi, uni)                      \
-    _TRYMAP_ENC(&charset##encmap[(uni) >> 8], assi, (uni) & 0xff)
+    _TRYMAP_ENC(&charset##_encmap[(uni) >> 8], assi, (uni) & 0xff)
 #define _TRYMAP_DEC(m, assi, val)                           \
     if ((m)->map != NULL && (val) >= (m)->bottom &&         \
         (val)<= (m)->top && ((assi) = (m)->map[(val) -      \
             (m)->bottom]) != UNIINV)
 #define TRYMAP_DEC(charset, assi, c1, c2)                   \
-    _TRYMAP_DEC(&charset##decmap[c1], assi, c2)
+    _TRYMAP_DEC(&charset##_decmap[c1], assi, c2)
 
 #if Py_UNICODE_SIZE == 2
 #define DECODE_SURROGATE(c)                                 \
