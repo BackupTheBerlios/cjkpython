@@ -1,7 +1,7 @@
 Shift-jis codec is mapping 0x20-0x7e area to U+20-U+7E directly
 instead of using JIS X 0201 for compatibility. The differences
 are:
- - U+005F REVERSE SOLIDUS is mapped to SHIFT-JIS 0x5f.
+ - U+005C REVERSE SOLIDUS is mapped to SHIFT-JIS 0x5c.
  - U+007E TILDE is mapped to SHIFT-JIS 0x7e.
  - U+FF3C FULL-WIDTH REVERSE SOLIDUS is mapped to SHIFT-JIS 815f.
 
