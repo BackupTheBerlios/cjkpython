@@ -26,14 +26,17 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.8 2004/06/27 21:41:15 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.9 2004/06/28 15:21:40 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
+#define USING_BINARY_PAIR_SEARCH
+
 #include "cjkcodecs.h"
 #include "alg_iso8859_1.h"
 #include "alg_iso8859_7.h"
 #include "alg_jisx0201.h"
+#include "map_jisx0213_pairs.h"
 
 /* STATE
 
@@ -120,7 +123,7 @@
 
 typedef int (*iso2022_init_func)(void);
 typedef ucs4_t (*iso2022_decode_func)(const unsigned char *data);
-typedef DBCHAR (*iso2022_encode_func)(const ucs4_t *data, int length);
+typedef DBCHAR (*iso2022_encode_func)(const ucs4_t *data, int *length);
 
 struct iso2022_designation {
 	unsigned char mark;
@@ -198,8 +201,26 @@ ENCODER(iso2022)
 		insize = GET_INSIZE(c);
 
 		for (dsg = CONFIG_DESIGNATIONS; dsg->mark; dsg++) {
-			encoded = dsg->encoder(&c, 1);
-			if (encoded != MAP_UNMAPPABLE)
+			int length = 1;
+			encoded = dsg->encoder(&c, &length);
+			if (encoded == MAP_MULTIPLE_AVAIL) {
+				/* this implementation won't work for pair
+				 * of non-bmp characters. */
+				if (inleft < 2) {
+					if (!(flags & MBENC_FLUSH))
+						return MBERR_TOOFEW;
+					length = -1;
+				}
+				else
+					length = 2;
+
+				encoded = dsg->encoder(*inbuf,&length);
+				if (encoded != MAP_UNMAPPABLE) {
+					insize = length;
+					break;
+				}
+			}
+			else if (encoded != MAP_UNMAPPABLE)
 				break;
 		}
 
@@ -492,8 +513,19 @@ bypass:					WRITE1(c)
 				decoded = dsg->decoder(*inbuf);
 				if (decoded == MAP_UNMAPPABLE)
 					return dsg->width;
-				WRITE1(decoded)
-				NEXT(dsg->width, 1)
+
+				if (decoded < 0x10000) {
+					WRITE1(decoded)
+					NEXT_OUT(1)
+				}
+				else if (decoded < 0x30000) {
+					WRITEUCS4(decoded)
+				}
+				else { /* JIS X 0213 pairs */
+					WRITE2(decoded >> 16, decoded & 0xffff)
+					NEXT_OUT(2)
+				}
+				NEXT_IN(dsg->width)
 			}
 			break;
 		}
@@ -514,6 +546,12 @@ DECMAP(ksx1001)
 ENCMAP(jisxcommon)
 DECMAP(jisx0208)
 DECMAP(jisx0212)
+ENCMAP(jisx0213_bmp)
+DECMAP(jisx0213_1_bmp)
+DECMAP(jisx0213_2_bmp)
+ENCMAP(jisx0213_emp)
+DECMAP(jisx0213_1_emp)
+DECMAP(jisx0213_2_emp)
 
 /* cn */
 ENCMAP(gbcommon)
@@ -545,10 +583,10 @@ ksx1001_decoder(const unsigned char *data)
 }
 
 static DBCHAR
-ksx1001_encoder(const ucs4_t *data, int length)
+ksx1001_encoder(const ucs4_t *data, int *length)
 {
 	DBCHAR coded;
-	assert(length == 1);
+	assert(*length == 1);
 	TRYMAP_ENC(cp949, coded, *data)
 		if (!(coded & 0x8000))
 			return coded;
@@ -581,10 +619,10 @@ jisx0208_decoder(const unsigned char *data)
 }
 
 static DBCHAR
-jisx0208_encoder(const ucs4_t *data, int length)
+jisx0208_encoder(const ucs4_t *data, int *length)
 {
 	DBCHAR coded;
-	assert(length == 1);
+	assert(*length == 1);
 	if (*data == 0xff3c) /* F/W REVERSE SOLIDUS */
 		return 0x2140;
 	else TRYMAP_ENC(jisxcommon, coded, *data) {
@@ -618,15 +656,143 @@ jisx0212_decoder(const unsigned char *data)
 }
 
 static DBCHAR
-jisx0212_encoder(const ucs4_t *data, int length)
+jisx0212_encoder(const ucs4_t *data, int *length)
 {
 	DBCHAR coded;
-	assert(length == 1);
+	assert(*length == 1);
 	TRYMAP_ENC(jisxcommon, coded, *data) {
 		if (coded & 0x8000)
 			return coded & 0x7fff;
 	}
 	return MAP_UNMAPPABLE;
+}
+
+static int
+jisx0213_init(void)
+{
+	static int initialized = 0;
+
+	if (!initialized && (
+			jisx0208_init() ||
+			IMPORT_MAP(jp, jisx0213_bmp,
+				   &jisx0213_bmp_encmap, NULL) ||
+			IMPORT_MAP(jp, jisx0213_1_bmp,
+				   NULL, &jisx0213_1_bmp_decmap) ||
+			IMPORT_MAP(jp, jisx0213_2_bmp,
+				   NULL, &jisx0213_2_bmp_decmap) ||
+			IMPORT_MAP(jp, jisx0213_emp,
+				   &jisx0213_emp_encmap, NULL) ||
+			IMPORT_MAP(jp, jisx0213_1_emp,
+				   NULL, &jisx0213_1_emp_decmap) ||
+			IMPORT_MAP(jp, jisx0213_2_emp,
+				   NULL, &jisx0213_2_emp_decmap)))
+		return -1;
+	initialized = 1;
+	return 0;
+}
+
+static ucs4_t
+jisx0213_1_decoder(const unsigned char *data)
+{
+	ucs4_t u;
+	if (data[0] == 0x21 && data[1] == 0x40) /* F/W REVERSE SOLIDUS */
+		return 0xff3c;
+	else TRYMAP_DEC(jisx0208, u, data[0], data[1]);
+	else TRYMAP_DEC(jisx0213_1_bmp, u, data[0], data[1]);
+	else TRYMAP_DEC(jisx0213_1_emp, u, data[0], data[1])
+		u |= 0x20000;
+	else TRYMAP_DEC(jisx0213_pair, u, data[0], data[1]);
+	else
+		return MAP_UNMAPPABLE;
+	return u;
+}
+
+static ucs4_t
+jisx0213_2_decoder(const unsigned char *data)
+{
+	ucs4_t u;
+	TRYMAP_DEC(jisx0213_2_bmp, u, data[0], data[1]);
+	else TRYMAP_DEC(jisx0213_2_emp, u, data[0], data[1])
+		u |= 0x20000;
+	else
+		return MAP_UNMAPPABLE;
+	return u;
+}
+
+static DBCHAR
+jisx0213_encoder(const ucs4_t *data, int *length)
+{
+	DBCHAR coded;
+
+	switch (*length) {
+	case 1: /* first character */
+		if (*data >= 0x10000) {
+			if ((*data) >> 16 == 0x20000 >> 16) {
+				TRYMAP_ENC(jisx0213_emp, coded,
+					   (*data) & 0xffff)
+					return coded;
+			}
+			return MAP_UNMAPPABLE;
+		}
+
+		TRYMAP_ENC(jisx0213_bmp, coded, *data) {
+			if (coded == MULTIC)
+				return MAP_MULTIPLE_AVAIL;
+		}
+		else TRYMAP_ENC(jisxcommon, coded, *data) {
+			if (coded & 0x8000)
+				return MAP_UNMAPPABLE;
+		}
+		else
+			return MAP_UNMAPPABLE;
+		return coded;
+	case 2: /* second character of unicode pair */
+		coded = find_pairencmap((ucs2_t)data[0], (ucs2_t)data[1],
+				jisx0213_pairencmap, JISX0213_ENCPAIRS);
+		if (coded == DBCINV) {
+			*length = 1;
+			coded = find_pairencmap((ucs2_t)data[0], 0,
+				  jisx0213_pairencmap, JISX0213_ENCPAIRS);
+			if (coded == DBCINV)
+				return MAP_UNMAPPABLE;
+		}
+		else
+			return coded;
+	case -1: /* flush unterminated */
+		*length = 1;
+		coded = find_pairencmap((ucs2_t)data[0], 0,
+				jisx0213_pairencmap, JISX0213_ENCPAIRS);
+		if (coded == DBCINV)
+			return MAP_UNMAPPABLE;
+		else
+			return coded;
+	default:
+		return MAP_UNMAPPABLE;
+	}
+}
+
+static DBCHAR
+jisx0213_1_encoder(const ucs4_t *data, int *length)
+{
+	DBCHAR coded = jisx0213_encoder(data, length);
+	if (coded == MAP_UNMAPPABLE || coded == MAP_MULTIPLE_AVAIL)
+		return coded;
+	else if (coded & 0x8000)
+		return MAP_UNMAPPABLE;
+	else
+		return coded;
+}
+
+static DBCHAR
+jisx0213_2_encoder(const ucs4_t *data, int *length)
+{
+	DBCHAR coded = jisx0213_encoder(data, length);
+	if (coded == MAP_UNMAPPABLE || coded == MAP_MULTIPLE_AVAIL)
+		return coded;
+	else if (coded & 0x8000)
+		return coded;
+	else
+		return MAP_UNMAPPABLE;
 }
 
 static ucs4_t
@@ -639,7 +805,7 @@ jisx0201_r_decoder(const unsigned char *data)
 }
 
 static DBCHAR
-jisx0201_r_encoder(const ucs4_t *data, int length)
+jisx0201_r_encoder(const ucs4_t *data, int *length)
 {
 	DBCHAR coded;
 	JISX0201_R_ENCODE(*data, coded)
@@ -657,7 +823,7 @@ jisx0201_k_decoder(const unsigned char *data)
 }
 
 static DBCHAR
-jisx0201_k_encoder(const ucs4_t *data, int length)
+jisx0201_k_encoder(const ucs4_t *data, int *length)
 {
 	DBCHAR coded;
 	JISX0201_K_ENCODE(*data, coded)
@@ -689,10 +855,10 @@ gb2312_decoder(const unsigned char *data)
 }
 
 static DBCHAR
-gb2312_encoder(const ucs4_t *data, int length)
+gb2312_encoder(const ucs4_t *data, int *length)
 {
 	DBCHAR coded;
-	assert(length == 1);
+	assert(*length == 1);
 	TRYMAP_ENC(gbcommon, coded, *data) {
 		if (!(coded & 0x8000))
 			return coded;
@@ -707,7 +873,7 @@ dummy_decoder(const unsigned char *data)
 }
 
 static DBCHAR
-dummy_encoder(const ucs4_t *data, int length)
+dummy_encoder(const ucs4_t *data, int *length)
 {
 	return MAP_UNMAPPABLE;
 }
@@ -732,6 +898,12 @@ dummy_encoder(const ucs4_t *data, int length)
 #define REGISTRY_JISX0212	{ CHARSET_JISX0212, 0, 2,		\
 				  jisx0212_init,			\
 				  jisx0212_decoder, jisx0212_encoder }
+#define REGISTRY_JISX0213_1	{ CHARSET_JISX0213_1, 0, 2,		\
+				  jisx0213_init,			\
+				  jisx0213_1_decoder, jisx0213_1_encoder }
+#define REGISTRY_JISX0213_2	{ CHARSET_JISX0213_2, 0, 2,		\
+				  jisx0213_init,			\
+				  jisx0213_2_decoder, jisx0213_2_encoder }
 #define REGISTRY_GB2312		{ CHARSET_GB2312, 1, 2,			\
 				  gb2312_init,				\
 				  gb2312_decoder, gb2312_encoder }
@@ -765,6 +937,12 @@ static const struct iso2022_config iso2022_jp_2_config = {
 	  REGISTRY_ISO8859_1, REGISTRY_ISO8859_7, REGISTRY_SENTINEL },
 };
 
+static const struct iso2022_config iso2022_jp_3_config = {
+	NO_SHIFT | USE_JISX0208_EXT,
+	{ REGISTRY_JISX0208, REGISTRY_JISX0213_1, REGISTRY_JISX0213_2,
+	  REGISTRY_SENTINEL },
+};
+
 static const struct iso2022_config iso2022_jp_ext_config = {
 	NO_SHIFT | USE_JISX0208_EXT,
 	{ REGISTRY_JISX0208, REGISTRY_JISX0212, REGISTRY_JISX0201_R,
@@ -787,6 +965,7 @@ BEGIN_CODECS_LIST
   ISO2022_CODEC(jp)
   ISO2022_CODEC(jp_1)
   ISO2022_CODEC(jp_2)
+  ISO2022_CODEC(jp_3)
   ISO2022_CODEC(jp_ext)
 END_CODECS_LIST
 
