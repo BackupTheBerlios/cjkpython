@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_japanese.py,v 1.5 2004/06/29 05:36:02 perky Exp $
+# $Id: genmap_japanese.py,v 1.6 2004/07/06 17:05:24 perky Exp $
 #
 
 from genmap_support import *
@@ -284,7 +284,7 @@ print_decmap(omap, filler, "jisx0213_pair",
 print "Generating JIS X 0213 unicode-pair encode map..."
 jisx0213pairencmap.sort()
 print >> omap, "#define JISX0213_ENCPAIRS   %d" % len(jisx0213pairencmap)
-print >> omap, "struct pair_encodemap jisx0213_pair_encmap" \
+print >> omap, "static const struct pair_encodemap jisx0213_pair_encmap" \
                "[JISX0213_ENCPAIRS] = {"
 for body, modifier, jis in jisx0213pairencmap:
     print >> omap, "    { 0x%04x%04x, 0x%04x }," % (body, modifier, jis)

@@ -1,5 +1,5 @@
 /*
- * $Id: map_jisx0213_pairs.h,v 1.3 2004/06/29 05:55:08 perky Exp $
+ * $Id: map_jisx0213_pairs.h,v 1.4 2004/07/06 17:05:24 perky Exp $
  */
 
 static const ucs4_t __jisx0213_pair_decmap[49] = {
@@ -41,7 +41,7 @@ static const struct widedbcs_index jisx0213_pair_decmap[256] = {
 };
 
 #define JISX0213_ENCPAIRS   46
-struct pair_encodemap jisx0213_pair_encmap[JISX0213_ENCPAIRS] = {
+static const struct pair_encodemap jisx0213_pair_encmap[JISX0213_ENCPAIRS] = {
     { 0x00e60000, 0x295c },
     { 0x00e60300, 0x2b44 },
     { 0x02540000, 0x2b38 },

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkcodecs.h,v 1.4 2004/07/06 17:00:18 perky Exp $
+ * $Id: cjkcodecs.h,v 1.5 2004/07/06 17:05:24 perky Exp $
  */
 
 #ifndef _CJKCODECS_H_
@@ -343,7 +343,7 @@ register_maps(PyObject *module)
 #ifdef USING_BINARY_PAIR_SEARCH
 static DBCHAR
 find_pairencmap(ucs2_t body, ucs2_t modifier,
-		struct pair_encodemap *haystack, int haystacksize)
+		const struct pair_encodemap *haystack, int haystacksize)
 {
 	int pos, min, max;
 	ucs4_t value = body << 16 | modifier;
