@@ -1,6 +1,6 @@
 #!/bin/sh
 # extractmain.sh: extract CJKCodecs to merge into mainstream Python
-# $Id: extracttomain.sh,v 1.5 2004/07/18 04:44:27 perky Exp $
+# $Id: extracttomain.sh,v 1.6 2004/07/18 15:22:31 perky Exp $
 
 CJKCODECSROOT=..
 PYTHONROOT=../../python
@@ -38,6 +38,9 @@ sed -e 's,OLD_GETATTR_DEF([^)]*),,g' \
   -e 's,GETATTRO_FUNC([^)]*),PyObject_GenericGetAttr,g' \
   $PYCJKDIR/multibytecodec.c.bak > $PYCJKDIR/multibytecodec.c
 rm -f $PYCJKDIR/multibytecodec.c.bak
+unifdef -DPY_VERSION_HEX=0x02040000 -UNO_ERROR_CALLBACKS -UOLD_STYLE_TYPE \
+  -UNO_METH_O $PYCJKDIR/cjkcodecs.h > $PYCJKDIR/cjkcodecs.h.bak
+mv -f $PYCJKDIR/cjkcodecs.h.bak $PYCJKDIR/cjkcodecs.h
 
 # Copy pure python libraries
 for f in `ls $CJKCODECSROOT/cjkcodecs/*.py |
