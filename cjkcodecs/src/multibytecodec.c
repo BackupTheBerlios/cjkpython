@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.7 2004/06/07 13:36:45 perky Exp $
+ * $Id: multibytecodec.c,v 1.8 2004/06/07 14:05:20 perky Exp $
  */
 
 #include "Python.h"
@@ -523,7 +523,7 @@ MultibyteCodec_Encode(MultibyteCodecObject *self,
 {
     MultibyteCodec_State   state;
     Py_UNICODE  *data;
-    PyObject    *errorcb, *r, *arg, *dob;
+    PyObject    *errorcb, *r, *arg, *ucvt;
     const char  *errors = NULL;
     int          datalen;
 
@@ -531,27 +531,26 @@ MultibyteCodec_Encode(MultibyteCodecObject *self,
                             codeckwarglist, &arg, &errors))
         return NULL;
 
-    if (PyUnicode_Check(arg)) {
-        dob = arg;
-        arg = NULL;
-    } else {
-        arg = dob = PyObject_Unicode(arg);
-        if (dob == NULL)
+    if (PyUnicode_Check(arg))
+        ucvt = NULL;
+    else {
+        arg = ucvt = PyObject_Unicode(arg);
+        if (arg == NULL)
             return NULL;
-        else if (!PyUnicode_Check(dob)) {
+        else if (!PyUnicode_Check(arg)) {
             PyErr_SetString(PyExc_TypeError,
                             "couldn't convert the object to unicode.");
-            Py_DECREF(dob);
+            Py_DECREF(ucvt);
             return NULL;
         }
     }
 
-    data = PyUnicode_AS_UNICODE(dob);
-    datalen = PyUnicode_GET_SIZE(dob);
+    data = PyUnicode_AS_UNICODE(arg);
+    datalen = PyUnicode_GET_SIZE(arg);
 
     errorcb = get_errorcallback(errors);
     if (errorcb == NULL) {
-        Py_XDECREF(arg);
+        Py_XDECREF(ucvt);
         return NULL;
     }
 
@@ -565,14 +564,14 @@ MultibyteCodec_Encode(MultibyteCodecObject *self,
     if (errorcb > ERROR_MAX) {
         Py_DECREF(errorcb);
     }
-    Py_XDECREF(arg);
+    Py_XDECREF(ucvt);
     return make_tuple(r, datalen);
 
 errorexit:
     if (errorcb > ERROR_MAX) {
         Py_DECREF(errorcb);
     }
-    Py_XDECREF(arg);
+    Py_XDECREF(ucvt);
     return NULL;
 }
 
@@ -1000,29 +999,28 @@ static int
 mbstreamwriter_iwrite(MultibyteStreamWriterObject *self,
                       PyObject *unistr)
 {
-    PyObject    *wr, *dob, *r = NULL;
+    PyObject    *wr, *ucvt, *r = NULL;
     Py_UNICODE  *inbuf, *inbuf_end, *data, *inbuf_tmp = NULL;
     int          datalen;
 
-    if (PyUnicode_Check(unistr)) {
-        dob = unistr;
-        unistr = NULL;
-    } else {
-        unistr = dob = PyObject_Unicode(unistr);
-        if (dob == NULL)
+    if (PyUnicode_Check(unistr))
+        ucvt = NULL;
+    else {
+        unistr = ucvt = PyObject_Unicode(unistr);
+        if (unistr == NULL)
             return -1;
-        else if (!PyUnicode_Check(dob)) {
+        else if (!PyUnicode_Check(unistr)) {
             PyErr_SetString(PyExc_TypeError,
                             "couldn't convert the object to unicode.");
-            Py_DECREF(dob);
+            Py_DECREF(ucvt);
             return -1;
         }
     }
 
-    data = PyUnicode_AS_UNICODE(dob);
-    datalen = PyUnicode_GET_SIZE(dob);
+    data = PyUnicode_AS_UNICODE(unistr);
+    datalen = PyUnicode_GET_SIZE(unistr);
     if (datalen == 0) {
-        Py_XDECREF(unistr);
+        Py_XDECREF(ucvt);
         return 0;
     }
 
@@ -1064,14 +1062,14 @@ mbstreamwriter_iwrite(MultibyteStreamWriterObject *self,
         PyMem_Del(inbuf_tmp);
     Py_DECREF(r);
     Py_DECREF(wr);
-    Py_XDECREF(dob);
+    Py_XDECREF(ucvt);
     return 0;
 
 errorexit:
     if (inbuf_tmp != NULL)
         PyMem_Del(inbuf_tmp);
     Py_XDECREF(r);
-    Py_XDECREF(dob);
+    Py_XDECREF(ucvt);
     return -1;
 }
 
