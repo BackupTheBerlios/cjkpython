@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codeccommon.h,v 1.4 2003/12/31 05:46:55 perky Exp $
+ * $Id: codeccommon.h,v 1.5 2004/06/16 05:56:43 perky Exp $
  */
 
 #include "Python.h"
@@ -40,9 +40,9 @@
 #endif
 
 #define ENCMAP(encoding)                                    \
-    const static encode_map *encoding##encmap;
+    static const encode_map *encoding##encmap;
 #define DECMAP(encoding)                                    \
-    const static decode_map *encoding##decmap;
+    static const decode_map *encoding##decmap;
 
 #define ENCODER_INIT(encoding)                              \
     static int encoding##_encode_init(                      \
