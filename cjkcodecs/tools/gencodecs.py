@@ -1,4 +1,4 @@
-# Makefile: maintenance tool set
+# gencodes: generates python-part codecs.
 #
 # Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
 # All rights reserved.
@@ -25,27 +25,27 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: Makefile,v 1.5 2003/12/31 05:46:55 perky Exp $
+# $Id: gencodecs.py,v 1.1 2004/06/18 19:13:24 perky Exp $
 #
 
-GENERIC_ENCODINGS=	gb2312 gbk gb18030 hz \
-			big5 cp950 \
-			cp932 shift_jis euc_jp \
-			iso_2022_jp iso_2022_jp_1 iso_2022_jp_2 \
-			iso_2022_jp_3 iso_2022_jp_ext \
-			euc_jisx0213 shift_jisx0213 \
-			shift_jis_strict euc_jp_strict \
-			cp949 euc_kr johab iso_2022_kr \
-			utf_7 utf_8
+codecs = {
+    'cn': ('gb2312', 'gbk', 'gb18030', 'hz'),
+    'tw': ('big5', 'cp950'),
+    'jp': ('cp932', 'shift_jis', 'euc_jp', 'iso_2022_jp', 'iso_2022_jp_1',
+           'iso_2022_jp_2', 'iso_2022_jp_3', 'iso_2022_jp_ext',
+           'euc_jisx0213', 'shift_jisx0213'),
+    'kr': ('cp949', 'euc_kr', 'johab', 'iso_2022_kr'),
+    'unicode': ('utf_7', 'utf_8'),
+}
+TEMPLATE = 'xxcodec.py.in'
 
-all:
-	for cset in ${GENERIC_ENCODINGS}; do \
-		CSET=`echo $$cset|tr "[:lower:]" "[:upper:]"`; \
-		if [ ! -f $$cset.py ]; then \
-		sed -e "s/%%ENCODING%%/$$CSET/g" \
-		-e "s/%%encoding%%/$$cset/g" \
-		-e "s/%%__%%/ACHTUNG: This file is generated automatically.\
-		Please do not edit./g" xxcodec.py.in \
-			> $$cset.py; \
-		fi \
-	done
+tmpl = open(TEMPLATE).read()
+for loc, encodings in codecs.iteritems():
+    for enc in encodings:
+        code = tmpl.replace('%%encoding%%', enc) \
+                .replace('%%ENCODING%%', enc.upper()) \
+                .replace('%%locality%%', loc) \
+                .replace('%%__%%',
+                    'ACHTUNG: This file is generated automatically. '
+                    'Please do not edit.')
+        open(enc + '.py', 'w').write(code)

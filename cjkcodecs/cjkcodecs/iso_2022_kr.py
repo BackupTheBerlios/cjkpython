@@ -27,11 +27,13 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: iso_2022_kr.py,v 1.3 2004/01/17 11:26:10 perky Exp $
+# $Id: iso_2022_kr.py,v 1.4 2004/06/18 19:13:24 perky Exp $
 #
 
-from cjkcodecs._codecs_iso_2022_kr import codec
+from cjkcodecs import _codecs_kr
 import codecs
+
+codec = _codecs_kr.getcodec('iso_2022_kr')
 
 class Codec(codecs.Codec):
     encode = codec.encode
@@ -57,4 +59,4 @@ class StreamWriter(Codec, codecs.StreamWriter):
 def getregentry():
     return (Codec().encode,Codec().decode,StreamReader,StreamWriter)
 
-# ex: ts=8 sts=4 et
+# ex: ts=8 sts=4 sw=4 et
