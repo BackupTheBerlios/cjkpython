@@ -1,7 +1,7 @@
 Changes with CJKCodecs 1.0.3
 
   *) JIS X 0208 21-40 is now mapped to 0xFF3C FULL-WIDTH REVERSE SOLIDUS
-     on iso-2022-jp* codecs. [IKEDA Soji]
+     on ISO-2022-JP* codecs. [IKEDA Soji]
 
   *) Fixed ISO-2022 decoder's behavior that didn't understand JIS X
      0208:1978. [IKEDA Soji]
@@ -13,6 +13,10 @@ Changes with CJKCodecs 1.0.3
      which is usually undesired by Japanese users. [IKEDA Soji]
 
   *) ISO-2022 codecs now raise decode error for bytes set MSB. [IKEDA Soji]
+
+  *) ISO-2022-JP* codecs now supports designation for JIS X 0208:1997 (ESC
+     & @ ESC $ B). While this isn't seen on RFCs, it's still worth to meet
+     Japanese domestic standards. [IKEDA Soji]
 
 
 Changes with CJKCodecs 1.0.2

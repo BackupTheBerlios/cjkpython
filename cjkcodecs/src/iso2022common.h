@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022common.h,v 1.5 2003/12/30 04:04:47 perky Exp $
+ * $Id: iso2022common.h,v 1.6 2003/12/30 05:15:28 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
@@ -40,7 +40,7 @@
 
 #define IS_ESCEND(c)        (((c) >= 'A' && (c) <= 'Z') || (c) == '@')
 #define IS_ISO2022ESC(c2)   ((c2) == '(' || (c2) == ')' || (c2) == '$' || \
-                             (c2) == '.')
+                             (c2) == '.' || (c2) == '&')
         /* this is not a full list of ISO-2022 escape sequence headers.
          * but, it's enough to implement CJK instances of iso-2022. */
 
@@ -216,6 +216,10 @@ iso2022processesc(MultibyteCodec_State *state,
             esclen = i + 1;
             break;
         }
+#ifdef ISO2022_USE_JISX0208EXT
+        else if (i+1 < *inleft && (*inbuf)[i] == '&' && (*inbuf)[i+1] == '@')
+            i += 2;
+#endif
     }
 
     if (i >= MAX_ESCSEQLEN)
@@ -245,6 +249,15 @@ iso2022processesc(MultibyteCodec_State *state,
         else if (IN3 == ')') designation = 1;
         else return 4;
         break;
+#ifdef ISO2022_USE_JISX0208EXT
+    case 6: /* designation with prefix */
+        if ((*inbuf)[3] == ESC && (*inbuf)[4] == '$' && (*inbuf)[5] == 'B') {
+            charset = 'B' | CHARSET_DOUBLEBYTE;
+            designation = 0;
+        } else
+            return 6;
+        break;
+#endif
     default:
         return esclen;
     }

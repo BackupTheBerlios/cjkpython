@@ -26,12 +26,13 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp.c,v 1.4 2003/12/30 04:04:47 perky Exp $
+ * $Id: _iso_2022_jp.c,v 1.5 2003/12/30 05:15:28 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
         CHARSET_ASCII, CHARSET_JISX0201_R, CHARSET_JISX0208, CHARSET_JISX0208_O
 #define ISO2022_NO_SHIFT
+#define ISO2022_USE_JISX0208EXT
 
 #include "codeccommon.h"
 #include "iso2022common.h"

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp_2.c,v 1.5 2003/12/30 04:04:47 perky Exp $
+ * $Id: _iso_2022_jp_2.c,v 1.6 2003/12/30 05:15:28 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
@@ -35,6 +35,7 @@
         CHARSET_KSX1001, CHARSET_JISX0212, \
         CHARSET_ISO8859_1, CHARSET_ISO8859_7
 #define ISO2022_USE_G2_DESIGNATION  yo!
+#define ISO2022_USE_JISX0208EXT
 
 #include "codeccommon.h"
 #include "iso2022common.h"
