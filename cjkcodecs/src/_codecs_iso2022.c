@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.22 2004/08/19 17:08:13 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.23 2004/08/21 01:04:05 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -228,7 +228,8 @@ ENCODER(iso2022)
 				} else
 					encoded = dsg->encoder(&c, &length);
 #else
-				encoded = dsg->encoder(*inbuf, &length);
+				encoded = dsg->encoder((const ucs2_t *)*inbuf,
+							&length);
 #endif
 				if (encoded != MAP_UNMAPPABLE) {
 					insize = length;
