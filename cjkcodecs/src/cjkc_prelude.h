@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_prelude.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: cjkc_prelude.h,v 1.2 2004/06/20 18:42:09 perky Exp $
  */
 
 #ifndef _CJKC_PRELUDE_H_
@@ -64,6 +64,11 @@ struct unim_index {
 	unsigned char bottom, top;
 };
 typedef struct unim_index encode_map;
+
+struct unim_index_bytebased {
+	const unsigned char *map;
+	unsigned char bottom, top;
+};
 
 struct dbcs_map {
 	const char *charset;

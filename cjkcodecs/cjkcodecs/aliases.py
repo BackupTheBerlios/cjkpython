@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.7 2004/06/19 06:14:25 perky Exp $
+# $Id: aliases.py,v 1.8 2004/06/20 18:42:09 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -82,6 +82,12 @@ aliases.update({
     'ks_c_5601_1987'     : 'cjkcodecs.euc_kr',
     'ksx1001'            : 'cjkcodecs.euc_kr',
     'ks_x_1001'          : 'cjkcodecs.euc_kr',
+
+    # euc_tw codec
+    'cns11643'           : 'cjkcodecs.euc_tw',
+    'cseuctw'            : 'cjkcodecs.euc_tw',
+    'euctw'              : 'cjkcodecs.euc_tw',
+    'euc_tw'             : 'cjkcodecs.euc_tw',
 
     # gb18030 codec
     'gb18030'            : 'cjkcodecs.gb18030',

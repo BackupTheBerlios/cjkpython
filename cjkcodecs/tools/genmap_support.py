@@ -26,14 +26,14 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_support.py,v 1.4 2004/06/19 06:11:46 perky Exp $
+# $Id: genmap_support.py,v 1.5 2004/06/20 18:42:09 perky Exp $
 #
 
 import re
 
 COPYRIGHT_HEADER = """\
 /*
- * $Id: genmap_support.py,v 1.4 2004/06/19 06:11:46 perky Exp $
+ * $Id: genmap_support.py,v 1.5 2004/06/20 18:42:09 perky Exp $
  */
 """
 
@@ -67,9 +67,91 @@ class BufferedFiller:
     def __len__(self):
         return self.count
 
+class UCMReader:
+    def __init__(self, fp):
+        self.file = fp
+    def itertokens(self):
+        isincharmap = False
+        for line in self.file:
+            body = line.split('#', 1)[0].strip()
+            if body == 'CHARMAP':
+                isincharmap = True
+            elif body == 'END CHARMAP':
+                isincharmap = False
+            elif isincharmap:
+                index, data = body.split(None, 1)
+                index = int(index[2:-1], 16)
+                data = self.parsedata(data)
+                yield index, data
+    def parsedata(self, data):
+        return eval('"'+data.split()[0]+'"')
+
 def printcopyright(fo):
     print >> fo, COPYRIGHT_HEADER
 
+class EncodeMapWriter:
+    filler_class = BufferedFiller
+    elemtype = 'DBCHAR'
+    indextype = 'struct unim_index'
+    def __init__(self, fp, prefix, map):
+        self.file = fp
+        self.prefix = prefix
+        self.filler = self.filler_class()
+        self.buildmap(map)
+        self.printmap(map)
+    def buildmap(self, emap):
+        for c1 in range(0, 256):
+            if c1 not in emap:
+                continue
+            c2map = emap[c1]
+            rc2values = c2map.keys()
+            rc2values.sort()
+            if not rc2values:
+                continue
+
+            c2map[self.prefix] = True
+            c2map['min'] = rc2values[0]
+            c2map['max'] = rc2values[-1]
+            c2map['midx'] = len(self.filler)
+
+            for v in range(rc2values[0], rc2values[-1] + 1):
+                if v not in c2map:
+                    self.write_nochar()
+                elif isinstance(c2map[v], int):
+                    self.write_char(c2map[v])
+                elif isinstance(c2map[v], tuple):
+                    self.write_multic(c2map[v])
+                else:
+                    raise ValueError
+    def write_nochar(self):
+        self.filler.write('N,')
+    def write_multic(self, point):
+        self.filler.write('M,')
+    def write_char(self, point):
+        self.filler.write(str(point) + ',')
+    def printmap(self, fmap):
+        print >> self.file, ("static const %s __%s_encmap[%d] = {" % (
+                             self.elemtype, self.prefix, len(self.filler)))
+        self.filler.printout(self.file)
+        print >> self.file, "};"
+        print >> self.file
+
+        print >> self.file, "static const %s %s_encmap[256] = {" % (
+                                self.indextype, self.prefix)
+        for i in range(256):
+            if i in fmap and self.prefix in fmap[i]:
+                self.filler.write("{", "__%s_encmap" % self.prefix, "+",
+                                  "%d" % fmap[i]['midx'], ",",
+                                  "%d," % fmap[i]['min'],
+                                  "%d," % fmap[i]['max'], "},")
+            else:
+                self.filler.write("{", "0,", "0,", "0", "},")
+                continue
+        self.filler.printout(self.file)
+        print >> self.file, "};"
+        print >> self.file
+
+# XXX: convert all usages of this function to EncodeMapWriter
 def genmap_encode(filler, prefix, emap):
     for c1 in range(0, 256):
         if not emap.has_key(c1):

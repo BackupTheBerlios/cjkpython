@@ -25,12 +25,12 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: gencodecs.py,v 1.1 2004/06/18 19:13:24 perky Exp $
+# $Id: gencodecs.py,v 1.2 2004/06/20 18:42:09 perky Exp $
 #
 
 codecs = {
     'cn': ('gb2312', 'gbk', 'gb18030', 'hz'),
-    'tw': ('big5', 'cp950'),
+    'tw': ('big5', 'cp950', 'euc_tw'),
     'jp': ('cp932', 'shift_jis', 'euc_jp', 'iso_2022_jp', 'iso_2022_jp_1',
            'iso_2022_jp_2', 'iso_2022_jp_3', 'iso_2022_jp_ext',
            'euc_jisx0213', 'shift_jisx0213'),

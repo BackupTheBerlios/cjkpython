@@ -26,9 +26,10 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_tchinese.py,v 1.4 2004/06/19 06:11:46 perky Exp $
+# $Id: genmap_tchinese.py,v 1.5 2004/06/20 18:42:09 perky Exp $
 #
 
+import sys
 from genmap_support import *
 
 BIG5_C1     = (0xa1, 0xfe)
@@ -37,6 +38,8 @@ BIG5_C2     = (0x40, 0xfe)
 # that for forward compatiblilty. "Hey! we have the euro-big5!" :)
 CP950_C1    = BIG5_C1
 CP950_C2    = BIG5_C2
+CNS11643_C1 = (0x21, 0x7e)
+CNS11643_C2 = (0x21, 0x7e)
 
 try:
     big5map = open('BIG5.TXT')
@@ -51,9 +54,45 @@ except IOError:
           "org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP950.TXT"
     raise SystemExit
 
+try:
+    cns11643map = open("cns-11643-1992.ucm")
+except IOError:
+    print "=>> Please download mapping table from http://oss.software." \
+          "ibm.com/cvs/icu/~checkout~/icu/source/data/mappings/cns-11643" \
+          "-1992.ucm"
+    raise SystemExit
+
+class CNS11643MapReader(UCMReader):
+    def parsedata(self, data):
+        d = UCMReader.parsedata(self, data)
+        return ord(d[0]) - 0x80, (ord(d[1]) << 8) + ord(d[2])
+    def readmap(self):
+        print "Loading UCM mapping from ", self.file
+        decmaps = [{} for i in range(8)] # 0(placeholder) 1-7
+        encmap_bmp = {}
+        encmap_nonbmp = {}
+        for i, (plane, code) in self.itertokens():
+            if code & 0x8000: raise ValueError
+            if i < 0x10000:
+                c1i = code >> 8
+                encmap = encmap_bmp
+            elif 0x20000 <= i < 0x30000:
+                c1i = (code >> 8) | 0x80
+                i &= 0xffff
+                encmap = encmap_nonbmp
+            else:
+                raise ValueError, i
+            decmaps[plane].setdefault(c1i, {})
+            decmaps[plane][c1i][code & 0xff] = i
+            encmap.setdefault(i >> 8, {})
+            encmap[i >> 8][i & 0xff] = (plane, code)
+        return decmaps, encmap_bmp, encmap_nonbmp
+
 print "Loading Mapping File..."
 cp950decmap = loadmap(cp950map)
 big5decmap = loadmap(big5map)
+cns11643decmaps, cns11643encmap_bmp, cns11643encmap_nonbmp = \
+    CNS11643MapReader(cns11643map).readmap()
 
 # big5 mapping fix (see doc/NOTES.big5)
 for m in """\
@@ -123,5 +162,38 @@ print "Generating CP950 extension encode map..."
 filler = BufferedFiller()
 genmap_encode(filler, "cp950ext", cp950encmap)
 print_encmap(omap, filler, "cp950ext", cp950encmap)
+
+omap = open('map_cns11643.h', 'w')
+printcopyright(omap)
+for plane in range(1, 8):
+    print "Generating CNS11643 plane %d decode map..." % plane
+    charset = "cns11643_%d" % plane
+    filler = BufferedFiller()
+    genmap_decode(filler, charset, CNS11643_C1, CNS11643_C2,
+                  cns11643decmaps[plane])
+    genmap_decode(filler, charset, [x | 0x80 for x in CNS11643_C1],
+                  CNS11643_C2, cns11643decmaps[plane])
+    print_decmap(omap, filler, charset, cns11643decmaps[plane])
+
+class CNS11643EncodeMapWriter(EncodeMapWriter):
+    elemtype = 'unsigned char'
+    indextype = 'struct unim_index_bytebased'
+    def write_nochar(self):
+        self.filler.write('0,', '0,', '0,')
+    def write_char(self, point):
+        raise ValueError
+    def write_multic(self, point):
+        self.filler.write('%d,' % point[0], '%d,' % (point[1] >> 8),
+                          '%d,' % (point[1] & 0xff))
+
+print "Generating CNS11643 encode map (BMP)..."
+CNS11643EncodeMapWriter(omap, 'cns11643_bmp', cns11643encmap_bmp)
+print "Generating CNS11643 encode map (non-BMP)..."
+CNS11643EncodeMapWriter(omap, 'cns11643_nonbmp', cns11643encmap_nonbmp)
+print >> omap, "static const struct dbcs_index *cns11643_decmap[] = {"
+print >> omap, "NULL,"
+print >> omap, "\n".join(["cns11643_%d_decmap," % plane
+                        for plane in range(1, 8)])
+print >> omap, "};"
 
 print "\nDone!"

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_interlude.h,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: cjkc_interlude.h,v 1.2 2004/06/20 18:42:09 perky Exp $
  */
 
 #ifndef _CJKC_INTERLUDE_H_
@@ -141,6 +141,18 @@
 	    (m)->bottom]) != UNIINV)
 #define TRYMAP_DEC(charset, assi, c1, c2)			\
 	_TRYMAP_DEC(&charset##_decmap[c1], assi, c2)
+
+#define _TRYMAP_ENC_MPLANE(m, assplane, asshi, asslo, val)	\
+	if ((m)->map != NULL && (val) >= (m)->bottom &&		\
+	    (val)<= (m)->top &&					\
+	    ((assplane) = (m)->map[((val) - (m)->bottom)*3]) != 0 && \
+	    (((asshi) = (m)->map[((val) - (m)->bottom)*3 + 1]), 1) && \
+	    (((asslo) = (m)->map[((val) - (m)->bottom)*3 + 2]), 1))
+#define TRYMAP_ENC_MPLANE(charset, assplane, asshi, asslo, uni)	\
+	_TRYMAP_ENC_MPLANE(&charset##_encmap[(uni) >> 8], \
+			   assplane, asshi, asslo, (uni) & 0xff)
+#define TRYMAP_DEC_MPLANE(charset, assi, plane, c1, c2)		\
+	_TRYMAP_DEC(&charset##_decmap[plane][c1], assi, c2)
 
 #if Py_UNICODE_SIZE == 2
 #define DECODE_SURROGATE(c)					\

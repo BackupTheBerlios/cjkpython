@@ -26,25 +26,38 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_tw.c,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: _codecs_tw.c,v 1.2 2004/06/20 18:42:09 perky Exp $
  */
 
 #include "cjkc_prelude.h"
 #include "maps/map_big5.h"
 #include "maps/map_cp950ext.h"
+#include "maps/map_cns11643.h"
 
 #include "cjkc_interlude.h"
 #include "codecimpl_big5.h"
 #include "codecimpl_cp950.h"
+#include "codecimpl_euc_tw.h"
 
 BEGIN_MAPPING_LIST
   MAPPING_ENCDEC(big5)
   MAPPING_ENCDEC(cp950ext)
+  /* these are non-regular tables and not used by external codecs yet.
+  MAPPING_ENCONLY(cns11643_bmp)
+  MAPPING_ENCONLY(cns11643_nonbmp)*/
+  MAPPING_DECONLY(cns11643_1)
+  MAPPING_DECONLY(cns11643_2)
+  MAPPING_DECONLY(cns11643_3)
+  MAPPING_DECONLY(cns11643_4)
+  MAPPING_DECONLY(cns11643_5)
+  MAPPING_DECONLY(cns11643_6)
+  MAPPING_DECONLY(cns11643_7)
 END_MAPPING_LIST
 
 BEGIN_CODEC_LIST
   CODEC_STATELESS(big5)
   CODEC_STATELESS(cp950)
+  CODEC_STATELESS(euc_tw)
 END_CODEC_LIST
 
 #include "cjkc_postlude.h"
