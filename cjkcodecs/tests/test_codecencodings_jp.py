@@ -3,7 +3,7 @@
 # test_codecencodings_jp.py
 #   Codec encoding tests for Japanese encodings.
 #
-# $Id: test_codecencodings_jp.py,v 1.1 2003/12/19 03:00:06 perky Exp $
+# $Id: test_codecencodings_jp.py,v 1.2 2004/01/06 09:25:37 perky Exp $
 
 from test import test_support
 import test_multibytecodec_support
@@ -122,9 +122,10 @@ def test_main():
     suite.addTest(unittest.makeSuite(Test_CP932))
     suite.addTest(unittest.makeSuite(Test_EUC_JISX0213))
     suite.addTest(unittest.makeSuite(Test_EUC_JP_COMPAT))
-    suite.addTest(unittest.makeSuite(Test_EUC_JP_STRICT))
     suite.addTest(unittest.makeSuite(Test_SJIS_COMPAT))
-    suite.addTest(unittest.makeSuite(Test_SJIS_STRICT))
+    if test_multibytecodec_support.__cjkcodecs__:
+        suite.addTest(unittest.makeSuite(Test_EUC_JP_STRICT))
+        suite.addTest(unittest.makeSuite(Test_SJIS_STRICT))
     suite.addTest(unittest.makeSuite(Test_SJISX0213))
     test_support.run_suite(suite)
 
