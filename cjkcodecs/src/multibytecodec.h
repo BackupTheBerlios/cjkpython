@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.h,v 1.6 2004/06/26 16:50:44 perky Exp $
+ * $Id: multibytecodec.h,v 1.7 2004/06/27 10:39:28 perky Exp $
  */
 
 #ifndef _PYTHON_MULTIBYTECODEC_H_
@@ -55,23 +55,28 @@ typedef union {
 	ucs4_t u4[2];
 } MultibyteCodec_State;
 
-typedef int (*mbcodec_init)(void *config);
-typedef int (*mbencode_func)(MultibyteCodec_State *state, void *config,
+typedef int (*mbcodec_init)(const void *config);
+typedef int (*mbencode_func)(MultibyteCodec_State *state, const void *config,
 			     const Py_UNICODE **inbuf, size_t inleft,
 			     unsigned char **outbuf, size_t outleft,
 			     int flags);
-typedef int (*mbencodeinit_func)(MultibyteCodec_State *state, void *config);
-typedef int (*mbencodereset_func)(MultibyteCodec_State *state, void *config,
+typedef int (*mbencodeinit_func)(MultibyteCodec_State *state,
+				 const void *config);
+typedef int (*mbencodereset_func)(MultibyteCodec_State *state,
+				  const void *config,
 				  unsigned char **outbuf, size_t outleft);
-typedef int (*mbdecode_func)(MultibyteCodec_State *state, void *config,
+typedef int (*mbdecode_func)(MultibyteCodec_State *state,
+			     const void *config,
 			     const unsigned char **inbuf, size_t inleft,
 			     Py_UNICODE **outbuf, size_t outleft);
-typedef int (*mbdecodeinit_func)(MultibyteCodec_State *state, void *config);
-typedef int (*mbdecodereset_func)(MultibyteCodec_State *state, void *config);
+typedef int (*mbdecodeinit_func)(MultibyteCodec_State *state,
+				 const void *config);
+typedef int (*mbdecodereset_func)(MultibyteCodec_State *state,
+				  const void *config);
 
 typedef struct {
 	const char *encoding;
-	void *config;
+	const void *config;
 	mbcodec_init codecinit;
 	mbencode_func encode;
 	mbencodeinit_func encinit;

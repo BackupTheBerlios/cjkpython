@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_kr.c,v 1.1 2004/06/17 18:31:20 perky Exp $
+ * $Id: _codecs_kr.c,v 1.2 2004/06/27 10:39:28 perky Exp $
  */
 
 #include "cjkc_prelude.h"
@@ -37,7 +37,6 @@
 #include "cjkc_interlude.h"
 #include "codecimpl_euc_kr.h"
 #include "codecimpl_cp949.h"
-#include "codecimpl_iso_2022_kr.h"
 #include "codecimpl_johab.h"
 
 BEGIN_MAPPING_LIST
@@ -49,7 +48,6 @@ END_MAPPING_LIST
 BEGIN_CODEC_LIST
   CODEC_STATELESS(euc_kr)
   CODEC_STATELESS(cp949)
-  CODEC_STATEFUL(iso_2022_kr)
   CODEC_STATELESS(johab)
 END_CODEC_LIST
 

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkc_interlude.h,v 1.4 2004/06/26 16:50:44 perky Exp $
+ * $Id: cjkc_interlude.h,v 1.5 2004/06/27 10:39:28 perky Exp $
  */
 
 #ifndef _CJKC_INTERLUDE_H_
@@ -37,30 +37,33 @@
 #undef M
 #undef D
 
+#define CODEC_INIT(encoding)						\
+	static int encoding##_codec_init(const void *config)
+
 #define ENCODER_INIT(encoding)						\
 	static int encoding##_encode_init(				\
-		MultibyteCodec_State *state, void *config)
+		MultibyteCodec_State *state, const void *config)
 #define ENCODER(encoding)						\
 	static int encoding##_encode(					\
-		MultibyteCodec_State *state, void *config,		\
+		MultibyteCodec_State *state, const void *config,	\
 		const Py_UNICODE **inbuf, size_t inleft,		\
 		unsigned char **outbuf, size_t outleft, int flags)
 #define ENCODER_RESET(encoding)						\
 	static int encoding##_encode_reset(				\
-		MultibyteCodec_State *state, void *config,		\
+		MultibyteCodec_State *state, const void *config,	\
 		unsigned char **outbuf, size_t outleft)
 
 #define DECODER_INIT(encoding)						\
 	static int encoding##_decode_init(				\
-		MultibyteCodec_State *state, void *config)
+		MultibyteCodec_State *state, const void *config)
 #define DECODER(encoding)						\
 	static int encoding##_decode(					\
-		MultibyteCodec_State *state, void *config,		\
+		MultibyteCodec_State *state, const void *config,	\
 		const unsigned char **inbuf, size_t inleft,		\
 		Py_UNICODE **outbuf, size_t outleft)
 #define DECODER_RESET(encoding)						\
 	static int encoding##_decode_reset(				\
-		MultibyteCodec_State *state, void *config)
+		MultibyteCodec_State *state, const void *config)
 
 #if Py_UNICODE_SIZE == 4
 #define UCS4INVALID(code)	\

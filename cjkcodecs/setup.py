@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.16 2004/06/20 18:55:36 perky Exp $
+# $Id: setup.py,v 1.17 2004/06/27 10:39:28 perky Exp $
 #
 
 import os
@@ -39,7 +39,7 @@ SRCDIR = 'src'
 LIBDIRS = []
 extensions = []
 macros = []
-locales = ['kr', 'jp', 'cn', 'tw', 'unicode']
+locales = ['kr', 'jp', 'cn', 'tw', 'iso2022', 'unicode']
 
 for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
     args = arg.split('=', 1)
@@ -51,6 +51,8 @@ for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
         locales.remove('cn')
     elif args[0] == '--disable-traditional-chinese':
         locales.remove('tw')
+    elif args[0] == '--disable-iso2022':
+        locales.remove('iso2022')
     elif args[0] == '--disable-utf':
         locales.remove('unicode')
     elif args[0] == '--disable-extra-encodings':
@@ -62,6 +64,7 @@ Language options:
   --disable-korean                  don't install Korean codecs
   --disable-simplified-chinese      don't install Simplified Chinese codecs
   --disable-traditional-chinese     don't install Traditional Chinese codecs
+  --disable-iso2022                 don't install ISO-2022 codecs
   --disable-utf                     don't install UTF codecs
   --disable-extra-encodings         disable building extra-expensive encodings:
                                         euc-tw iso-2022-cn iso-2022-ext
