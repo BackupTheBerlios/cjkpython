@@ -1,3 +1,6 @@
+Changes with CJKCodecs 1.0.3
+
+
 Changes with CJKCodecs 1.0.2
 
   *) Fixed unfriendly behavior that str.encode encodes from in-memory
