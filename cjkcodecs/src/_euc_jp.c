@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _euc_jp.c,v 1.1 2003/09/24 17:44:46 perky Exp $
+ * $Id: _euc_jp.c,v 1.2 2003/11/27 19:01:29 perky Exp $
  */
 
 #include "codeccommon.h"
@@ -67,8 +67,20 @@ ENCODER(euc_jp)
                          (Py_UNICODE)(c - 0xe3ac) % 94 + 0xa1)
             NEXT(1, 3)
             continue;
-        } else if (c == 0xff3c) /* F/W REVERSE SOLIDUS (see NOTES.euc-jp) */
+        }
+#ifndef STRICT_BUILD
+        else if (c == 0xff3c) /* FULL-WIDTH REVERSE SOLIDUS */
             code = 0x2140;
+        else if (c == 0xa5) { /* YEN SIGN */
+            WRITE1(0x5c);
+            NEXT(1, 1)
+            continue;
+        } else if (c == 0x203e) { /* OVERLINE */
+            WRITE1(0x7e);
+            NEXT(1, 1)
+            continue;
+        }
+#endif
         else
             return 1;
 
@@ -134,8 +146,12 @@ DECODER(euc_jp)
             c2 = IN2;
             if (c < 0xf5) {
                 /* JIS X 0208 */
-                if (c == 0xa1 && c2 == 0xc0) **outbuf = 0xff3c;
-                else TRYMAP_DEC(jisx0208, **outbuf, c ^ 0x80, c2 ^ 0x80);
+#ifndef STRICT_BUILD
+                if (c == 0xa1 && c2 == 0xc0) /* FULL-WIDTH REVERSE SOLIDUS */
+                    **outbuf = 0xff3c;
+                else
+#endif
+                TRYMAP_DEC(jisx0208, **outbuf, c ^ 0x80, c2 ^ 0x80);
                 else return 2;
             } else {
                 /* User-defined area 1 */

@@ -1,5 +1,7 @@
-euc-jp codec maps JIS X 0208 code 0x2140 into unicode U+FF3C
-instead of U+005C as on unicode.org's mapping. Because
-euc-jp has REVERSE SOLIDUS on 0x5c already and A140 is
-shown as a full width character, mapping to U+FF3C can make
-more sense.
+Euc-jp codec is a compatibility instance on these points:
+ - U+FF3C FULLWIDTH REVERSE SOLIDUS is mapped to EUC-JP A1C0 (vice versa)
+ - U+00A5 YEN SIGN is mapped to EUC-JP 0x5c. (one way)
+ - U+203E OVERLINE is mapped to EUC-JP 0x7e. (one way)
+
+If you need strict standard conformance, there's euc-jp-strict codec
+for you.

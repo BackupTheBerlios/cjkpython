@@ -4,14 +4,18 @@ Changes with CJKCodecs 1.0.2
      represention of unicode object directly. Codecs now decode as default
      encoding before encoding str object.
 
-  *) Strict-flavored codecs are added. While main codecs include several
+  *) "-strict" flavored codecs are added. While main codecs include several
      tweaks to cope with wild compatibility issues, -strict codecs enable
      pedantic people live a standard life.
 
-  *) SHIFT-JIS codec is now compatible with JapaneseCodecs's by default.
+  *) SHIFT-JIS codec is now compatible with JapaneseCodecs' by default.
      - U+005F REVERSE SOLIDUS is mapped to SHIFT-JIS 0x5f.
      - U+007E TILDE is mapped to SHIFT-JIS 0x7e.
      - U+FF3C FULL-WIDTH REVERSE SOLIDUS is mapped to SHIFT-JIS 815f.
+
+  *) EUC-JP codec is now compatible with JapaneseCodecs' by default.
+     - U+00A5 YEN SIGN is mapped to EUC-JP 0x5c. (one way)
+     - U+203E OVERLINE is mapped to EUC-JP 0x7e. (one way)
 
   *) Several aliases are added for compatibility.
      - ISO-2022-JP-1: ISO-2022-JP-EXT
