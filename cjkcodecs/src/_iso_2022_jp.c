@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp.c,v 1.5 2003/12/30 05:15:28 perky Exp $
+ * $Id: _iso_2022_jp.c,v 1.6 2003/12/31 02:44:57 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
@@ -164,8 +164,6 @@ DECODER(iso_2022_jp)
         RESERVE_INBUF(2)
         RESERVE_OUTBUF(1)
         c2 = IN2;
-        if (c2 >= 0x80)
-            return 1;
         if (c == 0x21 && c2 == 0x40) { /* FULL-WIDTH REVERSE SOLIDUS */
             **outbuf = 0xff3c;
             NEXT(2, 1)

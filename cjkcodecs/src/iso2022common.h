@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: iso2022common.h,v 1.6 2003/12/30 05:15:28 perky Exp $
+ * $Id: iso2022common.h,v 1.7 2003/12/31 02:44:57 perky Exp $
  */
 
 /* This ISO-2022 implementation is intended to comply ECMA-43 Level 1
@@ -146,10 +146,8 @@
         NEXT_IN(1)                                                  \
         break;
 #else
-#define SHIFT_CASES                                                 \
-    case SI:                                                        \
-    case SO:                                                        \
-        return 1;
+/* for compatibility with JapaneseCodecs */
+#define SHIFT_CASES
 #endif
 
 #define ISO2022_BASECASES(c1)                                       \
@@ -192,11 +190,13 @@
         switch(c) {                                                 \
         ISO2022_BASECASES(c)                                        \
         default:                                                    \
-            if ((c & 0x7f) < 0x20) { /* C0 and C1 */                \
+            if (c < 0x20) { /* C0 */                                \
                 RESERVE_OUTBUF(1)                                   \
-                OUT1(c & 0x7f)                                      \
+                OUT1(c)                                             \
                 NEXT(1, 1)                                          \
-            } else {
+            } else if (c >= 0x80)                                   \
+                return 1;                                           \
+            else {
 #define ISO2022_LOOP_END                                            \
             }                                                       \
         }                                                           \
