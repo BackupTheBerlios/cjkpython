@@ -1,6 +1,6 @@
 #!/bin/sh
 # extractmain.sh: extract CJKCodecs to merge into mainstream Python
-# $Id: extracttomain.sh,v 1.2 2004/01/06 02:30:38 perky Exp $
+# $Id: extracttomain.sh,v 1.3 2004/01/17 12:51:38 perky Exp $
 
 CJKCODECSROOT=..
 PYTHONROOT=../../python
@@ -20,6 +20,8 @@ for f in $PYCJKDIR/*.*; do
     -e 's,#include "multibytecodec_compat.h",,g' \
     -e 's,iso_2022,iso2022,g' \
     -e 's,\$Id\(.*\)\$,$CJKCodecs\1$,g' $f |
+  python -c 'import re,sys
+print re.compile("(\n\s*)*/\*\s*\n\s*\* ex:[^\n]*\n\s*\*/\s*", re.M).sub("", sys.stdin.read())' |
   awk 'BEGIN { output=1; }
 /Copyright.*Hye-Shik Chang/ { output=0; }
 /\$CJKCodecs/ {
@@ -48,6 +50,7 @@ for f in `ls $CJKCODECSROOT/cjkcodecs/*.py |
     -e 's,\$Id\(.*\)\$,$CJKCodecs\1$,g' \
     -e 's,from cjkcodecs\.,from ,g' \
     -e 's,iso_2022,iso2022,g' $f |
+  grep -v '^# ex:' |
   awk 'BEGIN { output=1; tignore=0; }
 /ACHTUNG/ { tignore=1; }
 /Copyright.*Hye-Shik Chang/ { output=0; }
@@ -71,7 +74,9 @@ for f in $CJKCODECSROOT/tests/test_*.py; do
     -e "s,encoding = 'cjkcodecs\.,encoding = ',g" \
     -e 's,cjkcodecs\.utf-8,utf-8,g' \
     -e 's,cjkcodecs\.gb18030,gb18030,g' \
-    -e 's,iso_2022,iso2022,g' $f > $DESTPATH
+    -e 's,iso_2022,iso2022,g' \
+    -e 's,^import test_,from test import test_,g' $f |
+  grep -v '^# [e]x:' > $DESTPATH
 done
 
 # ex: ts=8 sts=2 sw=2 et
