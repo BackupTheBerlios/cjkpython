@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.19 2004/07/18 04:44:27 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.20 2004/08/07 08:14:09 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -444,7 +444,7 @@ iso2022processg2(const void *config, MultibyteCodec_State *state,
 DECODER(iso2022)
 {
 	const struct iso2022_designation *dsgcache = NULL;
-	
+
 	while (inleft > 0) {
 		unsigned char c = IN1;
 		int err;
