@@ -27,13 +27,16 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.4 2003/11/27 15:15:46 perky Exp $
+# $Id: setup.py,v 1.5 2003/11/27 15:29:43 perky Exp $
 #
 
+import os, shutil
 import sys
 from distutils.core import setup, Extension
 from distutils.command.install import install
-import shutil
+
+SRCDIR = './src'
+TMPSRCDIR = './build/tmpsrc'
 
 LIBDIRS = []
 extensions = []
@@ -81,17 +84,26 @@ Language options:
 if sys.platform == 'win32' and '--compiler=mingw32' in sys.argv:
     LIBDIRS.append('.') # libpython23.a and libpython23.def
 
+try:
+    os.makedirs(TMPSRCDIR)
+except OSError, why:
+    import errno
+    if why.errno != errno.EEXIST:
+        raise OSError, why
+
 for loc in locales:
     if loc:
         extensions.append(Extension('cjkcodecs.mapdata_'+loc,
-                    ['src/maps/mapdata_%s.c'%loc]))
+                    ['%s/maps/mapdata_%s.c' % (SRCDIR, loc)]))
     for enc in encodings[loc]:
-        extensions.append(Extension('cjkcodecs._'+enc, ['src/_%s.c'%enc],
-            library_dirs=LIBDIRS))
-        if 'sdist' not in sys.argv and enc in strictencodings:
-            shutil.copy('src/_%s.c' % enc, 'src/_%s_strict.c' % enc)
+        extensions.append(Extension('cjkcodecs._'+enc,
+                          ['%s/_%s.c' % (SRCDIR, enc)], library_dirs=LIBDIRS))
+        if enc in strictencodings:
+            shutil.copy('%s/_%s.c' % (SRCDIR, enc),
+                        '%s/_%s_strict.c' % (TMPSRCDIR, enc))
             extensions.append(Extension('cjkcodecs._'+enc+'_strict',
-                ['src/_%s_strict.c' % enc], library_dirs=LIBDIRS,
+                ['%s/_%s_strict.c' % (TMPSRCDIR, enc)],
+                include_dirs=[SRCDIR], library_dirs=LIBDIRS,
                 define_macros=[('STRICT_BUILD', 1)]))
 
 
@@ -118,8 +130,8 @@ setup (name = "cjkcodecs",
        cmdclass = {'install': Install},
        packages = ['cjkcodecs'],
        ext_modules =
-            [Extension("cjkcodecs.multibytecodec", ["src/multibytecodec.c"],
-             library_dirs=LIBDIRS)]
+            [Extension("cjkcodecs.multibytecodec",
+                       ["%s/multibytecodec.c" % SRCDIR], library_dirs=LIBDIRS)]
             + extensions
        )
 
