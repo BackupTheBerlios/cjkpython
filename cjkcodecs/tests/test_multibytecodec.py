@@ -3,7 +3,7 @@
 # test_multibytecodec.py
 #   Unit test for multibytecodec itself
 #
-# $Id: test_multibytecodec.py,v 1.5 2004/01/06 02:26:28 perky Exp $
+# $Id: test_multibytecodec.py,v 1.6 2004/03/10 07:33:09 perky Exp $
 
 from test import test_support
 import test_multibytecodec_support
@@ -62,12 +62,12 @@ class Test_StreamWriter(unittest.TestCase):
         pass
 
     def test_nullcoding(self):
-        self.assertEqual(''.decode('cjkcodecs.utf-8'), u'')
-        self.assertEqual(unicode('', 'cjkcodecs.utf-8'), u'')
-        self.assertEqual(u''.encode('cjkcodecs.utf-8'), '')
+        self.assertEqual(''.decode('cjkcodecs.gb18030'), u'')
+        self.assertEqual(unicode('', 'cjkcodecs.gb18030'), u'')
+        self.assertEqual(u''.encode('cjkcodecs.gb18030'), '')
 
     def test_str_decode(self):
-        self.assertEqual('abcd'.encode('cjkcodecs.utf-8'), 'abcd')
+        self.assertEqual('abcd'.encode('cjkcodecs.gb18030'), 'abcd')
 
 def test_main():
     suite = unittest.TestSuite()
