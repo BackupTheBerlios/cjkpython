@@ -1,5 +1,5 @@
 /*
- * codecimpl_gb18030.h: the GB18030 codec implementation
+ * impl_gb18030.h: the GB18030 codec implementation
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_gb18030.h,v 1.2 2004/06/27 19:24:13 perky Exp $
+ * $Id: impl_gb18030.h,v 1.1 2004/06/27 20:59:34 perky Exp $
  */
 
 ENCODER(gb18030)

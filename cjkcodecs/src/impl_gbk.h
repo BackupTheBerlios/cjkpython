@@ -1,5 +1,5 @@
 /*
- * codecimpl_cp949.h: the CP949 codec implementation
+ * impl_gbk.c: the GBK codec implementation
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,10 +26,10 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_cp949.h,v 1.2 2004/06/27 19:24:13 perky Exp $
+ * $Id: impl_gbk.h,v 1.1 2004/06/27 20:59:34 perky Exp $
  */
 
-ENCODER(cp949)
+ENCODER(gbk)
 {
 	while (inleft > 0) {
 		Py_UNICODE c = IN1;
@@ -43,21 +43,23 @@ ENCODER(cp949)
 		UCS4INVALID(c)
 
 		REQUIRE_OUTBUF(2)
-		TRYMAP_ENC(cp949, code, c);
+
+		GBK_PREENCODE(c, code)
+		else TRYMAP_ENC(gbcommon, code, c);
 		else return 1;
 
 		OUT1((code >> 8) | 0x80)
 		if (code & 0x8000)
-			OUT2(code & 0xFF) /* MSB set: CP949 */
+			OUT2((code & 0xFF)) /* MSB set: GBK */
 		else
-			OUT2((code & 0xFF) | 0x80) /* MSB unset: ks x 1001 */
+			OUT2((code & 0xFF) | 0x80) /* MSB unset: GB2312 */
 		NEXT(1, 2)
 	}
 
 	return 0;
 }
 
-DECODER(cp949)
+DECODER(gbk)
 {
 	while (inleft > 0) {
 		unsigned char c = IN1;
@@ -71,8 +73,10 @@ DECODER(cp949)
 		}
 
 		REQUIRE_INBUF(2)
-		TRYMAP_DEC(ksx1001, **outbuf, c ^ 0x80, IN2 ^ 0x80);
-		else TRYMAP_DEC(cp949ext, **outbuf, c, IN2);
+
+		GBK_PREDECODE(c, IN2, **outbuf)
+		else TRYMAP_DEC(gb2312, **outbuf, c ^ 0x80, IN2 ^ 0x80);
+		else TRYMAP_DEC(gbkext, **outbuf, c, IN2);
 		else return 2;
 
 		NEXT(2, 1)

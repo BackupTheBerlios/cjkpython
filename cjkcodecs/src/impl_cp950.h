@@ -1,5 +1,5 @@
 /*
- * codecimpl_gb2312.h: the GB2312 codec implementation
+ * impl_cp950.h: the CP950 codec implementation
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,10 +26,10 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_gb2312.h,v 1.2 2004/06/27 19:24:13 perky Exp $
+ * $Id: impl_cp950.h,v 1.1 2004/06/27 20:59:34 perky Exp $
  */
 
-ENCODER(gb2312)
+ENCODER(cp950)
 {
 	while (inleft > 0) {
 		Py_UNICODE c = IN1;
@@ -43,24 +43,22 @@ ENCODER(gb2312)
 		UCS4INVALID(c)
 
 		REQUIRE_OUTBUF(2)
-		TRYMAP_ENC(gbcommon, code, c);
+		TRYMAP_ENC(cp950ext, code, c);
+		else TRYMAP_ENC(big5, code, c);
 		else return 1;
 
-		if (code & 0x8000) /* MSB set: GBK */
-			return 1;
-
-		OUT1((code >> 8) | 0x80)
-		OUT2((code & 0xFF) | 0x80)
+		OUT1(code >> 8)
+		OUT2(code & 0xFF)
 		NEXT(1, 2)
 	}
 
 	return 0;
 }
 
-DECODER(gb2312)
+DECODER(cp950)
 {
 	while (inleft > 0) {
-		unsigned char c = **inbuf;
+		unsigned char c = IN1;
 
 		REQUIRE_OUTBUF(1)
 
@@ -71,10 +69,12 @@ DECODER(gb2312)
 		}
 
 		REQUIRE_INBUF(2)
-		TRYMAP_DEC(gb2312, **outbuf, c ^ 0x80, IN2 ^ 0x80) {
-			NEXT(2, 1)
-		}
+
+		TRYMAP_DEC(cp950ext, **outbuf, c, IN2);
+		else TRYMAP_DEC(big5, **outbuf, c, IN2);
 		else return 2;
+
+		NEXT(2, 1)
 	}
 
 	return 0;

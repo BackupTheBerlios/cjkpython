@@ -1,7 +1,7 @@
 /*
- * codecimpl_gbk.c: the GBK codec implementation
+ * impl_euc_tw.c: the EUC-TW codec implementation
  *
- * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
+ * Copyright (C) 2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,60 +26,93 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_gbk.h,v 1.2 2004/06/27 19:24:13 perky Exp $
+ * $Id: impl_euc_tw.h,v 1.1 2004/06/27 20:59:34 perky Exp $
  */
 
-ENCODER(gbk)
+ENCODER(euc_tw)
 {
 	while (inleft > 0) {
-		Py_UNICODE c = IN1;
-		DBCHAR code;
+		ucs4_t c = IN1;
+		unsigned char whi, wlo;
+		int insize, plane;
 
 		if (c < 0x80) {
 			WRITE1((unsigned char)c)
 			NEXT(1, 1)
 			continue;
 		}
-		UCS4INVALID(c)
 
-		REQUIRE_OUTBUF(2)
+		DECODE_SURROGATE(c)
+		insize = GET_INSIZE(c);
 
-		GBK_PREENCODE(c, code)
-		else TRYMAP_ENC(gbcommon, code, c);
-		else return 1;
-
-		OUT1((code >> 8) | 0x80)
-		if (code & 0x8000)
-			OUT2((code & 0xFF)) /* MSB set: GBK */
+		if (c <= 0xFFFF) {
+			TRYMAP_ENC_MPLANE(cns11643_bmp, plane, whi, wlo, c);
+			else return insize;
+		}
+		else if (0x20000 <= c && c < 0x30000) {
+			TRYMAP_ENC_MPLANE(cns11643_nonbmp, plane, whi, wlo,
+					  c & 0xffff);
+			else return insize;
+		}
 		else
-			OUT2((code & 0xFF) | 0x80) /* MSB unset: GB2312 */
-		NEXT(1, 2)
+			return insize;
+
+		if (plane == 1) {
+			WRITE2(whi ^ 0x80, wlo ^ 0x80)
+			NEXT(insize, 2)
+		}
+		else {
+			WRITE4(0x8e, 0x80+plane,
+				whi ^ 0x80, wlo ^ 0x80)
+			NEXT(insize, 4)
+		}
 	}
 
 	return 0;
 }
 
-DECODER(gbk)
+DECODER(euc_tw)
 {
 	while (inleft > 0) {
-		unsigned char c = IN1;
+		unsigned char c1 = IN1, c2;
+		ucs4_t code;
+		int plane, insize;
 
 		REQUIRE_OUTBUF(1)
-
-		if (c < 0x80) {
-			OUT1(c)
+		if (c1 < 0x80) {
+			OUT1(c1)
 			NEXT(1, 1)
 			continue;
 		}
 
-		REQUIRE_INBUF(2)
+		if (c1 == 0x8e) {
+			REQUIRE_INBUF(4)
+			plane = IN2;
+			if (plane < 0x81 || plane > 0x87)
+				return 4;
+			plane -= 0x80;
+			insize = 4;
+			c1 = IN3;
+			c2 = IN4;
+		}
+		else {
+			insize = 2;
+			plane = 1;
+			c2 = IN2;
+		}
 
-		GBK_PREDECODE(c, IN2, **outbuf)
-		else TRYMAP_DEC(gb2312, **outbuf, c ^ 0x80, IN2 ^ 0x80);
-		else TRYMAP_DEC(gbkext, **outbuf, c, IN2);
-		else return 2;
-
-		NEXT(2, 1)
+		TRYMAP_DEC_MPLANE(cns11643, code, plane,
+				  c1 ^ 0x80, c2 ^ 0x80) { /* BMP */
+			OUT1(code)
+			NEXT(insize, 1)
+		}
+		else TRYMAP_DEC_MPLANE(cns11643, code, plane,
+				       c1, c2 ^ 0x80) { /* non-BMP */
+			WRITEUCS4(0x20000 | code)
+			NEXT_IN(insize)
+		}
+		else
+			return insize;
 	}
 
 	return 0;

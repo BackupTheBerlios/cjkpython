@@ -1,5 +1,5 @@
 /*
- * codecimpl_johab.h: the Johab codec implementation
+ * impl_johab.h: the Johab codec implementation
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_johab.h,v 1.2 2004/06/27 19:24:13 perky Exp $
+ * $Id: impl_johab.h,v 1.1 2004/06/27 20:59:34 perky Exp $
  */
 
 static const unsigned char u2johabidx_choseong[32] = {

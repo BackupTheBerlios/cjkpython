@@ -1,5 +1,5 @@
 /*
- * codecimpl_cp950.h: the CP950 codec implementation
+ * impl_big5.h: the Big5 codec implementation
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,25 +26,26 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_cp950.h,v 1.2 2004/06/27 19:24:13 perky Exp $
+ * $Id: impl_big5.h,v 1.1 2004/06/27 20:59:34 perky Exp $
  */
 
-ENCODER(cp950)
+ENCODER(big5)
 {
 	while (inleft > 0) {
-		Py_UNICODE c = IN1;
+		Py_UNICODE c = **inbuf;
 		DBCHAR code;
 
 		if (c < 0x80) {
-			WRITE1((unsigned char)c)
+			REQUIRE_OUTBUF(1)
+			**outbuf = (unsigned char)c;
 			NEXT(1, 1)
 			continue;
 		}
 		UCS4INVALID(c)
 
 		REQUIRE_OUTBUF(2)
-		TRYMAP_ENC(cp950ext, code, c);
-		else TRYMAP_ENC(big5, code, c);
+
+		TRYMAP_ENC(big5, code, c);
 		else return 1;
 
 		OUT1(code >> 8)
@@ -55,7 +56,7 @@ ENCODER(cp950)
 	return 0;
 }
 
-DECODER(cp950)
+DECODER(big5)
 {
 	while (inleft > 0) {
 		unsigned char c = IN1;
@@ -69,12 +70,10 @@ DECODER(cp950)
 		}
 
 		REQUIRE_INBUF(2)
-
-		TRYMAP_DEC(cp950ext, **outbuf, c, IN2);
-		else TRYMAP_DEC(big5, **outbuf, c, IN2);
+		TRYMAP_DEC(big5, **outbuf, c, IN2) {
+			NEXT(2, 1)
+		}
 		else return 2;
-
-		NEXT(2, 1)
 	}
 
 	return 0;

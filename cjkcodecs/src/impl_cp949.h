@@ -1,5 +1,5 @@
 /*
- * codecimpl_hz.h: the HZ codec (RFC1843) implementation
+ * impl_cp949.h: the CP949 codec implementation
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,120 +26,56 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_hz.h,v 1.2 2004/06/27 19:24:13 perky Exp $
+ * $Id: impl_cp949.h,v 1.1 2004/06/27 20:59:34 perky Exp $
  */
 
-ENCODER_INIT(hz)
-{
-	state->i = 0;
-	return 0;
-}
-
-ENCODER_RESET(hz)
-{
-	if (state->i != 0) {
-		WRITE2('~', '}')
-		state->i = 0;
-		NEXT_OUT(2)
-	}
-	return 0;
-}
-
-ENCODER(hz)
+ENCODER(cp949)
 {
 	while (inleft > 0) {
 		Py_UNICODE c = IN1;
 		DBCHAR code;
 
 		if (c < 0x80) {
-			if (state->i == 0) {
-				WRITE1((unsigned char)c)
-				NEXT(1, 1)
-			}
-			else {
-				WRITE3('~', '}', (unsigned char)c)
-				NEXT(1, 3)
-				state->i = 0;
-			}
+			WRITE1((unsigned char)c)
+			NEXT(1, 1)
 			continue;
 		}
-
 		UCS4INVALID(c)
 
-		TRYMAP_ENC(gbcommon, code, c);
+		REQUIRE_OUTBUF(2)
+		TRYMAP_ENC(cp949, code, c);
 		else return 1;
 
-		if (code & 0x8000) /* MSB set: GBK */
-			return 1;
-
-		if (state->i == 0) {
-			WRITE4('~', '{', code >> 8, code & 0xff)
-			NEXT(1, 4)
-			state->i = 1;
-		}
-		else {
-			WRITE2(code >> 8, code & 0xff)
-			NEXT(1, 2)
-		}
+		OUT1((code >> 8) | 0x80)
+		if (code & 0x8000)
+			OUT2(code & 0xFF) /* MSB set: CP949 */
+		else
+			OUT2((code & 0xFF) | 0x80) /* MSB unset: ks x 1001 */
+		NEXT(1, 2)
 	}
 
 	return 0;
 }
 
-DECODER_INIT(hz)
-{
-	state->i = 0;
-	return 0;
-}
-
-DECODER_RESET(hz)
-{
-	state->i = 0;
-	return 0;
-}
-
-DECODER(hz)
+DECODER(cp949)
 {
 	while (inleft > 0) {
 		unsigned char c = IN1;
 
-		if (c == '~') {
-			unsigned char c2 = IN2;
+		REQUIRE_OUTBUF(1)
 
-			REQUIRE_INBUF(2)
-			if (c2 == '~') {
-				WRITE1('~')
-				NEXT(2, 1)
-				continue;
-			}
-			else if (c2 == '{' && state->i == 0)
-				state->i = 1; /* set GB */
-			else if (c2 == '}' && state->i == 1)
-				state->i = 0; /* set ASCII */
-			else if (c2 == '\n')
-				; /* line-continuation */
-			else
-				return 2;
-			NEXT(2, 0);
+		if (c < 0x80) {
+			OUT1(c)
+			NEXT(1, 1)
 			continue;
 		}
 
-		if (c & 0x80)
-			return 1;
+		REQUIRE_INBUF(2)
+		TRYMAP_DEC(ksx1001, **outbuf, c ^ 0x80, IN2 ^ 0x80);
+		else TRYMAP_DEC(cp949ext, **outbuf, c, IN2);
+		else return 2;
 
-		if (state->i == 0) { /* ASCII mode */
-			WRITE1(c)
-			NEXT(1, 1)
-		}
-		else { /* GB mode */
-			REQUIRE_INBUF(2)
-			REQUIRE_OUTBUF(1)
-			TRYMAP_DEC(gb2312, **outbuf, c, IN2) {
-				NEXT(2, 1)
-			}
-			else
-				return 2;
-		}
+		NEXT(2, 1)
 	}
 
 	return 0;

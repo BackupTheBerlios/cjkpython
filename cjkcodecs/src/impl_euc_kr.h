@@ -1,5 +1,5 @@
 /*
- * codecimpl_big5.h: the Big5 codec implementation
+ * impl_euc_kr.h: the EUC-KR codec implementation
  *
  * Copyright (C) 2003-2004 Hye-Shik Chang <perky@FreeBSD.org>.
  * All rights reserved.
@@ -26,37 +26,38 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: codecimpl_big5.h,v 1.3 2004/06/27 20:57:33 perky Exp $
+ * $Id: impl_euc_kr.h,v 1.1 2004/06/27 20:59:34 perky Exp $
  */
 
-ENCODER(big5)
+ENCODER(euc_kr)
 {
 	while (inleft > 0) {
-		Py_UNICODE c = **inbuf;
+		Py_UNICODE c = IN1;
 		DBCHAR code;
 
 		if (c < 0x80) {
-			REQUIRE_OUTBUF(1)
-			**outbuf = (unsigned char)c;
+			WRITE1((unsigned char)c)
 			NEXT(1, 1)
 			continue;
 		}
 		UCS4INVALID(c)
 
 		REQUIRE_OUTBUF(2)
-
-		TRYMAP_ENC(big5, code, c);
+		TRYMAP_ENC(cp949, code, c);
 		else return 1;
 
-		OUT1(code >> 8)
-		OUT2(code & 0xFF)
+		if (code & 0x8000) /* MSB set: CP949 */
+			return 1;
+
+		OUT1((code >> 8) | 0x80)
+		OUT2((code & 0xFF) | 0x80)
 		NEXT(1, 2)
 	}
 
 	return 0;
 }
 
-DECODER(big5)
+DECODER(euc_kr)
 {
 	while (inleft > 0) {
 		unsigned char c = IN1;
@@ -70,10 +71,10 @@ DECODER(big5)
 		}
 
 		REQUIRE_INBUF(2)
-		TRYMAP_DEC(big5, **outbuf, c, IN2) {
+
+		TRYMAP_DEC(ksx1001, **outbuf, c ^ 0x80, IN2 ^ 0x80) {
 			NEXT(2, 1)
-		}
-		else return 2;
+		} else return 2;
 	}
 
 	return 0;
