@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: cjkcodecs.h,v 1.1 2004/06/27 21:37:47 perky Exp $
+ * $Id: cjkcodecs.h,v 1.2 2004/06/27 21:41:15 perky Exp $
  */
 
 #ifndef _CJKCODECS_H_
@@ -219,13 +219,13 @@ static const struct dbcs_map mapping_list[];
 #define GET_INSIZE(c)	1
 #endif
 
-#define BEGIN_MAPPING_LIST static const struct dbcs_map mapping_list[] = {
+#define BEGIN_MAPPINGS_LIST static const struct dbcs_map mapping_list[] = {
 #define MAPPING_ENCONLY(enc) {#enc, enc##_encmap, NULL},
 #define MAPPING_DECONLY(enc) {#enc, NULL, enc##_decmap},
 #define MAPPING_ENCDEC(enc) {#enc, enc##_encmap, enc##_decmap},
-#define END_MAPPING_LIST {"", NULL, NULL} };
+#define END_MAPPINGS_LIST {"", NULL, NULL} };
 
-#define BEGIN_CODEC_LIST static const MultibyteCodec codec_list[] = {
+#define BEGIN_CODECS_LIST static const MultibyteCodec codec_list[] = {
 #define _STATEFUL_METHODS(enc)		\
 	enc##_encode,			\
 	enc##_encode_init,		\
@@ -244,7 +244,7 @@ static const struct dbcs_map mapping_list[];
 	#enc, NULL, NULL,		\
 	_STATELESS_METHODS(enc)		\
 },
-#define END_CODEC_LIST {"", NULL,} };
+#define END_CODECS_LIST {"", NULL,} };
 
 static PyObject *
 getmultibytecodec(void)
