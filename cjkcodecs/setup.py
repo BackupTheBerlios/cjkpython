@@ -27,7 +27,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.15 2004/06/17 18:31:20 perky Exp $
+# $Id: setup.py,v 1.16 2004/06/20 18:55:36 perky Exp $
 #
 
 import os
@@ -38,6 +38,7 @@ from distutils.command.install import install
 SRCDIR = 'src'
 LIBDIRS = []
 extensions = []
+macros = []
 locales = ['kr', 'jp', 'cn', 'tw', 'unicode']
 
 for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
@@ -52,6 +53,8 @@ for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
         locales.remove('tw')
     elif args[0] == '--disable-utf':
         locales.remove('unicode')
+    elif args[0] == '--disable-extra-encodings':
+        macros.append(('NO_EXTRA_ENCODINGS', '1'))
     elif args[0] == '--help':
         print """\
 Language options:
@@ -60,6 +63,8 @@ Language options:
   --disable-simplified-chinese      don't install Simplified Chinese codecs
   --disable-traditional-chinese     don't install Traditional Chinese codecs
   --disable-utf                     don't install UTF codecs
+  --disable-extra-encodings         disable building extra-expensive encodings:
+                                        euc-tw iso-2022-cn iso-2022-ext
 """
         continue
     else:
@@ -72,7 +77,8 @@ if sys.platform == 'win32' and '--compiler=mingw32' in sys.argv:
 
 for loc in locales:
     extensions.append(Extension('cjkcodecs._codecs_' + loc,
-                      ['%s/_codecs_%s.c' % (SRCDIR, loc)]))
+                      ['%s/_codecs_%s.c' % (SRCDIR, loc)],
+                      define_macros=macros))
 
 class Install(install):
     def initialize_options (self):
