@@ -26,15 +26,11 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_cn.c,v 1.7 2004/06/27 21:41:15 perky Exp $
+ * $Id: _codecs_cn.c,v 1.8 2004/07/07 14:59:26 perky Exp $
  */
 
 #include "cjkcodecs.h"
-#include "map_gb2312.h"
-#include "map_gbkext.h"
-#include "map_gbcommon.h"
-#include "map_gb18030ext.h"
-#include "map_gb18030uni.h"
+#include "mappings_cn.h"
 
 #define GBK_PREDECODE(dc1, dc2, assi) \
 	if ((dc1) == 0xa1 && (dc2) == 0xaa) (assi) = 0x2014; \

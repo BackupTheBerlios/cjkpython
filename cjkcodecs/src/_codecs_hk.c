@@ -26,13 +26,13 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_hk.c,v 1.2 2004/06/29 13:55:37 perky Exp $
+ * $Id: _codecs_hk.c,v 1.3 2004/07/07 14:59:26 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
 
 #include "cjkcodecs.h"
-#include "map_big5hkscs.h"
+#include "mappings_hk.h"
 
 /*
  * BIG5HKSCS codec

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_iso2022.c,v 1.16 2004/07/07 02:33:55 perky Exp $
+ * $Id: _codecs_iso2022.c,v 1.17 2004/07/07 14:59:26 perky Exp $
  */
 
 #define USING_IMPORTED_MAPS
@@ -35,7 +35,7 @@
 
 #include "cjkcodecs.h"
 #include "alg_jisx0201.h"
-#include "map_jisx0213_pairs.h"
+#include "mappings_jisx0213_pair.h"
 
 /* STATE
 

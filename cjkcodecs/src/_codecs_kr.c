@@ -26,13 +26,11 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_kr.c,v 1.7 2004/06/27 21:41:15 perky Exp $
+ * $Id: _codecs_kr.c,v 1.8 2004/07/07 14:59:26 perky Exp $
  */
 
 #include "cjkcodecs.h"
-#include "map_ksx1001.h"
-#include "map_cp949.h"
-#include "map_cp949ext.h"
+#include "mappings_kr.h"
 
 /*
  * EUC-KR codec

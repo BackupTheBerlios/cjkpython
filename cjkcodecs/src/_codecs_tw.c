@@ -26,14 +26,13 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _codecs_tw.c,v 1.9 2004/07/06 17:00:18 perky Exp $
+ * $Id: _codecs_tw.c,v 1.10 2004/07/07 14:59:26 perky Exp $
  */
 
 #include "cjkcodecs.h"
-#include "map_big5.h"
-#include "map_cp950ext.h"
+#include "mappings_tw.h"
 #ifndef NO_EXTRA_ENCODINGS
-# include "map_cns11643.h"
+# include "mappings_cns11643.h"
 #endif
 
 /*
