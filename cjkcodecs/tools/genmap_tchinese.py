@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_tchinese.py,v 1.7 2004/06/28 18:16:03 perky Exp $
+# $Id: genmap_tchinese.py,v 1.8 2004/07/07 15:35:45 perky Exp $
 #
 
 import sys
@@ -177,7 +177,7 @@ for c1, m in cp950decmap.items():
                 and big5decmap[c1][c2] == code):
             del cp950decmap[c1][c2]
 
-omap = open('map_big5.h', 'w')
+omap = open('mappings_tw.h', 'w')
 printcopyright(omap)
 
 print "Generating BIG5 decode map..."
@@ -190,9 +190,6 @@ filler = BufferedFiller()
 genmap_encode(filler, "big5", big5encmap)
 print_encmap(omap, filler, "big5", big5encmap)
 
-omap = open('map_cp950ext.h', 'w')
-printcopyright(omap)
-
 print "Generating CP950 extension decode map..."
 filler = BufferedFiller()
 genmap_decode(filler, "cp950ext", BIG5_C1, BIG5_C2, cp950decmap)
@@ -203,7 +200,7 @@ filler = BufferedFiller()
 genmap_encode(filler, "cp950ext", cp950encmap)
 print_encmap(omap, filler, "cp950ext", cp950encmap)
 
-omap = open('map_big5hkscs.h', 'w')
+omap = open('mappings_hk.h', 'w')
 printcopyright(omap)
 
 print "Generating BIG5HKSCS decode map..."
@@ -237,7 +234,7 @@ filler = BufferedFiller()
 genmap_encode(filler, "big5hkscs_nonbmp", hkscsencmap_nonbmp)
 print_encmap(omap, filler, "big5hkscs_nonbmp", hkscsencmap_nonbmp)
 
-omap = open('map_cns11643.h', 'w')
+omap = open('mappings_cns11643.h', 'w')
 printcopyright(omap)
 for plane in range(1, 8):
     print "Generating CNS11643 plane %d decode map..." % plane

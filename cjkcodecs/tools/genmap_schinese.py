@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_schinese.py,v 1.4 2004/06/19 06:11:46 perky Exp $
+# $Id: genmap_schinese.py,v 1.5 2004/07/07 15:35:45 perky Exp $
 #
 
 from genmap_support import *
@@ -118,30 +118,25 @@ for c1, m in gb18030decmap.iteritems():
         gb18030encmap.setdefault(code >> 8, {})
         gb18030encmap[code >> 8][code & 0xff] = c1 << 8 | c2
 
-omap = open('map_gb2312.h', 'w')
+omap = open('mappings_cn.h', 'w')
 printcopyright(omap)
+
 print "Generating GB2312 decode map..."
 filler = BufferedFiller()
 genmap_decode(filler, "gb2312", GB2312_C1, GB2312_C2, gb2312decmap)
 print_decmap(omap, filler, "gb2312", gb2312decmap)
 
-omap = open('map_gbkext.h', 'w')
-printcopyright(omap)
 print "Generating GBK decode map..."
 filler = BufferedFiller()
 genmap_decode(filler, "gbkext", GBKL1_C1, GBKL1_C2, gbkdecmap)
 genmap_decode(filler, "gbkext", GBKL2_C1, GBKL2_C2, gbkdecmap)
 print_decmap(omap, filler, "gbkext", gbkdecmap)
 
-omap = open('map_gbcommon.h', 'w')
-printcopyright(omap)
 print "Generating GB2312 && GBK encode map..."
 filler = BufferedFiller()
 genmap_encode(filler, "gbcommon", gb2312_gbkencmap)
 print_encmap(omap, filler, "gbcommon", gb2312_gbkencmap)
 
-omap = open('map_gb18030ext.h', 'w')
-printcopyright(omap)
 print "Generating GB18030 extension decode map..."
 filler = BufferedFiller()
 for i in range(1, 6):
@@ -154,8 +149,6 @@ filler = BufferedFiller()
 genmap_encode(filler, "gb18030ext", gb18030encmap)
 print_encmap(omap, filler, "gb18030ext", gb18030encmap)
 
-omap = open('map_gb18030uni.h', 'w')
-printcopyright(omap)
 print "Generating GB18030 Unicode BMP Mapping Ranges..."
 ranges = [[-1, -1, -1]]
 gblinnum = 0
@@ -170,9 +163,11 @@ for uni in gb18030unilinear:
     else:
         ranges.append([uni, uni, gblinnum])
     gblinnum += 1
+filler = BufferedFiller()
 for first, last, base in ranges[1:]:
-    print >> omap, "{%d,%d,%d}," % (first, last, base)
-print >> omap, "{0,0,%d}};" % (
-    ranges[-1][2] + ranges[-1][1] - ranges[-1][0] + 1)
+    filler.write('{', str(first), ',', str(last), ',', str(base), '},')
+filler.write('{', '0,', '0,', str(
+    ranges[-1][2] + ranges[-1][1] - ranges[-1][0] + 1), '}', '};')
+filler.printout(omap)
 
 print "\nDone!"

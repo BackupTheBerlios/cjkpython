@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_japanese.py,v 1.6 2004/07/06 17:05:24 perky Exp $
+# $Id: genmap_japanese.py,v 1.7 2004/07/07 15:35:45 perky Exp $
 #
 
 from genmap_support import *
@@ -200,7 +200,7 @@ for c1, m in jis4_2_decmap.iteritems():
         jisx0213empencmap.setdefault(code >> 8, {})
         jisx0213empencmap[code >> 8][code & 0xff] = 0x8000 | c1 << 8 | c2
 
-omap = open("map_jisx0208.h", "w")
+omap = open("mappings_jp.h", "w")
 printcopyright(omap)
 
 print "Generating JIS X 0208 decode map..."
@@ -208,22 +208,16 @@ filler = BufferedFiller()
 genmap_decode(filler, "jisx0208", JISX0208_C1, JISX0208_C2, jisx0208decmap)
 print_decmap(omap, filler, "jisx0208", jisx0208decmap)
 
-omap = open("map_jisx0212.h", "w")
-printcopyright(omap)
 print "Generating JIS X 0212 decode map..."
 filler = BufferedFiller()
 genmap_decode(filler, "jisx0212", JISX0212_C1, JISX0212_C2, jisx0212decmap)
 print_decmap(omap, filler, "jisx0212", jisx0212decmap)
 
-omap = open("map_jisxcommon.h", "w")
-printcopyright(omap)
 print "Generating JIS X 0208 && JIS X 0212 encode map..."
 filler = BufferedFiller()
 genmap_encode(filler, "jisxcommon", jisx0208_0212encmap)
 print_encmap(omap, filler, "jisxcommon", jisx0208_0212encmap)
 
-omap = open("map_cp932ext.h", "w")
-printcopyright(omap)
 print "Generating CP932 Extension decode map..."
 filler = BufferedFiller()
 genmap_decode(filler, "cp932ext", CP932P0_C1, CP932P0_C2, cp932decmap)
@@ -235,9 +229,6 @@ print "Generating CP932 Extension encode map..."
 filler = BufferedFiller()
 genmap_encode(filler, "cp932ext", cp932encmap)
 print_encmap(omap, filler, "cp932ext", cp932encmap)
-
-omap = open("map_jisx0213.h", "w")
-printcopyright(omap)
 
 print "Generating JIS X 0213 Plane 1 BMP decode map..."
 filler = BufferedFiller()
@@ -271,8 +262,15 @@ filler = BufferedFiller()
 genmap_encode(filler, "jisx0213_emp", jisx0213empencmap)
 print_encmap(omap, filler, "jisx0213_emp", jisx0213empencmap)
 
-omap = open("map_jisx0213_pairs.h", "w")
+omap = open('mappings_jisx0213_pair.h', 'w')
 printcopyright(omap)
+
+print >> omap, "#define JISX0213_ENCPAIRS %d" % len(jisx0213pairencmap)
+print >> omap, """\
+#ifdef EXTERN_JISX0213_PAIR
+static const struct widedbcs_index *jisx0213_pair_decmap;
+static const struct pair_encodemap *jisx0213_pair_encmap;
+#else"""
 
 print "Generating JIS X 0213 unicode-pair decode map..."
 filler = BufferedFiller()
@@ -283,11 +281,13 @@ print_decmap(omap, filler, "jisx0213_pair",
 
 print "Generating JIS X 0213 unicode-pair encode map..."
 jisx0213pairencmap.sort()
-print >> omap, "#define JISX0213_ENCPAIRS   %d" % len(jisx0213pairencmap)
 print >> omap, "static const struct pair_encodemap jisx0213_pair_encmap" \
                "[JISX0213_ENCPAIRS] = {"
+filler = BufferedFiller()
 for body, modifier, jis in jisx0213pairencmap:
-    print >> omap, "    { 0x%04x%04x, 0x%04x }," % (body, modifier, jis)
+    filler.write('{', '0x%04x%04x,' % (body, modifier), '0x%04x' % jis, '},')
+filler.printout(omap)
 print >> omap, "};"
+print >> omap, "#endif"
 
 print "\nDone!"

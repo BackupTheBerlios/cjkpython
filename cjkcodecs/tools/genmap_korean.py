@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: genmap_korean.py,v 1.4 2004/06/19 06:11:46 perky Exp $
+# $Id: genmap_korean.py,v 1.5 2004/07/07 15:35:45 perky Exp $
 #
 
 from genmap_support import *
@@ -62,7 +62,7 @@ for c1, c2map in decmap.iteritems():
             cp949encmap.setdefault(code >> 8, {}) # MSB set
             cp949encmap[code >> 8][code & 0xFF] = (c1<<8 | c2)
 
-omap = open('map_ksx1001.h', 'w')
+omap = open('mappings_kr.h', 'w')
 printcopyright(omap)
 
 print "Generating KS X 1001 decode map..."
@@ -70,17 +70,11 @@ filler = BufferedFiller()
 genmap_decode(filler, "ksx1001", KSX1001_C1, KSX1001_C2, ksx1001decmap)
 print_decmap(omap, filler, "ksx1001", ksx1001decmap)
 
-omap = open('map_cp949ext.h', 'w')
-printcopyright(omap)
-
 print "Generating UHC decode map..."
 filler = BufferedFiller()
 genmap_decode(filler, "cp949ext", UHCL1_C1, UHCL1_C2, uhcdecmap)
 genmap_decode(filler, "cp949ext", UHCL2_C1, UHCL2_C2, uhcdecmap)
 print_decmap(omap, filler, "cp949ext", uhcdecmap)
-
-omap = open('map_cp949.h', 'w')
-printcopyright(omap)
 
 print "Generating CP949 (includes KS X 1001) encode map..."
 filler = BufferedFiller()
