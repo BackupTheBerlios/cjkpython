@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: multibytecodec.c,v 1.2 2003/09/24 18:04:36 perky Exp $
+ * $Id: multibytecodec.c,v 1.3 2003/11/27 08:51:54 perky Exp $
  */
 
 #include "Python.h"
@@ -523,17 +523,33 @@ MultibyteCodec_Encode(MultibyteCodecObject *self,
 {
     MultibyteCodec_State   state;
     Py_UNICODE  *data;
-    PyObject    *errorcb, *r;
+    PyObject    *errorcb, *r, *arg;
     const char  *errors = NULL;
     int          datalen;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "u#|z:encode",
-                            codeckwarglist, &data, &datalen, &errors))
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|z:encode",
+                            codeckwarglist, &arg, &errors))
         return NULL;
 
+    if (PyUnicode_Check(arg)) {
+        data = PyUnicode_AS_UNICODE(arg);
+        datalen = PyUnicode_GET_SIZE(arg);
+        arg = NULL; /* forget reference */
+    } else {
+        arg = PyObject_Unicode(arg);
+        if (arg == NULL || !PyUnicode_Check(arg)) {
+            Py_XDECREF(arg);
+            return NULL;
+        }
+        data = PyUnicode_AS_UNICODE(arg);
+        datalen = PyUnicode_GET_SIZE(arg);
+    }
+
     errorcb = get_errorcallback(errors);
-    if (errorcb == NULL)
+    if (errorcb == NULL) {
+        Py_XDECREF(arg);
         return NULL;
+    }
 
     if (self->codec->encinit != NULL && self->codec->encinit(&state) != 0)
         goto errorexit;
@@ -545,12 +561,14 @@ MultibyteCodec_Encode(MultibyteCodecObject *self,
     if (errorcb > ERROR_MAX) {
         Py_DECREF(errorcb);
     }
+    Py_XDECREF(arg);
     return make_tuple(r, datalen);
 
 errorexit:
     if (errorcb > ERROR_MAX) {
         Py_DECREF(errorcb);
     }
+    Py_XDECREF(arg);
     return NULL;
 }
 

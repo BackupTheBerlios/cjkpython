@@ -1,5 +1,9 @@
 Changes with CJKCodecs 1.0.2
 
+  *) Fixed a weird behavior that str.encode encodes from in-memory
+     represention of unicode object directly. Codecs now decode as default
+     encoding before encoding str object.
+
   *) Several aliases are added for compatibility.
      - ISO-2022-JP-1: ISO-2022-JP-EXT
      - BIG5: BIG5-TW
