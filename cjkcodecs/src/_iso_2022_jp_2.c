@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp_2.c,v 1.2 2003/09/26 04:25:53 perky Exp $
+ * $Id: _iso_2022_jp_2.c,v 1.3 2003/12/30 01:32:28 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
@@ -98,7 +98,8 @@ ENCODER(iso_2022_jp_2)
             }
             if (c == '\n')
                 STATE_CLEARFLAG(state, F_SHIFTED)
-        } else UCS4INVALID(c)
+        }
+        else UCS4INVALID(c)
         else {
             unsigned char    charset;
 
@@ -122,7 +123,7 @@ ENCODER(iso_2022_jp_2)
                     }
                     WRITE2((code >> 8) & 0x7f, code & 0x7f)
                 } else { /* MSB unset: JIS X 0208 */
-                    if (charset != CHARSET_JISX0208) {
+jisx0208encode:     if (charset != CHARSET_JISX0208) {
                         WRITE3(ESC, '$', 'B')
                         STATE_SETG0(state, CHARSET_JISX0208)
                         NEXT_OUT(3)
@@ -150,41 +151,16 @@ ENCODER(iso_2022_jp_2)
                 }
                 WRITE2(code >> 8, code & 0xff)
                 NEXT(1, 2)
+            } else if (c == 0xff3c) { /* FULL-WIDTH REVERSE SOLIDUS */
+                code = 0x2140;
+                goto jisx0208encode;
             } else {
                 JISX0201_R_ENCODE(c, code)
                 else {
-#if 0
-/* This code is useless. JIS X 0212 includes all characters on ISO-8859-1 and
- * ISO-8859-7! */
-                    ISO8859_1_ENCODE(c, code)
-                    else {
-                        ISO8859_7_ENCODE(c, code)
-                        else
-                            return 1;
-
-                        /* encode as ISO8859-7 */
-                        if (STATE_GETG2(state) != CHARSET_ISO8859_7) {
-                            WRITE3(ESC, '.', 'F')
-                            STATE_SETG2(state, CHARSET_ISO8859_7)
-                            NEXT_OUT(3)
-                        }
-                        WRITE3(ESC, 'N', code & 0x7f)
-                        NEXT(1, 3)
-                        continue;
-                    }
-
-                    /* encode as ISO8859-1 */
-                    if (STATE_GETG2(state) != CHARSET_ISO8859_1) {
-                        WRITE3(ESC, '.', 'A')
-                        STATE_SETG2(state, CHARSET_ISO8859_1)
-                        NEXT_OUT(3)
-                    }
-                    WRITE3(ESC, 'N', code & 0x7f)
-                    NEXT(1, 3)
-                    continue;
-#else
+                    /* There's no need to try to encode as ISO-8859-1 or
+                     * ISO-8859-7 because JIS X 0212 includes them already.
+                     */
                     return 1;
-#endif
                 }
                 /* if (charset == CHARSET_JISX0201_R) : already checked */
                 WRITE4(ESC, '(', 'J', code)
@@ -226,7 +202,9 @@ DECODER(iso_2022_jp_2)
         RESERVE_OUTBUF(1)
         c2 &= IN2;
         if (charset == CHARSET_JISX0208 || charset == CHARSET_JISX0208_O) {
-            TRYMAP_DEC(jisx0208, **outbuf, c, c2);
+            if (c == 0x21 && c2 == 0x40) /* FULL-WIDTH REVERSE SOLIDUS */
+                **outbuf = 0xff3c;
+            else TRYMAP_DEC(jisx0208, **outbuf, c, c2);
             else return 2;
         } else if (charset == CHARSET_JISX0212) {
             TRYMAP_DEC(jisx0212, **outbuf, c, c2);

@@ -1,5 +1,8 @@
 Changes with CJKCodecs 1.0.3
 
+  *) JIS X 0208 21-40 is now mapped to 0xFF3C FULL-WIDTH REVERSE SOLIDUS
+     on iso-2022-jp* codecs. [IKEDA Soji]
+
 
 Changes with CJKCodecs 1.0.2
 

@@ -26,7 +26,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: _iso_2022_jp.c,v 1.1 2003/09/24 17:44:47 perky Exp $
+ * $Id: _iso_2022_jp.c,v 1.2 2003/12/30 01:32:28 perky Exp $
  */
 
 #define ISO2022_DESIGNATIONS \
@@ -89,7 +89,8 @@ ENCODER(iso_2022_jp)
             }
             if (c == '\n')
                 STATE_CLEARFLAG(state, F_SHIFTED)
-        } else UCS4INVALID(c)
+        }
+        else UCS4INVALID(c)
         else {
             unsigned char    charset;
 
@@ -103,17 +104,20 @@ ENCODER(iso_2022_jp)
                     continue;
                 }
             }
-            
+
             TRYMAP_ENC(jisxcommon, code, c) {
                 if (code & 0x8000) /* MSB set: JIS X 0212 */
                     return 1;
-                if (charset != CHARSET_JISX0208) {
+jisx0208encode: if (charset != CHARSET_JISX0208) {
                     WRITE3(ESC, '$', 'B')
                     STATE_SETG0(state, CHARSET_JISX0208)
                     NEXT_OUT(3)
                 }
                 WRITE2(code >> 8, code & 0xff)
                 NEXT(1, 2)
+            } else if (c == 0xff3c) { /* FULL-WIDTH REVERSE SOLIDUS */
+                code = 0x2140;
+                goto jisx0208encode;
             } else {
                 JISX0201_R_ENCODE(c, code)
                 else
@@ -158,7 +162,10 @@ DECODER(iso_2022_jp)
         RESERVE_INBUF(2)
         RESERVE_OUTBUF(1)
         c2 &= IN2;
-        TRYMAP_DEC(jisx0208, **outbuf, c, c2) {
+        if (c == 0x21 && c2 == 0x40) { /* FULL-WIDTH REVERSE SOLIDUS */
+            **outbuf = 0xff3c;
+            NEXT(2, 1)
+        } else TRYMAP_DEC(jisx0208, **outbuf, c, c2) {
             NEXT(2, 1)
         } else
             return 2;
