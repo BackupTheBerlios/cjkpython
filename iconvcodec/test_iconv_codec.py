@@ -24,7 +24,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 #
-# $Id: test_iconv_codec.py,v 1.1 2003/11/27 09:04:45 perky Exp $
+# $Id: test_iconv_codec.py,v 1.2 2003/11/27 09:18:05 perky Exp $
 
 from StringIO import StringIO
 import sys, codecs
@@ -204,6 +204,11 @@ class TestBase:
                         ostream.write(data)
 
                 self.assertEqual(ostream.getvalue(), self.tstring[0])
+
+    def test_null_decode(self):
+        self.assertEqual(''.decode('iconvcodec.utf-8'), u'')
+        self.assertEqual(unicode('', 'iconvcodec.utf-8'), u'')
+        self.assertEqual(u''.encode('iconvcodec.utf-8'), '')
 
 class Test_EUC_KR(TestBase, unittest.TestCase):
     encoding = 'euc-kr'

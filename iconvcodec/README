@@ -1,8 +1,8 @@
-Python Iconv Codec version 1.1.1
+Python Iconv Codec version 1.1.2
 ================================
 
 Copyright(C) Hye-Shik Chang, 2003.
-$Id: README,v 1.1 2003/11/27 09:04:45 perky Exp $
+$Id: README,v 1.2 2003/11/27 09:18:05 perky Exp $
 
 
 
@@ -43,16 +43,6 @@ python setup.py install [options ...]
 				(default)
 
 You can specify another options for distutils, also.
-
-
-Notes
------
-
-If you are using Python 2.3a2, you'll need to delete 2 files to run iconvcodec
-correctly:
-
- ${PREFIX}/lib/python2.3/encodings/iconv_codec.py{,s} for POSIX users
- C:\Python23\Lib\encodings\iconv_codec.py{,s} for Windows users
 
 
 Author

@@ -25,7 +25,7 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 #
-# $Id: setup.py,v 1.1 2003/11/27 09:04:45 perky Exp $
+# $Id: setup.py,v 1.2 2003/11/27 09:18:05 perky Exp $
 #
 
 import sys
@@ -35,7 +35,10 @@ from distutils.command.install import install
 include_dirs = []
 library_dirs = []
 libraries = []
-use_libiconv = 1
+if sys.platform.startswith('linux'):
+    use_libiconv = 0
+else:
+    use_libiconv = 1
 
 for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
     args = arg.split('=', 1)
@@ -51,7 +54,7 @@ for arg in sys.argv[1:]: # don't use getopt to ignore arguments for distutils
         print """\
 Iconvcodec options:
   --with-libc               use iconv incorporated in libc
-  --with-libiconv[=path]    use separated libiconv (default)
+  --with-libiconv[=path]    use separated libiconv
 """
         continue
     else:

@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $Id: _iconv_codec.c,v 1.1 2003/11/27 09:04:45 perky Exp $
+ * $Id: _iconv_codec.c,v 1.2 2003/11/27 09:18:05 perky Exp $
  */
 
 #include "Python.h"
@@ -1180,7 +1180,7 @@ iconvdecoder_call(IconvDecoderObject *self,
     if (datalen == 0) {
         if (errorcb > ERROR_MAX)
             {Py_DECREF(errorcb);}
-        return PyUnicode_FromUnicode(NULL, 0);
+        return make_tuple(PyUnicode_FromUnicode(NULL, 0), 0);
     }
 
     buf.outobj = buf.excobj = NULL;
