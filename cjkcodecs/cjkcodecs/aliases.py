@@ -26,7 +26,7 @@
 # IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# $Id: aliases.py,v 1.2 2003/11/27 07:55:44 perky Exp $
+# $Id: aliases.py,v 1.3 2003/11/27 16:54:09 perky Exp $
 #
 
 from encodings.aliases import aliases
@@ -60,11 +60,17 @@ aliases.update({
     'eucjisx0213'        : 'cjkcodecs.euc_jisx0213',
     'euc_jisx0213'       : 'cjkcodecs.euc_jisx0213',
 
+    # euc_jisx0213_strict codec
+    'euc_jisx0213_strict': 'cjkcodecs.euc_jisx0213_strict',
+
     # euc_jp codec
     'eucjp'              : 'cjkcodecs.euc_jp',
     'euc_jp'             : 'cjkcodecs.euc_jp',
     'ujis'               : 'cjkcodecs.euc_jp',
     'u_jis'              : 'cjkcodecs.euc_jp',
+
+    # euc_jp_strict codec
+    'euc_jp_strict'      : 'cjkcodecs.euc_jp_strict',
 
     # euc_kr codec
     'euckr'              : 'cjkcodecs.euc_kr',
@@ -142,6 +148,9 @@ aliases.update({
     'shift_jis'          : 'cjkcodecs.shift_jis',
     'sjis'               : 'cjkcodecs.shift_jis',
     's_jis'              : 'cjkcodecs.shift_jis',
+
+    # shift_jis_strict codec
+    'shift_jis_strict'   : 'cjkcodecs.shift_jis_strict',
 
     # shift_jisx0213 codec
     'shiftjisx0213'      : 'cjkcodecs.shift_jisx0213',
